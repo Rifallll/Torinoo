@@ -16,7 +16,8 @@ import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
 import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
-import WeatherCard from '@/components/WeatherCard'; // Import the new WeatherCard component
+import WeatherCard from '@/components/WeatherCard';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'; // Import Recharts components
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,10 +33,14 @@ const TorinoDashboard = () => {
     activeSensors: 12,
   };
 
-  const trafficFlowPrediction = [
-    { area: "Main Street", time: "07:00-09:00", congestion: "Low Congestion", badgeClass: "bg-green-100 text-green-600" },
-    { area: "Oak Avenue", time: "07:00-09:00", congestion: "Moderate Congestion", badgeClass: "bg-yellow-100 text-yellow-600" },
-    { area: "Pine Road", time: "07:00-09:00", congestion: "High Congestion", badgeClass: "bg-red-100 text-red-600" },
+  // Adjusted dummy data for traffic flow prediction to be suitable for a chart
+  const trafficFlowPredictionData = [
+    { name: "Via Roma", "Low Congestion": 80, "Moderate Congestion": 15, "High Congestion": 5 },
+    { name: "Piazza Castello", "Low Congestion": 60, "Moderate Congestion": 30, "High Congestion": 10 },
+    { name: "Corso Vittorio Emanuele II", "Low Congestion": 40, "Moderate Congestion": 40, "High Congestion": 20 },
+    { name: "Main Street", "Low Congestion": 70, "Moderate Congestion": 20, "High Congestion": 10 },
+    { name: "Oak Avenue", "Low Congestion": 50, "Moderate Congestion": 35, "High Congestion": 15 },
+    { name: "Pine Road", "Low Congestion": 30, "Moderate Congestion": 45, "High Congestion": 25 },
   ];
 
   return (
@@ -120,18 +125,31 @@ const TorinoDashboard = () => {
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Flow Prediction</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Based on historical data and real-time sensor input, here are the traffic flow predictions for the next hour:
-                  </p>
-                  <div className="space-y-2">
-                    {trafficFlowPrediction.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
-                        <span>{item.area} ({item.time})</span>
-                        <Badge variant="outline" className={item.badgeClass}>{item.congestion}</Badge>
-                      </div>
-                    ))}
-                  </div>
+                <CardContent className="h-[300px]"> {/* Set a fixed height for the chart */}
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={trafficFlowPredictionData}
+                      margin={{
+                        top: 20,
+                        right: 30,
+                        left: 0,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="name" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Bar dataKey="Low Congestion" stackId="a" fill="#82ca9d" name="Low" />
+                      <Bar dataKey="Moderate Congestion" stackId="a" fill="#ffc658" name="Moderate" />
+                      <Bar dataKey="High Congestion" stackId="a" fill="#ff7300" name="High" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
 
