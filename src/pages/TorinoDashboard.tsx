@@ -40,8 +40,8 @@ const TorinoDashboard = () => {
     <div className="flex h-screen overflow-hidden">
       <TorinoSidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TorinoHeader setIsSidebarOpen={setIsSidebarOpen} />
+      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-200 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+        <TorinoHeader setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

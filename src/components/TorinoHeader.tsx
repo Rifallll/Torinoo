@@ -1,16 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Menu, X } from 'lucide-react'; // Import Menu and X icons
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from './ThemeToggle'; // Import ThemeToggle
 
 interface TorinoHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
+  isSidebarOpen: boolean; // Add isSidebarOpen prop
 }
 
-const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen }) => {
+const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebarOpen }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
@@ -35,21 +36,10 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
-              onClick={() => setIsSidebarOpen(true)}
+              className="mr-2" // Remove md:hidden, make it always visible
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} // Toggle sidebar state
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />} {/* Change icon based on state */}
             </Button>
             <h2 className="ml-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Torino Traffic Dashboard</h2>
             <div className="ml-6 text-sm text-gray-500 dark:text-gray-400 hidden md:block">
@@ -65,8 +55,7 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen }) => {
               <Bell className="h-6 w-6" />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">3</span>
             </Button>
-            <ThemeToggle /> {/* Add ThemeToggle here */}
-            {/* Dropdown menu Admin dihapus */}
+            <ThemeToggle />
           </div>
         </div>
       </div>
