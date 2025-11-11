@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter } from 'lucide-react';
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge } from 'lucide-react'; // Added Gauge
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,9 +17,10 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
-import ActiveIncidentsSummary from '@/components/ActiveIncidentsSummary'; // Import the new component
+import ActiveIncidentsSummary from '@/components/ActiveIncidentsSummary';
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart'; // Import the new component
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Import LineChart and Line
+import SensorStatusOverviewCard from '@/components/SensorStatusOverviewCard'; // Import the new component
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -145,22 +146,19 @@ const TorinoDashboard = () => {
                   <TorinoMapComponent />
                 </CardContent>
               </Card>
-              {/* New Traffic Speed Distribution Chart */}
               <TrafficSpeedDistributionChart />
             </div>
 
             <div className="space-y-6">
-              {/* New Weather Card */}
               <WeatherCard />
-
-              {/* New Active Incidents Summary Card */}
               <ActiveIncidentsSummary />
+              <SensorStatusOverviewCard /> {/* New Sensor Status Overview Card */}
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Flow Prediction</CardTitle>
                 </CardHeader>
-                <CardContent className="h-[300px]"> {/* Set a fixed height for the chart */}
+                <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={trafficFlowPredictionData}
@@ -188,7 +186,6 @@ const TorinoDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* New Card for Traffic Volume Trends */}
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Volume Trends (Last 24 Hours)</CardTitle>
