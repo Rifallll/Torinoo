@@ -11,9 +11,13 @@ const educationResearch = [
   { label: "Research institutions", value: "INRIM (National Institute of Metrological Research), CNR Torino." },
 ];
 
-const EducationResearchSection: React.FC = () => {
+interface EducationResearchSectionProps {
+  id?: string;
+}
+
+const EducationResearchSection: React.FC<EducationResearchSectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <GraduationCap className="h-5 w-5 mr-2 text-indigo-600" /> Education & Research

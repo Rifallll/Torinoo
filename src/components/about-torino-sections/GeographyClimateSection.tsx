@@ -15,9 +15,13 @@ const geographyClimate = [
   { label: "Annual Rainfall", value: "±850 mm." },
 ];
 
-const GeographyClimateSection: React.FC = () => {
+interface GeographyClimateSectionProps {
+  id?: string;
+}
+
+const GeographyClimateSection: React.FC<GeographyClimateSectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <MapPin className="h-5 w-5 mr-2 text-orange-600" /> Geography & Climate

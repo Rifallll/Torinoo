@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import GlobalCommandPalette from './GlobalCommandPalette'; // Import the new component
 
 interface TorinoHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -12,6 +13,7 @@ interface TorinoHeaderProps {
 
 const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebarOpen }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false); // State for command palette
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -45,14 +47,18 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
           </div>
 
           <div className="flex items-center flex-1 justify-center space-x-4">
-            <div className="relative flex-grow max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                type="text"
-                placeholder="Search"
-                className="w-full bg-white text-gray-900 rounded-full pl-10 pr-4 py-2 border-none focus:ring-2 focus:ring-blue-300"
-              />
-            </div>
+            {/* Search button to open command palette */}
+            <Button
+              variant="ghost"
+              className="flex items-center text-white hover:bg-blue-700 px-4 py-2 rounded-full"
+              onClick={() => setIsCommandPaletteOpen(true)}
+            >
+              <Search className="h-4 w-4 mr-2" />
+              <span className="text-sm hidden md:inline">Search...</span>
+              <kbd className="ml-4 hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-blue-900 px-1.5 font-mono text-[10px] font-medium text-white opacity-100">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
           </div>
 
           <div className="flex items-center space-x-6 text-white">
@@ -63,6 +69,7 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
           </div>
         </div>
       </div>
+      <GlobalCommandPalette open={isCommandPaletteOpen} setOpen={setIsCommandPaletteOpen} />
     </header>
   );
 };

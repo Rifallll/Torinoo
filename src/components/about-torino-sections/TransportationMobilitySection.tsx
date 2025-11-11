@@ -23,9 +23,13 @@ const mobilityStatistics = [
   { label: "Average congestion level", value: "28%." },
 ];
 
-const TransportationMobilitySection: React.FC = () => {
+interface TransportationMobilitySectionProps {
+  id?: string;
+}
+
+const TransportationMobilitySection: React.FC<TransportationMobilitySectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Car className="h-5 w-5 mr-2 text-red-600" /> Transportation & Mobility

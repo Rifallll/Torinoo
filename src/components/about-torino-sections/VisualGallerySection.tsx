@@ -11,9 +11,13 @@ const visualGalleryImages = [
   { src: "https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", alt: "Egyptian Museum, Torino" },
 ];
 
-const VisualGallerySection: React.FC = () => {
+interface VisualGallerySectionProps {
+  id?: string;
+}
+
+const VisualGallerySection: React.FC<VisualGallerySectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 lg:col-span-2 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 lg:col-span-2 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <ImageIcon className="h-5 w-5 mr-2 text-teal-600" /> Visual Gallery

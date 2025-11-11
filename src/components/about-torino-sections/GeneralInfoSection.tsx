@@ -22,9 +22,13 @@ const generalInfo = [
   { label: "City Nicknames", value: "“La Città dell’Automobile” (The Automotive City), “La Capitale Sabauda” (The Savoy Capital)" },
 ];
 
-const GeneralInfoSection: React.FC = () => {
+interface GeneralInfoSectionProps {
+  id?: string;
+}
+
+const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Globe className="h-5 w-5 mr-2 text-blue-600" /> General Information

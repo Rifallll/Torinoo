@@ -13,9 +13,13 @@ const smartCityInitiatives = [
   "Smart Road Project: road sensor & autonomous vehicle trials.",
 ];
 
-const SmartCityInitiativesSection: React.FC = () => {
+interface SmartCityInitiativesSectionProps {
+  id?: string;
+}
+
+const SmartCityInitiativesSection: React.FC<SmartCityInitiativesSectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Lightbulb className="h-5 w-5 mr-2 text-lime-600" /> Smart City Initiatives

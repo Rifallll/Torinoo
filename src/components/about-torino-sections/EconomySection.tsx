@@ -14,9 +14,13 @@ const economyData = [
   { label: "Main exports", value: "Vehicles, industrial machinery, design products, and chocolate (Ferrero)." },
 ];
 
-const EconomySection: React.FC = () => {
+interface EconomySectionProps {
+  id?: string;
+}
+
+const EconomySection: React.FC<EconomySectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <DollarSign className="h-5 w-5 mr-2 text-yellow-600" /> Economy

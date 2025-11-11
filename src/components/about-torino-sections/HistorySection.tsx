@@ -15,9 +15,13 @@ const historyData = [
   { period: "Present", event: "A city of universities, culture, and green technology innovation." },
 ];
 
-const HistorySection: React.FC = () => {
+interface HistorySectionProps {
+  id?: string;
+}
+
+const HistorySection: React.FC<HistorySectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <History className="h-5 w-5 mr-2 text-purple-600" /> Brief History

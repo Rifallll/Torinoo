@@ -33,44 +33,44 @@ const AboutTorinoTabs: React.FC = () => {
       </TabsList>
 
       <div className="mt-6 space-y-8">
-        <TabsContent value="overview">
+        <TabsContent value="overview" id="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <GeneralInfoSection />
-            <DemographicsSection />
-            <SummaryTableSection />
-            <QuotesMottoSection />
+            <GeneralInfoSection id="general-info" />
+            <DemographicsSection id="demographics" />
+            <SummaryTableSection id="summary-table" />
+            <QuotesMottoSection id="quotes-motto" />
           </div>
         </TabsContent>
 
-        <TabsContent value="history-governance">
+        <TabsContent value="history-governance" id="history-governance">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <HistorySection />
-            <GovernmentInfoSection />
+            <HistorySection id="history" />
+            <GovernmentInfoSection id="government-info" />
           </div>
         </TabsContent>
 
-        <TabsContent value="geography-climate">
-          <GeographyClimateSection />
+        <TabsContent value="geography-climate" id="geography-climate">
+          <GeographyClimateSection id="geography-climate-section" />
         </TabsContent>
 
-        <TabsContent value="economy-innovation">
+        <TabsContent value="economy-innovation" id="economy-innovation">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <EconomySection />
-            <EducationResearchSection />
-            <SmartCityInitiativesSection />
+            <EconomySection id="economy" />
+            <EducationResearchSection id="education-research" />
+            <SmartCityInitiativesSection id="smart-city-initiatives" />
           </div>
         </TabsContent>
 
-        <TabsContent value="culture-lifestyle">
+        <TabsContent value="culture-lifestyle" id="culture-lifestyle">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CultureTourismSection />
-            <CuisineSection />
-            <VisualGallerySection />
+            <CultureTourismSection id="culture-tourism-section" />
+            <CuisineSection id="cuisine" />
+            <VisualGallerySection id="visual-gallery" />
           </div>
         </TabsContent>
 
-        <TabsContent value="transportation">
-          <TransportationMobilitySection />
+        <TabsContent value="transportation" id="transportation">
+          <TransportationMobilitySection id="transportation-mobility" />
         </TabsContent>
       </div>
     </Tabs>

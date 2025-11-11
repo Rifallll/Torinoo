@@ -22,9 +22,13 @@ const festivalsEvents = [
   "Salone dell’Auto",
 ];
 
-const CultureTourismSection: React.FC = () => {
+interface CultureTourismSectionProps {
+  id?: string;
+}
+
+const CultureTourismSection: React.FC<CultureTourismSectionProps> = ({ id }) => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg" id={id}>
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Palette className="h-5 w-5 mr-2 text-pink-600" /> Culture & Tourism
