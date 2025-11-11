@@ -9,7 +9,8 @@ const TrafficCongestionCard: React.FC = () => {
   // Dummy data for congestion level
   const congestionLevel = 45; // Percentage
   const congestionStatus = congestionLevel < 30 ? "Low" : congestionLevel < 60 ? "Moderate" : "High";
-  const trend = "increasing"; // dummy: can be 'increasing', 'decreasing', 'stable'
+  // Explicitly define the type for 'trend' to allow all possible string literal values
+  const trend: "increasing" | "decreasing" | "stable" = "increasing"; // dummy: can be 'increasing', 'decreasing', 'stable'
 
   const getStatusColor = (level: number) => {
     if (level < 30) return "text-green-600";
@@ -57,7 +58,7 @@ const TrafficCongestionCard: React.FC = () => {
               {trend.charAt(0).toUpperCase() + trend.slice(1)}
             </span>
           </div>
-        </div
+        </div> {/* Fixed: Added closing tag for div */}
       </CardContent>
     </Card>
   );
