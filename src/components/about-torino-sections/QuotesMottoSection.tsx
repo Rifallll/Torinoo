@@ -11,16 +11,16 @@ const quotesMotto = [
 
 const QuotesMottoSection: React.FC = () => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold flex items-center">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Quote className="h-5 w-5 mr-2 text-gray-600" /> Quotes & Motto
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2 text-gray-700 dark:text-gray-300 italic">
+      <CardContent className="p-4">
+        <div className="space-y-3 text-gray-700 dark:text-gray-300 italic text-lg">
           {quotesMotto.map((quote, index) => (
-            <p key={index}>&ldquo;{quote.replace(/“|”/g, '')}&rdquo;</p>
+            <p key={index} className="leading-relaxed">&ldquo;{quote.replace(/“|”/g, '')}&rdquo;</p>
           ))}
         </div>
       </CardContent>

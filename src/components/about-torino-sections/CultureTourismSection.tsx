@@ -24,37 +24,37 @@ const festivalsEvents = [
 
 const CultureTourismSection: React.FC = () => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold flex items-center">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Palette className="h-5 w-5 mr-2 text-pink-600" /> Culture & Tourism
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 p-0">
         <div>
-          <h3 className="text-lg font-semibold mb-2">Main Landmarks</h3>
+          <h3 className="text-lg font-semibold mb-2 px-4 pt-4 text-gray-800 dark:text-gray-100">Main Landmarks</h3>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-1/3">Name</TableHead>
-                <TableHead>Description</TableHead>
+              <TableRow className="border-b">
+                <TableHead className="w-1/3 py-3 px-4 text-gray-600 dark:text-gray-400">Name</TableHead>
+                <TableHead className="py-3 px-4 text-gray-600 dark:text-gray-400">Description</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {landmarkData.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
+                <TableRow key={index} className="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <TableCell className="font-medium py-3 px-4 text-gray-700 dark:text-gray-300">{item.name}</TableCell>
+                  <TableCell className="py-3 px-4 text-gray-800 dark:text-gray-200">{item.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-2">Festivals & Events</h3>
-          <ul className="list-disc list-inside pl-4 space-y-1 text-gray-700 dark:text-gray-300">
+          <h3 className="text-lg font-semibold mb-2 px-4 pt-4 text-gray-800 dark:text-gray-100">Festivals & Events</h3>
+          <ul className="list-disc list-inside pl-8 pb-4 space-y-1 text-gray-700 dark:text-gray-300">
             {festivalsEvents.map((event, index) => (
-              <li key={index}>{event}</li>
+              <li key={index} className="py-1">{event}</li>
             ))}
           </ul>
         </div>

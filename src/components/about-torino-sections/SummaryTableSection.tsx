@@ -19,25 +19,25 @@ const summaryTableData = [
 
 const SummaryTableSection: React.FC = () => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold flex items-center">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Info className="h-5 w-5 mr-2 text-blue-600" /> Quick Statistics
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-1/2">Indicator</TableHead>
-              <TableHead className="w-1/2">Value</TableHead>
+            <TableRow className="border-b">
+              <TableHead className="w-1/2 py-3 px-4 text-gray-600 dark:text-gray-400">Indicator</TableHead>
+              <TableHead className="w-1/2 py-3 px-4 text-gray-600 dark:text-gray-400">Value</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {summaryTableData.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{item.indicator}</TableCell>
-                <TableCell>{item.value}</TableCell>
+              <TableRow key={index} className="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <TableCell className="font-medium py-3 px-4 text-gray-700 dark:text-gray-300">{item.indicator}</TableCell>
+                <TableCell className="py-3 px-4 text-gray-800 dark:text-gray-200">{item.value}</TableCell>
               </TableRow>
             ))}
           </TableBody>

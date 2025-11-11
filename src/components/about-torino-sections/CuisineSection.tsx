@@ -15,25 +15,25 @@ const cuisineData = [
 
 const CuisineSection: React.FC = () => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold flex items-center">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <Utensils className="h-5 w-5 mr-2 text-brown-600" /> Torino's Signature Cuisine
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-1/3">Food / Drink</TableHead>
-              <TableHead>Description</TableHead>
+            <TableRow className="border-b">
+              <TableHead className="w-1/3 py-3 px-4 text-gray-600 dark:text-gray-400">Food / Drink</TableHead>
+              <TableHead className="py-3 px-4 text-gray-600 dark:text-gray-400">Description</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {cuisineData.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{item.item}</TableCell>
-                <TableCell>{item.description}</TableCell>
+              <TableRow key={index} className="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <TableCell className="font-medium py-3 px-4 text-gray-700 dark:text-gray-300">{item.item}</TableCell>
+                <TableCell className="py-3 px-4 text-gray-800 dark:text-gray-200">{item.description}</TableCell>
               </TableRow>
             ))}
           </TableBody>

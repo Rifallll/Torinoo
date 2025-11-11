@@ -17,25 +17,25 @@ const historyData = [
 
 const HistorySection: React.FC = () => {
   return (
-    <Card className="dark:bg-gray-800 dark:text-gray-200">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold flex items-center">
+    <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
           <History className="h-5 w-5 mr-2 text-purple-600" /> Brief History
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[150px]">Period</TableHead>
-              <TableHead>Event</TableHead>
+            <TableRow className="border-b">
+              <TableHead className="w-[150px] py-3 px-4 text-gray-600 dark:text-gray-400">Period</TableHead>
+              <TableHead className="py-3 px-4 text-gray-600 dark:text-gray-400">Event</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {historyData.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{item.period}</TableCell>
-                <TableCell>{item.event}</TableCell>
+              <TableRow key={index} className="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <TableCell className="font-medium py-3 px-4 text-gray-700 dark:text-gray-300">{item.period}</TableCell>
+                <TableCell className="py-3 px-4 text-gray-800 dark:text-gray-200">{item.event}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -23,13 +23,13 @@ import SummaryTableSection from '@/components/about-torino-sections/SummaryTable
 const AboutTorinoTabs: React.FC = () => {
   return (
     <Tabs defaultValue="overview" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto flex-wrap">
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="history-governance">History & Governance</TabsTrigger>
-        <TabsTrigger value="geography-climate">Geography & Climate</TabsTrigger>
-        <TabsTrigger value="economy-innovation">Economy & Innovation</TabsTrigger>
-        <TabsTrigger value="culture-lifestyle">Culture & Lifestyle</TabsTrigger>
-        <TabsTrigger value="transportation">Transportation</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto flex-wrap bg-gray-100 dark:bg-gray-800 p-1 rounded-lg shadow-inner">
+        <TabsTrigger value="overview" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Overview</TabsTrigger>
+        <TabsTrigger value="history-governance" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">History & Governance</TabsTrigger>
+        <TabsTrigger value="geography-climate" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Geography & Climate</TabsTrigger>
+        <TabsTrigger value="economy-innovation" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Economy & Innovation</TabsTrigger>
+        <TabsTrigger value="culture-lifestyle" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Culture & Lifestyle</TabsTrigger>
+        <TabsTrigger value="transportation" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">Transportation</TabsTrigger>
       </TabsList>
 
       <div className="mt-6 space-y-8">
