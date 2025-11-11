@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import TrafficDashboard from "./pages/TrafficDashboard";
-import NewsPortal from "./pages/NewsPortal"; // Import the new NewsPortal
+import NewsPortal from "./pages/NewsPortal";
+import SensorManagement from "./pages/SensorManagement"; // Import the new SensorManagement page
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,7 +19,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<TrafficDashboard />} />
-          <Route path="/news" element={<NewsPortal />} /> {/* New News Portal route */}
+          <Route path="/news" element={<NewsPortal />} />
+          <Route path="/sensors" element={<SensorManagement />} /> {/* New Sensor Management route */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
