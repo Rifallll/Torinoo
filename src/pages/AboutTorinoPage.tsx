@@ -6,21 +6,8 @@ import { ArrowLeft, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// Import modular sections
-import GeneralInfoSection from '@/components/about-torino-sections/GeneralInfoSection';
-import GovernmentInfoSection from '@/components/about-torino-sections/GovernmentInfoSection';
-import HistorySection from '@/components/about-torino-sections/HistorySection';
-import GeographyClimateSection from '@/components/about-torino-sections/GeographyClimateSection';
-import TransportationMobilitySection from '@/components/about-torino-sections/TransportationMobilitySection';
-import EconomySection from '@/components/about-torino-sections/EconomySection';
-import EducationResearchSection from '@/components/about-torino-sections/EducationResearchSection';
-import CultureTourismSection from '@/components/about-torino-sections/CultureTourismSection';
-import CuisineSection from '@/components/about-torino-sections/CuisineSection';
-import VisualGallerySection from '@/components/about-torino-sections/VisualGallerySection';
-import DemographicsSection from '@/components/about-torino-sections/DemographicsSection';
-import SmartCityInitiativesSection from '@/components/about-torino-sections/SmartCityInitiativesSection';
-import QuotesMottoSection from '@/components/about-torino-sections/QuotesMottoSection';
-import SummaryTableSection from '@/components/about-torino-sections/SummaryTableSection';
+// Import the new tabbed component
+import AboutTorinoTabs from '@/components/AboutTorinoTabs';
 
 const AboutTorinoPage = () => {
   return (
@@ -56,20 +43,8 @@ const AboutTorinoPage = () => {
           </CardContent>
         </Card>
 
-        <GeneralInfoSection />
-        <GovernmentInfoSection />
-        <HistorySection />
-        <GeographyClimateSection />
-        <TransportationMobilitySection />
-        <EconomySection />
-        <EducationResearchSection />
-        <CultureTourismSection />
-        <CuisineSection />
-        <VisualGallerySection />
-        <DemographicsSection />
-        <SmartCityInitiativesSection />
-        <QuotesMottoSection />
-        <SummaryTableSection />
+        {/* Render the new tabbed content */}
+        <AboutTorinoTabs />
       </main>
     </div>
   );
