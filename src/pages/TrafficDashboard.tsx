@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Globe } from 'lucide-react'; // Added Globe icon
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity } from 'lucide-react'; // Removed Globe icon
 import MapComponent from '@/components/MapComponent';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { Button } from '@/components/ui/button';
@@ -99,10 +99,6 @@ const TrafficDashboard = () => {
           <Link to="/reports" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
             <BarChart2 className="h-5 w-5 mr-3" />
             Reports
-          </Link>
-          <Link to="/torino-map" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
-            <Globe className="h-5 w-5 mr-3" /> {/* New link */}
-            Torino Data Map
           </Link>
         </nav>
 
@@ -299,6 +295,7 @@ const TrafficDashboard = () => {
                             <TableCell>
                               <div className="text-sm text-gray-900">{incident.assignedTo}</div>
                               <div className="text-sm text-gray-500">Traffic Sensor</div>
+                            </div>
                             </TableCell>
                             <TableCell className="text-sm text-gray-500">
                               {incident.location.split(', ')[1]}
