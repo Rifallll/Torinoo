@@ -1,10 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, Menu, X } from 'lucide-react'; // Import Menu and X icons
+import { Search, Menu, X, ChevronDown } from 'lucide-react'; // Import Menu, X, and ChevronDown icons
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ThemeToggle } from './ThemeToggle'; // Import ThemeToggle
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TorinoHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -22,40 +27,58 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
   }, []);
 
   const formattedDate = currentDateTime.toLocaleDateString('id-ID', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    weekday: 'long', month: 'long', day: 'numeric'
   });
   const formattedTime = currentDateTime.toLocaleTimeString('id-ID', {
-    hour: '2-digit', minute: '2-digit', second: '2-digit'
+    hour: '2-digit', minute: '2-digit', hour12: true
   });
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm z-20">
+    <header className="bg-blue-800 shadow-sm z-20">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Button
               variant="ghost"
               size="icon"
-              className="mr-2" // Remove md:hidden, make it always visible
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)} // Toggle sidebar state
+              className="mr-2 text-white hover:bg-blue-700"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
-              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />} {/* Change icon based on state */}
+              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <h2 className="ml-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Torino Traffic Dashboard</h2>
-            <div className="ml-6 text-sm text-gray-500 dark:text-gray-400 hidden md:block">
-              {formattedDate}, {formattedTime}
+            <h2 className="ml-4 text-2xl font-bold text-white">Torino</h2> {/* Changed to match image style */}
+          </div>
+
+          <div className="flex items-center flex-1 justify-center space-x-4">
+            <div className="relative flex-grow max-w-md"> {/* Adjusted width for search bar */}
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                type="text"
+                placeholder="Search"
+                className="w-full bg-white text-gray-900 rounded-full pl-10 pr-4 py-2 border-none focus:ring-2 focus:ring-blue-300"
+              />
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input type="text" placeholder="Search..." className="pl-10 pr-4 py-2" />
+
+          <div className="flex items-center space-x-6 text-white">
+            <Button variant="link" className="text-white hover:text-gray-200 p-0 h-auto">Go to Grid</Button>
+            <Button variant="link" className="text-white hover:text-gray-200 p-0 h-auto">Go to Map</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="link" className="text-white hover:text-gray-200 p-0 h-auto flex items-center">
+                  Change City <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="z-50">
+                <DropdownMenuItem>Torino</DropdownMenuItem>
+                <DropdownMenuItem>Milan</DropdownMenuItem>
+                <DropdownMenuItem>Rome</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="text-right">
+              <p className="text-sm">{formattedDate}</p>
+              <p className="text-2xl font-bold">{formattedTime}</p>
             </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-6 w-6" />
-              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">3</span>
-            </Button>
-            <ThemeToggle />
           </div>
         </div>
       </div>
