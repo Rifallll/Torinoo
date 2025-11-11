@@ -131,7 +131,10 @@ const TorinoDashboard = () => {
                       </div>
                     ))}
                   </div>
-                  <Button className="mt-4 w-full" onClick={() => setIsTrafficAnalysisModalOpen(true)}>Lihat Prakiraan Detail</Button>
+                  {/* Removed the button and replaced with plain text */}
+                  <p className="text-sm text-gray-500 mt-4">
+                    Untuk prakiraan detail, silakan lihat bagian laporan.
+                  </p>
                 </CardContent>
               </Card>
 
