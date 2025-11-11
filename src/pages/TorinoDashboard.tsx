@@ -12,7 +12,7 @@ import TorinoMapComponent from '@/components/TorinoMapComponent';
 import TorinoSidebar from '@/components/TorinoSidebar';
 import TorinoHeader from '@/components/TorinoHeader';
 import UploadCSVModal from '@/components/modals/UploadCSVModal';
-import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal'; // Diaktifkan kembali
+import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
 import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 
@@ -152,7 +152,7 @@ const TorinoDashboard = () => {
                       <Link to="/about-torino" className="flex flex-col items-center justify-center">
                         <Info className="h-6 w-6 text-yellow-600 mb-2" />
                         <span className="text-sm font-medium text-yellow-600">Tentang Kota Torino</span>
-                      </div>
+                      </Link> {/* Corrected closing tag */}
                     </Button>
                     <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto" onClick={() => setIsExportModalOpen(true)}>
                       <div className="flex flex-col items-center justify-center">
