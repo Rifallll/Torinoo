@@ -4,7 +4,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, HelpCircle, User
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, HelpCircle, User, Palette // Added Palette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -14,12 +14,19 @@ interface TorinoSidebarProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
 }
 
+interface SubNavItem {
+  label: string;
+  path: string;
+  icon: React.ElementType;
+  onClick?: () => void; // Added optional onClick for sub-items
+}
+
 interface NavItemConfig {
   label: string;
   icon: React.ElementType;
   isCategory?: boolean;
   path?: string;
-  subItems?: { label: string; path: string; icon: React.ElementType }[];
+  subItems?: SubNavItem[]; // Updated to use SubNavItem interface
   onClick?: () => void;
 }
 

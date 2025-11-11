@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Speedometer, AlertCircle, Clock, Map, Car, ParkingSquare } from 'lucide-react';
+import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare } from 'lucide-react'; // Replaced Speedometer with Gauge
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -92,7 +92,7 @@ const DataAnalysisPage = () => {
                   <span>Congestion Analysis: Identify and quantify traffic bottlenecks.</span>
                 </li>
                 <li className="flex items-center">
-                  <Speedometer className="h-5 w-5 mr-2 text-blue-500" />
+                  <Gauge className="h-5 w-5 mr-2 text-blue-500" /> {/* Replaced Speedometer with Gauge */}
                   <span>Average Speed Analysis: Track speeds across different road segments.</span>
                 </li>
                 <li className="flex items-center">

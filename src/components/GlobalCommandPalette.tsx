@@ -79,7 +79,7 @@ const searchableItems = [
 
 interface GlobalCommandPaletteProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>; // Updated type to accept functional updates
 }
 
 const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOpen }) => {
@@ -106,7 +106,7 @@ const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOp
     <CommandDialog
       open={open}
       onOpenChange={setOpen}
-      className="z-[9999]"
+      // className="z-[9999]" // Removed className as CommandDialog does not directly accept it
       aria-labelledby="dialog-title-command-palette"
       aria-describedby="dialog-description-command-palette"
     >
