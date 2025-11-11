@@ -28,9 +28,9 @@ const FilterDropdowns: React.FC = () => {
           <DropdownMenuLabel>Filter Waktu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => { setTimeFilter('all'); applyFilter('Waktu', 'Semua'); }}>Semua</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setTimeFilter('morning'); applyFilter('Waktu', 'Pagi'); }}>Pagi (06:00-10:00)</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setTimeFilter('morning'); applyFilter('Waktu', 'Pagi (06:00-10:00)'); }}>Pagi (06:00-10:00)</DropdownMenuItem>
           <DropdownMenuItem onClick={() => { setTimeFilter('day'); applyFilter('Waktu', 'Siang (10:00-17:00)'); }}>Siang (10:00-17:00)</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setTimeFilter('evening'); applyFilter('Waktu', 'Sore (17:00-20:00)'); }}>Sore (17:00-20:00)</DropdownM
+          <DropdownMenuItem onClick={() => { setTimeFilter('evening'); applyFilter('Waktu', 'Sore (17:00-20:00)'); }}>Sore (17:00-20:00)</DropdownMenuItem>
           <DropdownMenuItem onClick={() => { setTimeFilter('night'); applyFilter('Waktu', 'Malam (20:00-06:00)'); }}>Malam (20:00-06:00)</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
