@@ -44,51 +44,51 @@ const TorinoDashboard = () => {
       <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-200 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
         <TorinoHeader setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Total Incidents</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Incidents</CardTitle>
                 <AlertTriangle className="h-4 w-4 text-indigo-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dummyStats.totalIncidents}</div>
+                <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{dummyStats.totalIncidents}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <span className="text-green-600 font-medium">+12%</span> from last month
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Resolved</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Resolved</CardTitle>
                 <Car className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dummyStats.resolvedIncidents}</div>
+                <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{dummyStats.resolvedIncidents}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <span className="text-green-600 font-medium">+8%</span> from last month
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Pending</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Pending</CardTitle>
                 <Clock className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dummyStats.pendingIncidents}</div>
+                <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{dummyStats.pendingIncidents}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <span className="text-red-600 font-medium">-3%</span> from last month
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500">Active Sensors</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Sensors</CardTitle>
                 <Activity className="h-4 w-4 text-purple-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dummyStats.activeSensors}</div>
+                <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{dummyStats.activeSensors}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <span className="text-green-600 font-medium">+2</span> new sensors
                 </p>
@@ -98,9 +98,9 @@ const TorinoDashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card>
+              <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-gray-800">Torino Traffic Map</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Torino Traffic Map</CardTitle>
                   <div className="flex space-x-2">
                     <FilterDropdowns />
                   </div>
@@ -112,17 +112,17 @@ const TorinoDashboard = () => {
             </div>
 
             <div className="space-y-6">
-              <Card>
+              <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-800">Traffic Flow Prediction</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Flow Prediction</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Based on historical data and real-time sensor input, here are the traffic flow predictions for the next hour:
                   </p>
                   <div className="space-y-2">
                     {trafficFlowPrediction.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
+                      <div key={index} className="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
                         <span>{item.area} ({item.time})</span>
                         <Badge variant="outline" className={item.badgeClass}>{item.congestion}</Badge>
                       </div>
@@ -131,9 +131,9 @@ const TorinoDashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-800">Quick Actions</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
