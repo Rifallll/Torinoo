@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/command";
 import {
   DialogDescription,
-  DialogHeader,
+  DialogHeader, // Keep import for potential future use or if other dialogs need it
   DialogTitle,
-} from "@/components/ui/dialog"; // Import Dialog components for accessibility
+} from "@/components/ui/dialog";
 import {
   LayoutDashboard,
   Newspaper,
@@ -104,11 +104,9 @@ const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOp
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen} className="z-[9999]">
-      {/* Add DialogHeader, DialogTitle, and DialogDescription for accessibility */}
-      <DialogHeader className="sr-only">
-        <DialogTitle>Command Palette</DialogTitle>
-        <DialogDescription>Search for commands or navigate the application.</DialogDescription>
-      </DialogHeader>
+      {/* Directly place DialogTitle and DialogDescription as children of CommandDialog */}
+      <DialogTitle className="sr-only">Command Palette</DialogTitle>
+      <DialogDescription className="sr-only">Search for commands or navigate the application.</DialogDescription>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
