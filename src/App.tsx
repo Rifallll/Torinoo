@@ -16,8 +16,9 @@ const IncidentDetailPage = React.lazy(() => import("./pages/IncidentDetailPage")
 const ReportsPage = React.lazy(() => import("./pages/ReportsPage"));
 const DataAnalysisPage = React.lazy(() => import("./pages/DataAnalysisPage"));
 const AboutTorinoPage = React.lazy(() => import("./pages/AboutTorinoPage"));
-const CultureTourismPage = React.lazy(() => import("./pages/CultureTourismPage")); // New page
-const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollaborationPage")); // New page
+const CultureTourismPage = React.lazy(() => import("./pages/CultureTourismPage"));
+const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollaborationPage"));
+const WeatherPage = React.lazy(() => import("./pages/WeatherPage")); // Import WeatherPage
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -32,7 +33,7 @@ const App = () => (
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
-                <Route path="/" element={<HomePage />} /> {/* Set HomePage as default */}
+                <Route path="/" element={<HomePage />} />
                 <Route path="/torino-dashboard" element={<TorinoDashboard />} />
                 <Route path="/news" element={<NewsPortal />} />
                 <Route path="/sensors" element={<SensorsPage />} />
@@ -41,8 +42,9 @@ const App = () => (
                 <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/data-analysis" element={<DataAnalysisPage />} />
                 <Route path="/about-torino" element={<AboutTorinoPage />} />
-                <Route path="/culture-tourism" element={<CultureTourismPage />} /> {/* New route */}
-                <Route path="/contact-collaboration" element={<ContactCollaborationPage />} /> {/* New route */}
+                <Route path="/culture-tourism" element={<CultureTourismPage />} />
+                <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
+                <Route path="/weather" element={<WeatherPage />} /> {/* New route for WeatherPage */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
