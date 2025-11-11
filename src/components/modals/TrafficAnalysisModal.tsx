@@ -3,7 +3,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Car, Clock, MapPin, Speedometer } from 'lucide-react';
+import { Car, Clock, MapPin, Gauge } from 'lucide-react'; // Mengganti Speedometer dengan Gauge
 
 interface TrafficAnalysisModalProps {
   isOpen: boolean;
@@ -32,7 +32,7 @@ const TrafficAnalysisModal: React.FC<TrafficAnalysisModalProps> = ({ isOpen, onC
             <strong>Area Paling Padat:</strong> Via Roma, Piazza Castello, Corso Vittorio Emanuele II
           </div>
           <div className="flex items-center">
-            <Speedometer className="mr-2 h-5 w-5 text-green-600" />
+            <Gauge className="mr-2 h-5 w-5 text-green-600" /> {/* Menggunakan ikon Gauge */}
             <strong>Kecepatan Rata-rata:</strong> 24 km/jam
           </div>
           <p className="text-sm text-gray-500 mt-2">
