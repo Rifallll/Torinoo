@@ -20,12 +20,12 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
     return () => clearInterval(timer);
   }, []);
 
-  // Using 'en-US' for English date and time format
+  // Using 'en-US' for English date and time format, with Torino's timezone (Europe/Rome)
   const formattedDate = currentDateTime.toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric'
+    weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Europe/Rome'
   });
   const formattedTime = currentDateTime.toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit', hour12: false // Using 24-hour format
+    hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Rome' // Using 24-hour format
   });
 
   return (
