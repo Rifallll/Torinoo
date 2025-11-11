@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Newspaper, Upload, Info, Download, Filter } from 'lucide-react';
+import { Home, Users, MapPin, BarChart2, Bell, Newspaper, Upload, Info, Download, Filter, Palette, Mail } from 'lucide-react'; // Add Palette and Mail icons
 import { Button } from '@/components/ui/button';
 
 interface TorinoSidebarProps {
@@ -14,16 +14,16 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
   return (
     <div
       id="sidebar"
-      className={`sidebar bg-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
+      className={`sidebar bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 shadow-lg`}
     >
       <div className="flex items-center justify-between px-4">
-        <h1 className="text-xl font-bold text-gray-800">Torino Traffic</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Torino Traffic</h1>
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="md:hidden text-gray-700 dark:text-gray-200"
           onClick={() => setIsSidebarOpen(false)}
         >
           <svg
@@ -42,25 +42,45 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
       </div>
 
       <nav className="px-2 space-y-1">
-        <Link to="/torino-dashboard" className="flex items-center px-4 py-2 text-gray-700 rounded-md bg-gray-100">
+        <Link to="/" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
           <Home className="h-5 w-5 mr-3" />
-          Dashboard
+          Beranda
         </Link>
-        <Link to="/sensors" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+        <Link to="/torino-dashboard" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+          <MapPin className="h-5 w-5 mr-3" />
+          Dashboard Lalu Lintas
+        </Link>
+        <Link to="/sensors" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
           <Users className="h-5 w-5 mr-3" />
-          Sensors
+          Sensor
         </Link>
-        <Link to="/incidents" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+        <Link to="/incidents" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
           <Bell className="h-5 w-5 mr-3" />
-          Incidents
+          Insiden
         </Link>
-        <Link to="/reports" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+        <Link to="/reports" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
           <BarChart2 className="h-5 w-5 mr-3" />
-          Reports
+          Laporan
         </Link>
-        <Link to="/news" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+        <Link to="/news" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
           <Newspaper className="h-5 w-5 mr-3" />
-          News Portal
+          Portal Berita
+        </Link>
+        <Link to="/culture-tourism" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+          <Palette className="h-5 w-5 mr-3" />
+          Budaya & Pariwisata
+        </Link>
+        <Link to="/about-torino" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+          <Info className="h-5 w-5 mr-3" />
+          Tentang Torino
+        </Link>
+        <Link to="/data-analysis" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+          <BarChart2 className="h-5 w-5 mr-3" />
+          Analisis Data
+        </Link>
+        <Link to="/contact-collaboration" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+          <Mail className="h-5 w-5 mr-3" />
+          Kontak & Kolaborasi
         </Link>
       </nav>
     </div>

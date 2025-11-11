@@ -5,6 +5,7 @@ import { Search, Bell, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from './ThemeToggle'; // Import ThemeToggle
 
 interface TorinoHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -28,7 +29,7 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen }) => {
   });
 
   return (
-    <header className="bg-white shadow-sm z-20">
+    <header className="bg-white dark:bg-gray-900 shadow-sm z-20">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -51,8 +52,8 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen }) => {
                 />
               </svg>
             </Button>
-            <h2 className="ml-4 text-xl font-semibold text-gray-700">Torino Traffic Dashboard</h2>
-            <div className="ml-6 text-sm text-gray-500 hidden md:block">
+            <h2 className="ml-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Torino Traffic Dashboard</h2>
+            <div className="ml-6 text-sm text-gray-500 dark:text-gray-400 hidden md:block">
               {formattedDate}, {formattedTime}
             </div>
           </div>
@@ -65,10 +66,11 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen }) => {
               <Bell className="h-6 w-6" />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">3</span>
             </Button>
+            <ThemeToggle /> {/* Add ThemeToggle here */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-2 p-2">
-                  <span className="text-sm font-medium text-gray-700">Admin</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Admin</span>
                   <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin Avatar" />
                 </Button>
               </DropdownMenuTrigger>
