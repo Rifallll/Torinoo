@@ -15,7 +15,8 @@ import UploadCSVModal from '@/components/modals/UploadCSVModal';
 import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
 import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
-import RecentNewsSection from '@/components/RecentNewsSection'; // Import the new component
+import RecentNewsSection from '@/components/RecentNewsSection';
+import WeatherCard from '@/components/WeatherCard'; // Import the new WeatherCard component
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -112,6 +113,9 @@ const TorinoDashboard = () => {
             </div>
 
             <div className="space-y-6">
+              {/* New Weather Card */}
+              <WeatherCard />
+
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Flow Prediction</CardTitle>
