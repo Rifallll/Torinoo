@@ -19,8 +19,6 @@ import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
 import ActiveIncidentsSummary from '@/components/ActiveIncidentsSummary';
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
-import SensorStatusOverviewCard from '@/components/SensorStatusOverviewCard';
-import TrafficCongestionCard from '@/components/TrafficCongestionCard'; // Import the new component
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const TorinoDashboard = () => {
@@ -153,8 +151,8 @@ const TorinoDashboard = () => {
             <div className="space-y-6">
               <WeatherCard />
               <ActiveIncidentsSummary />
-              <SensorStatusOverviewCard />
-              <TrafficCongestionCard /> {/* New Traffic Congestion Card */}
+              {/* Removed SensorStatusOverviewCard */}
+              {/* Removed TrafficCongestionCard */}
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
