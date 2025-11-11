@@ -24,7 +24,7 @@ const FilterDropdowns: React.FC = () => {
             <Filter className="mr-2 h-4 w-4" /> Waktu
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" side="top" className="z-50"> {/* Added side="top" and className="z-50" */}
           <DropdownMenuLabel>Filter Waktu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => { setTimeFilter('all'); applyFilter('Waktu', 'Semua'); }}>Semua</DropdownMenuItem>
@@ -41,7 +41,7 @@ const FilterDropdowns: React.FC = () => {
             <Filter className="mr-2 h-4 w-4" /> Kendaraan
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" side="top" className="z-50"> {/* Added side="top" and className="z-50" */}
           <DropdownMenuLabel>Filter Jenis Kendaraan</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => { setVehicleTypeFilter('all'); applyFilter('Jenis Kendaraan', 'Semua'); }}>Semua</DropdownMenuItem>
@@ -58,7 +58,7 @@ const FilterDropdowns: React.FC = () => {
             <Filter className="mr-2 h-4 w-4" /> Kondisi Jalan
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" side="top" className="z-50"> {/* Added side="top" and className="z-50" */}
           <DropdownMenuLabel>Filter Kondisi Jalan</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => { setRoadConditionFilter('all'); applyFilter('Kondisi Jalan', 'Semua'); }}>Semua</DropdownMenuItem>
