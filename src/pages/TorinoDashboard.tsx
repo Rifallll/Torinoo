@@ -285,7 +285,7 @@ const TorinoDashboard = () => {
 
       {/* Modals */}
       <UploadCSVModal isOpen={isUploadCSVModalOpen} onClose={() => setIsUploadCSVModalOpen(false)} />
-      <TrafficAnalysisModal isOpen={isTrafficAnalysisModalModalOpen} onClose={() => setIsTrafficAnalysisModalOpen(false)} />
+      <TrafficAnalysisModal isOpen={isTrafficAnalysisModalOpen} onClose={() => setIsTrafficAnalysisModalOpen(false)} />
       <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
     </div>
   );
