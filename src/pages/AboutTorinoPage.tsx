@@ -12,12 +12,12 @@ const AboutTorinoPage = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <Info className="h-8 w-8 mr-3 text-indigo-600" />
-          Tentang Kota Torino
+          About the City of Torino
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -25,7 +25,7 @@ const AboutTorinoPage = () => {
       <main className="flex-1 max-w-4xl mx-auto w-full">
         <Card className="dark:bg-gray-800 dark:text-gray-200">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">Torino, Permata Italia Utara</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">Torino, Jewel of Northern Italy</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <img
@@ -34,57 +34,57 @@ const AboutTorinoPage = () => {
               className="w-full h-64 object-cover rounded-md shadow-md"
             />
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              Torino adalah kota besar di Italia utara, ibu kota wilayah Piedmont. Terletak di tepi barat Sungai Po, kota ini dikelilingi oleh pegunungan Alpen di barat dan utara, menawarkan pemandangan yang menakjubkan. Torino dikenal sebagai pusat budaya dan bisnis yang penting, dengan sejarah yang kaya dan arsitektur Barok yang indah.
+              Torino is a major city in northern Italy, the capital of the Piedmont region. Located on the western bank of the Po River, the city is surrounded by the Alps to the west and north, offering stunning views. Torino is known as an important cultural and business center, with a rich history and beautiful Baroque architecture.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
               <div className="flex items-center">
                 <MapPin className="mr-3 h-6 w-6 text-blue-600" />
                 <div>
-                  <strong className="block text-md">Letak Geografis:</strong>
-                  <span className="text-sm">Piemonte, Italia Utara, di tepi Sungai Po, dikelilingi Pegunungan Alpen.</span>
+                  <strong className="block text-md">Geographical Location:</strong>
+                  <span className="text-sm">Piedmont, Northern Italy, on the Po River, surrounded by the Alps.</span>
                 </div>
               </div>
               <div className="flex items-center">
                 <History className="mr-3 h-6 w-6 text-blue-600" />
                 <div>
-                  <strong className="block text-md">Sejarah Singkat:</strong>
-                  <span className="text-sm">Berawal dari bangsa Taurini, kemudian Romawi, pernah menjadi ibu kota Italia.</span>
+                  <strong className="block text-md">Brief History:</strong>
+                  <span className="text-sm">Originated from the Taurini people, then Roman, once the capital of Italy.</span>
                 </div>
               </div>
               <div className="flex items-center">
                 <Building2 className="mr-3 h-6 w-6 text-blue-600" />
                 <div>
-                  <strong className="block text-md">Karakter Khas Kota:</strong>
-                  <span className="text-sm">Gaya Barok, arsitektur megah, budaya kafe, industri otomotif, cokelat terkenal.</span>
+                  <strong className="block text-md">City Characteristics:</strong>
+                  <span className="text-sm">Baroque style, magnificent architecture, cafe culture, automotive industry, famous chocolate.</span>
                 </div>
               </div>
               <div className="flex items-center">
                 <Users className="mr-3 h-6 w-6 text-blue-600" />
                 <div>
-                  <strong className="block text-md">Populasi:</strong>
-                  <span className="text-sm">Sekitar 870.000 jiwa (area metropolitan lebih dari 2 juta).</span>
+                  <strong className="block text-md">Population:</strong>
+                  <span className="text-sm">Around 870,000 inhabitants (metropolitan area over 2 million).</span>
                 </div>
               </div>
               <div className="flex items-center">
                 <Factory className="mr-3 h-6 w-6 text-blue-600" />
                 <div>
-                  <strong className="block text-md">Ekonomi Utama:</strong>
-                  <span className="text-sm">Industri (otomotif), pariwisata, riset, dan teknologi.</span>
+                  <strong className="block text-md">Main Economy:</strong>
+                  <span className="text-sm">Industry (automotive), tourism, research, and technology.</span>
                 </div>
               </div>
             </div>
 
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Efisiensi lalu lintas sangat penting bagi Torino untuk mendukung pertumbuhan ekonomi dan kualitas hidup penduduknya. Dengan sistem manajemen lalu lintas yang cerdas, kota ini dapat mengurangi kemacetan, meningkatkan keamanan jalan, dan mempromosikan mobilitas yang berkelanjutan. Proyek ini bertujuan untuk membantu mencapai tujuan tersebut dengan menyediakan alat analisis dan visualisasi yang canggih.
+              Traffic efficiency is crucial for Torino to support economic growth and the quality of life for its residents. With a smart traffic management system, the city can reduce congestion, improve road safety, and promote sustainable mobility. This project aims to help achieve these goals by providing advanced analysis and visualization tools.
             </p>
 
             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Jelajahi Lebih Lanjut</h3>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Explore Further</h3>
               <Button asChild className="w-full md:w-auto">
                 <Link to="/culture-tourism" className="flex items-center justify-center">
                   <Palette className="h-5 w-5 mr-2" />
-                  Budaya, Kuliner & Pariwisata
+                  Culture, Cuisine & Tourism
                 </Link>
               </Button>
             </div>

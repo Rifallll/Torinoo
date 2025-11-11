@@ -12,7 +12,7 @@ const FilterDropdowns: React.FC = () => {
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
 
   const applyFilter = (filterName: string, value: string) => {
-    let message = `Filter '${filterName}' diterapkan: ${value}`;
+    let message = `Filter '${filterName}' applied: ${value}`;
     toast.info(message);
   };
 
@@ -21,50 +21,50 @@ const FilterDropdowns: React.FC = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="flex items-center">
-            <Filter className="mr-2 h-4 w-4" /> Waktu
+            <Filter className="mr-2 h-4 w-4" /> Time
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top" className="z-50"> {/* Added side="top" and className="z-50" */}
-          <DropdownMenuLabel>Filter Waktu</DropdownMenuLabel>
+        <DropdownMenuContent align="end" side="top" className="z-50">
+          <DropdownMenuLabel>Time Filter</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => { setTimeFilter('all'); applyFilter('Waktu', 'Semua'); }}>Semua</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setTimeFilter('morning'); applyFilter('Waktu', 'Pagi (06:00-10:00)'); }}>Pagi (06:00-10:00)</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setTimeFilter('day'); applyFilter('Waktu', 'Siang (10:00-17:00)'); }}>Siang (10:00-17:00)</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setTimeFilter('evening'); applyFilter('Waktu', 'Sore (17:00-20:00)'); }}>Sore (17:00-20:00)</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setTimeFilter('night'); applyFilter('Waktu', 'Malam (20:00-06:00)'); }}>Malam (20:00-06:00)</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setTimeFilter('all'); applyFilter('Time', 'All'); }}>All</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setTimeFilter('morning'); applyFilter('Time', 'Morning (06:00-10:00)'); }}>Morning (06:00-10:00)</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setTimeFilter('day'); applyFilter('Time', 'Day (10:00-17:00)'); }}>Day (10:00-17:00)</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setTimeFilter('evening'); applyFilter('Time', 'Evening (17:00-20:00)'); }}>Evening (17:00-20:00)</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setTimeFilter('night'); applyFilter('Time', 'Night (20:00-06:00)'); }}>Night (20:00-06:00)</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="flex items-center">
-            <Filter className="mr-2 h-4 w-4" /> Kendaraan
+            <Filter className="mr-2 h-4 w-4" /> Vehicle Type
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top" className="z-50"> {/* Added side="top" and className="z-50" */}
-          <DropdownMenuLabel>Filter Jenis Kendaraan</DropdownMenuLabel>
+        <DropdownMenuContent align="end" side="top" className="z-50">
+          <DropdownMenuLabel>Vehicle Type Filter</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('all'); applyFilter('Jenis Kendaraan', 'Semua'); }}>Semua</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('car'); applyFilter('Jenis Kendaraan', 'Mobil'); }}>Mobil</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('motorcycle'); applyFilter('Jenis Kendaraan', 'Motor'); }}>Motor</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('bus'); applyFilter('Jenis Kendaraan', 'Bus'); }}>Bus</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('truck'); applyFilter('Jenis Kendaraan', 'Truk'); }}>Truk</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('all'); applyFilter('Vehicle Type', 'All'); }}>All</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('car'); applyFilter('Vehicle Type', 'Car'); }}>Car</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('motorcycle'); applyFilter('Vehicle Type', 'Motorcycle'); }}>Motorcycle</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('bus'); applyFilter('Vehicle Type', 'Bus'); }}>Bus</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('truck'); applyFilter('Vehicle Type', 'Truck'); }}>Truck</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="flex items-center">
-            <Filter className="mr-2 h-4 w-4" /> Kondisi Jalan
+            <Filter className="mr-2 h-4 w-4" /> Road Condition
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top" className="z-50"> {/* Added side="top" and className="z-50" */}
-          <DropdownMenuLabel>Filter Kondisi Jalan</DropdownMenuLabel>
+        <DropdownMenuContent align="end" side="top" className="z-50">
+          <DropdownMenuLabel>Road Condition Filter</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => { setRoadConditionFilter('all'); applyFilter('Kondisi Jalan', 'Semua'); }}>Semua</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setRoadConditionFilter('smooth'); applyFilter('Kondisi Jalan', 'Lancar'); }}>Lancar</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setRoadConditionFilter('moderate'); applyFilter('Kondisi Jalan', 'Padat'); }}>Padat</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => { setRoadConditionFilter('heavy'); applyFilter('Kondisi Jalan', 'Macet'); }}>Macet</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setRoadConditionFilter('all'); applyFilter('Road Condition', 'All'); }}>All</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setRoadConditionFilter('smooth'); applyFilter('Road Condition', 'Smooth'); }}>Smooth</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setRoadConditionFilter('moderate'); applyFilter('Road Condition', 'Moderate'); }}>Moderate</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setRoadConditionFilter('heavy'); applyFilter('Road Condition', 'Heavy'); }}>Heavy</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

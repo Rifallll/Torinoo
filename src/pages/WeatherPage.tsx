@@ -13,15 +13,15 @@ const WeatherPage: React.FC = () => {
     location: 'Torino, Italy',
     current: {
       temperature: 22, // Celsius
-      condition: 'Cerah Sebagian',
+      condition: 'Partly Cloudy',
       icon: 'cloud-sun',
       humidity: 65, // percentage
       windSpeed: 15, // km/h
     },
     forecast: [
-      { day: 'Hari Ini', temp: 24, condition: 'Cerah', icon: 'sun' },
-      { day: 'Besok', temp: 20, condition: 'Hujan Ringan', icon: 'cloud-rain' },
-      { day: 'Lusa', temp: 23, condition: 'Berawan', icon: 'cloud' },
+      { day: 'Today', temp: 24, condition: 'Clear', icon: 'sun' },
+      { day: 'Tomorrow', temp: 20, condition: 'Light Rain', icon: 'cloud-rain' },
+      { day: 'Day After', temp: 23, condition: 'Cloudy', icon: 'cloud' },
     ],
   };
 
@@ -40,12 +40,12 @@ const WeatherPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-          Prakiraan Cuaca Torino
+          Torino Weather Forecast
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -55,7 +55,7 @@ const WeatherPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Thermometer className="h-5 w-5 mr-2 text-red-600" />
-              Cuaca Saat Ini
+              Current Weather
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
@@ -70,11 +70,11 @@ const WeatherPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center">
                 <Droplet className="h-5 w-5 mr-2 text-blue-500" />
-                <span>Kelembaban: {weatherData.current.humidity}%</span>
+                <span>Humidity: {weatherData.current.humidity}%</span>
               </div>
               <div className="flex items-center">
                 <Wind className="h-5 w-5 mr-2 text-gray-500" />
-                <span>Kecepatan Angin: {weatherData.current.windSpeed} km/jam</span>
+                <span>Wind Speed: {weatherData.current.windSpeed} km/h</span>
               </div>
             </div>
           </CardContent>
@@ -84,7 +84,7 @@ const WeatherPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <CloudSun className="h-5 w-5 mr-2 text-indigo-600" />
-              Prakiraan 3 Hari
+              3-Day Forecast
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">

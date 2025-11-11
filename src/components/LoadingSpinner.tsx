@@ -7,7 +7,7 @@ const LoadingSpinner: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-      <p className="ml-3 text-lg text-gray-700">Memuat...</p>
+      <p className="ml-3 text-lg text-gray-700">Loading...</p>
     </div>
   );
 };

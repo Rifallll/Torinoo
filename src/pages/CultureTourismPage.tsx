@@ -12,12 +12,12 @@ const CultureTourismPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <Palette className="h-8 w-8 mr-3 text-indigo-600" />
-          Budaya, Kuliner & Pariwisata Torino
+          Torino Culture, Cuisine & Tourism
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -27,18 +27,18 @@ const CultureTourismPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Palette className="h-5 w-5 mr-2 text-blue-600" />
-              Kegiatan Budaya & Arsitektur
+              Cultural Activities & Architecture
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              Torino adalah kota yang kaya akan warisan budaya, dengan arsitektur Barok yang mendominasi pusat kota. Jelajahi istana-istana megah, museum kelas dunia, dan festival seni yang semarak.
+              Torino is a city rich in cultural heritage, with Baroque architecture dominating the city center. Explore magnificent palaces, world-class museums, and vibrant art festivals.
             </p>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong className="font-medium">Mole Antonelliana:</strong> Simbol kota, kini menjadi Museum Nasional Sinema.</li>
-              <li><strong className="font-medium">Musei Reali:</strong> Kompleks museum yang mencakup Istana Kerajaan, Armory, dan Galeri Sabauda.</li>
-              <li><strong className="font-medium">Museo Egizio (Museum Mesir):</strong> Salah satu koleksi Mesir kuno terbesar di dunia di luar Kairo.</li>
-              <li><strong className="font-medium">Festival Jazz Torino:</strong> Acara tahunan yang menarik musisi dan penggemar jazz dari seluruh dunia.</li>
+              <li><strong className="font-medium">Mole Antonelliana:</strong> The symbol of the city, now home to the National Museum of Cinema.</li>
+              <li><strong className="font-medium">Musei Reali:</strong> A museum complex including the Royal Palace, Armory, and Sabauda Gallery.</li>
+              <li><strong className="font-medium">Museo Egizio (Egyptian Museum):</strong> One of the largest collections of ancient Egypt outside Cairo.</li>
+              <li><strong className="font-medium">Torino Jazz Festival:</strong> An annual event attracting musicians and jazz enthusiasts from around the world.</li>
             </ul>
             <img
               src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -52,18 +52,18 @@ const CultureTourismPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Utensils className="h-5 w-5 mr-2 text-green-600" />
-              Kuliner Khas Torino
+              Torino's Signature Cuisine
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              Torino adalah surga bagi pecinta kuliner, terutama bagi mereka yang menyukai cokelat dan tradisi aperitivo.
+              Torino is a paradise for food lovers, especially for those who enjoy chocolate and the aperitivo tradition.
             </p>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong className="font-medium">Cokelat:</strong> Kota ini terkenal dengan gianduiotto, cokelat hazelnut yang lezat, dan bicerin, minuman kopi, cokelat, dan krim.</li>
-              <li><strong className="font-medium">Kafe Bersejarah:</strong> Nikmati suasana klasik di kafe-kafe seperti Caffè Al Bicerin atau Caffè Fiorio.</li>
-              <li><strong className="font-medium">Aperitivo Piemonte:</strong> Tradisi minum sebelum makan malam dengan hidangan pembuka lokal.</li>
-              <li><strong className="font-medium">Pasta Agnolotti:</strong> Pasta isi khas Piemonte yang wajib dicoba.</li>
+              <li><strong className="font-medium">Chocolate:</strong> The city is famous for gianduiotto, delicious hazelnut chocolate, and bicerin, a coffee, chocolate, and cream drink.</li>
+              <li><strong className="font-medium">Historic Cafes:</strong> Enjoy the classic atmosphere in cafes like Caffè Al Bicerin or Caffè Fiorio.</li>
+              <li><strong className="font-medium">Piedmontese Aperitivo:</strong> A pre-dinner drink tradition with local appetizers.</li>
+              <li><strong className="font-medium">Agnolotti Pasta:</strong> A must-try traditional Piedmontese stuffed pasta.</li>
             </ul>
             <img
               src="https://images.unsplash.com/photo-1575936123201-e85230447270?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -77,17 +77,17 @@ const CultureTourismPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Landmark className="h-5 w-5 mr-2 text-purple-600" />
-              Tempat Wisata & Landmark Utama
+              Main Tourist Attractions & Landmarks
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              Selain museum, Torino menawarkan berbagai tempat wisata ikonik yang patut dikunjungi.
+              In addition to museums, Torino offers various iconic tourist attractions worth visiting.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h3 className="font-semibold text-lg mb-2">Piazza Castello</h3>
-                <p>Alun-alun utama kota yang dikelilingi oleh bangunan-bangunan penting seperti Palazzo Reale dan Palazzo Madama.</p>
+                <p>The city's main square surrounded by important buildings such as Palazzo Reale and Palazzo Madama.</p>
                 <img
                   src="https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Piazza Castello"
@@ -96,7 +96,7 @@ const CultureTourismPage: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-2">Parco del Valentino</h3>
-                <p>Taman kota yang luas di tepi Sungai Po, dengan kastil abad pertengahan dan kebun raya.</p>
+                <p>A large city park on the banks of the Po River, with a medieval castle and botanical gardens.</p>
                 <img
                   src="https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Parco del Valentino"

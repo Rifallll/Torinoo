@@ -39,7 +39,7 @@ const NewsPortal = () => {
           Traffic News Portal
         </h1>
         <Button asChild variant="outline">
-          <Link to="/dashboard" className="flex items-center">
+          <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Link>

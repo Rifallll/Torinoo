@@ -28,10 +28,10 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
       console.log("Uploading file (dummy):", selectedFile.name);
       // In a real application, you would handle the file upload here.
       // For this frontend-only app, we just simulate it.
-      alert(`File '${selectedFile.name}' dipilih. Data akan diproses oleh sistem Python.`);
+      alert(`File '${selectedFile.name}' selected. Data will be processed by the Python system.`);
       onClose();
     } else {
-      alert("Pilih file CSV terlebih dahulu.");
+      alert("Please select a CSV file first.");
     }
   };
 
@@ -40,18 +40,18 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <span className="flex items-center"> {/* Wrapped icon and text in a span */}
+            <span className="flex items-center">
               <Upload className="mr-2 h-5 w-5" /> Upload CSV Data
             </span>
           </DialogTitle>
           <DialogDescription>
-            Pilih file CSV yang berisi data lalu lintas untuk dianalisis.
+            Select a CSV file containing traffic data for analysis.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="csvFile" className="text-right">
-              File CSV
+              CSV File
             </Label>
             <Input
               id="csvFile"
@@ -62,11 +62,11 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
           {selectedFile && (
-            <p className="text-sm text-gray-600 text-center">File dipilih: <span className="font-medium">{selectedFile.name}</span></p>
+            <p className="text-sm text-gray-600 text-center">File selected: <span className="font-medium">{selectedFile.name}</span></p>
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Batal</Button>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={handleUpload} disabled={!selectedFile}>Upload</Button>
         </DialogFooter>
       </DialogContent>

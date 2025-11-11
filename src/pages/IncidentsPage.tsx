@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, Car, Clock, CheckCircle2 } from 'lucide-react'; // Ensuring CheckCircle2 is imported
+import { ArrowLeft, AlertTriangle, Car, Clock, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,7 +55,7 @@ const IncidentsPage = () => {
           Traffic Incidents
         </h1>
         <Button asChild variant="outline">
-          <Link to="/dashboard" className="flex items-center">
+          <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Link>

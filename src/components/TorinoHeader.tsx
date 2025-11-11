@@ -15,21 +15,17 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // Create a new Date object for Torino's timezone (CET/CEST)
-      // This is a client-side approximation. For precise timezone handling,
-      // a library like `date-fns-tz` or `moment-timezone` would be ideal,
-      // but for this scope, we'll rely on the browser's locale settings for 'it-IT'.
       setCurrentDateTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Menggunakan 'it-IT' untuk format tanggal dan waktu Italia
-  const formattedDate = currentDateTime.toLocaleDateString('it-IT', {
+  // Using 'en-US' for English date and time format
+  const formattedDate = currentDateTime.toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric'
   });
-  const formattedTime = currentDateTime.toLocaleTimeString('it-IT', {
-    hour: '2-digit', minute: '2-digit', hour12: false // Menggunakan format 24 jam untuk Italia
+  const formattedTime = currentDateTime.toLocaleTimeString('en-US', {
+    hour: '2-digit', minute: '2-digit', hour12: false // Using 24-hour format
   });
 
   return (

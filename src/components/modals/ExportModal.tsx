@@ -17,7 +17,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
   const handleExport = () => {
     console.log(`Simulating export to ${exportFormat} format.`);
-    alert(`Tampilan atau data simulasi akan diekspor ke format ${exportFormat.toUpperCase()}.`);
+    alert(`The simulated view or data will be exported to ${exportFormat.toUpperCase()} format.`);
     onClose();
   };
 
@@ -26,12 +26,12 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <span className="flex items-center"> {/* Wrapped icon and text in a span */}
-              <Download className="mr-2 h-5 w-5" /> Ekspor Data
+            <span className="flex items-center">
+              <Download className="mr-2 h-5 w-5" /> Export Data
             </span>
           </DialogTitle>
           <DialogDescription>
-            Pilih format untuk mengekspor tampilan peta atau data simulasi.
+            Select a format to export the map view or simulated data.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -41,19 +41,19 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
             </Label>
             <Select onValueChange={setExportFormat} defaultValue={exportFormat}>
               <SelectTrigger id="exportFormat" className="col-span-3">
-                <SelectValue placeholder="Pilih format" />
+                <SelectValue placeholder="Select format" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="csv">CSV</SelectItem>
                 <SelectItem value="pdf">PDF</SelectItem>
-                <SelectItem value="png">PNG (Tampilan Peta)</SelectItem>
+                <SelectItem value="png">PNG (Map View)</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Batal</Button>
-          <Button onClick={handleExport}>Ekspor</Button>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleExport}>Export</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

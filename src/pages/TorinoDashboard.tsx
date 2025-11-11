@@ -99,7 +99,7 @@ const TorinoDashboard = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-gray-800">Peta Lalu Lintas Torino</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800">Torino Traffic Map</CardTitle>
                   <div className="flex space-x-2">
                     <FilterDropdowns />
                   </div>
@@ -113,11 +113,11 @@ const TorinoDashboard = () => {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-800">Prediksi Arus Lalu Lintas</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800">Traffic Flow Prediction</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 mb-4">
-                    Berdasarkan data historis dan input sensor real-time, berikut prediksi arus lalu lintas untuk jam berikutnya:
+                    Based on historical data and real-time sensor input, here are the traffic flow predictions for the next hour:
                   </p>
                   <div className="space-y-2">
                     {trafficFlowPrediction.map((item, index) => (
@@ -132,7 +132,7 @@ const TorinoDashboard = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-800">Aksi Cepat</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800">Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
@@ -145,19 +145,19 @@ const TorinoDashboard = () => {
                     <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
                       <Link to="/data-analysis" className="flex flex-col items-center justify-center">
                         <BarChart2 className="h-6 w-6 text-green-600 mb-2" />
-                        <span className="text-sm font-medium text-green-600">Lihat & Sinkronisasi Data</span>
+                        <span className="text-sm font-medium text-green-600">View & Sync Data</span>
                       </Link>
                     </Button>
                     <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
                       <Link to="/about-torino" className="flex flex-col items-center justify-center">
                         <Info className="h-6 w-6 text-yellow-600 mb-2" />
-                        <span className="text-sm font-medium text-yellow-600">Tentang Kota Torino</span>
+                        <span className="text-sm font-medium text-yellow-600">About Torino City</span>
                       </Link>
                     </Button>
                     <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
                       <div className="flex flex-col items-center justify-center" onClick={() => setIsExportModalOpen(true)}>
                         <Download className="h-6 w-6 text-purple-600 mb-2" />
-                        <span className="text-sm font-medium text-purple-600">Ekspor</span>
+                        <span className="text-sm font-medium text-purple-600">Export</span>
                       </div>
                     </Button>
                   </div>

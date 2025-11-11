@@ -18,11 +18,11 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
   const location = useLocation();
 
   const handleLogout = () => {
-    toast.info("Fungsi Logout belum diimplementasikan.");
-    // Dalam aplikasi nyata, Anda akan menangani logout autentikasi di sini
+    toast.info("Logout function not yet implemented.");
+    // In a real application, you would handle authentication logout here
   };
 
-  // Helper untuk memeriksa apakah kategori atau anak-anaknya aktif
+  // Helper to check if a category or its children are active
   const isCategoryActive = (paths: string[]) => {
     return paths.some(path => location.pathname === path);
   };
@@ -35,7 +35,7 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
     const activeClasses = "bg-blue-50/50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
     const inactiveClasses = "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700";
     const categoryTextClasses = "font-semibold";
-    const linkIndentClasses = "pl-12"; // Indentasi untuk sub-tautan
+    const linkIndentClasses = "pl-12"; // Indentation for sub-links
 
     if (isCategory) {
       return (
@@ -108,42 +108,42 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
       <nav className="px-2 space-y-1">
         {/* Overview */}
         <NavItem icon={LayoutDashboard} label="Overview" isCategory categoryPaths={["/", "/torino-dashboard"]} />
-        <NavItem to="/" icon={Home} label="Beranda" />
-        <NavItem to="/torino-dashboard" icon={MapPin} label="Dashboard Lalu Lintas" />
+        <NavItem to="/" icon={Home} label="Home" />
+        <NavItem to="/torino-dashboard" icon={MapPin} label="Traffic Dashboard" />
 
         {/* Transportations */}
         <NavItem icon={Bike} label="Transportations" isCategory categoryPaths={["/sensors", "/incidents", "/reports"]} />
-        <NavItem to="/sensors" icon={Activity} label="Sensor" />
-        <NavItem to="/incidents" icon={Bell} label="Insiden" />
-        <NavItem to="/reports" icon={BarChart2} label="Laporan" />
+        <NavItem to="/sensors" icon={Activity} label="Sensors" />
+        <NavItem to="/incidents" icon={Bell} label="Incidents" />
+        <NavItem to="/reports" icon={BarChart2} label="Reports" />
 
         {/* Traffic */}
         <NavItem icon={TrafficCone} label="Traffic" isCategory categoryPaths={["/data-analysis"]} />
-        <NavItem to="/data-analysis" icon={BarChart2} label="Analisis Data" />
+        <NavItem to="/data-analysis" icon={BarChart2} label="Data Analysis" />
 
         {/* Weather */}
         <NavItem icon={CloudSun} label="Weather" isCategory categoryPaths={["/weather"]} />
-        <NavItem to="/weather" icon={CloudSun} label="Prakiraan Cuaca Torino" />
+        <NavItem to="/weather" icon={CloudSun} label="Torino Weather Forecast" />
 
         {/* News */}
         <NavItem icon={Newspaper} label="News" isCategory categoryPaths={["/news"]} />
-        <NavItem to="/news" icon={Newspaper} label="Portal Berita" />
+        <NavItem to="/news" icon={Newspaper} label="News Portal" />
 
         {/* Others */}
         <NavItem icon={Info} label="Others" isCategory categoryPaths={["/about-torino", "/culture-tourism", "/contact-collaboration"]} />
-        <NavItem to="/about-torino" icon={Info} label="Tentang Torino" />
-        <NavItem to="/contact-collaboration" icon={Mail} label="Kontak & Kolaborasi" />
+        <NavItem to="/about-torino" icon={Info} label="About Torino" />
+        <NavItem to="/contact-collaboration" icon={Mail} label="Contact & Collaboration" />
 
         {/* Account */}
         <div className="pt-4">
           <NavItem icon={User} label="Account" isCategory categoryPaths={["#settings", "#logout"]} />
-          <NavItem icon={Settings} label="Settings" onClick={() => toast.info("Halaman Pengaturan belum diimplementasikan.")} />
+          <NavItem icon={Settings} label="Settings" onClick={() => toast.info("Settings page not yet implemented.")} />
           <NavItem icon={LogOut} label="Log out" onClick={handleLogout} />
         </div>
 
         {/* FAQ */}
         <div className="pt-4">
-          <NavItem icon={HelpCircle} label="FAQ" isCategory onClick={() => toast.info("Halaman FAQ belum diimplementasikan.")} />
+          <NavItem icon={HelpCircle} label="FAQ" isCategory onClick={() => toast.info("FAQ page not yet implemented.")} />
         </div>
       </nav>
     </div>
