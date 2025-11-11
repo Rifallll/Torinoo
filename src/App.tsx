@@ -23,7 +23,7 @@ const App = () => (
       <TooltipProvider>
         {/* Membungkus BrowserRouter dalam sebuah div untuk memastikan TooltipProvider memiliki satu elemen anak yang konkret */}
         <div>
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               <Route path="/" element={<Navigate to="/torino-dashboard" replace />} />
               <Route path="/torino-dashboard" element={<TorinoDashboard />} />
