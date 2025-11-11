@@ -12,6 +12,11 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import {
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"; // Import Dialog components for accessibility
+import {
   LayoutDashboard,
   Newspaper,
   Wifi,
@@ -99,6 +104,11 @@ const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOp
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen} className="z-[9999]">
+      {/* Add DialogHeader, DialogTitle, and DialogDescription for accessibility */}
+      <DialogHeader className="sr-only">
+        <DialogTitle>Command Palette</DialogTitle>
+        <DialogDescription>Search for commands or navigate the application.</DialogDescription>
+      </DialogHeader>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
