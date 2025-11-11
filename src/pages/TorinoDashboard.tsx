@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge } from 'lucide-react'; // Added Gauge
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -18,8 +18,9 @@ import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
 import ActiveIncidentsSummary from '@/components/ActiveIncidentsSummary';
-import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart'; // Import the new component
-import SensorStatusOverviewCard from '@/components/SensorStatusOverviewCard'; // Import the new component
+import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
+import SensorStatusOverviewCard from '@/components/SensorStatusOverviewCard';
+import TrafficCongestionCard from '@/components/TrafficCongestionCard'; // Import the new component
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const TorinoDashboard = () => {
@@ -152,7 +153,8 @@ const TorinoDashboard = () => {
             <div className="space-y-6">
               <WeatherCard />
               <ActiveIncidentsSummary />
-              <SensorStatusOverviewCard /> {/* New Sensor Status Overview Card */}
+              <SensorStatusOverviewCard />
+              <TrafficCongestionCard /> {/* New Traffic Congestion Card */}
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
