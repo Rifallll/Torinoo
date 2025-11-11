@@ -12,18 +12,18 @@ import TorinoMapComponent from '@/components/TorinoMapComponent';
 import TorinoSidebar from '@/components/TorinoSidebar';
 import TorinoHeader from '@/components/TorinoHeader';
 import UploadCSVModal from '@/components/modals/UploadCSVModal';
-import PythonAnalysisInfoModal from '@/components/modals/PythonAnalysisInfoModal';
-import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
-import AboutTorinoModal from '@/components/modals/AboutTorinoModal';
+// import PythonAnalysisInfoModal from '@/components/modals/PythonAnalysisInfoModal'; // Removed
+// import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal'; // Kept as modal
+// import AboutTorinoModal from '@/components/modals/AboutTorinoModal'; // Removed
 import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUploadCSVModalOpen, setIsUploadCSVModalOpen] = useState(false);
-  const [isPythonAnalysisInfoModalOpen, setIsPythonAnalysisInfoModalOpen] = useState(false);
+  // const [isPythonAnalysisInfoModalOpen, setIsPythonAnalysisInfoModalOpen] = useState(false); // Removed
   const [isTrafficAnalysisModalOpen, setIsTrafficAnalysisModalOpen] = useState(false);
-  const [isAboutTorinoModalOpen, setIsAboutTorinoModalOpen] = useState(false);
+  // const [isAboutTorinoModalOpen, setIsAboutTorinoModalOpen] = useState(false); // Removed
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Dummy data for quick actions and statistics
@@ -131,10 +131,6 @@ const TorinoDashboard = () => {
                       </div>
                     ))}
                   </div>
-                  {/* Removed the button and replaced with plain text */}
-                  {/* <p className="text-sm text-gray-500 mt-4">
-                    Untuk prakiraan detail, silakan lihat bagian laporan.
-                  </p> */}
                 </CardContent>
               </Card>
 
@@ -144,23 +140,23 @@ const TorinoDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
-                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto" onClick={() => setIsUploadCSVModalOpen(true)}>
-                      <div className="flex flex-col items-center justify-center">
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <div className="flex flex-col items-center justify-center" onClick={() => setIsUploadCSVModalOpen(true)}>
                         <Upload className="h-6 w-6 text-indigo-600 mb-2" />
                         <span className="text-sm font-medium text-indigo-600">Upload CSV Data</span>
                       </div>
                     </Button>
-                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto" onClick={() => setIsPythonAnalysisInfoModalOpen(true)}>
-                      <div className="flex flex-col items-center justify-center">
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <Link to="/data-analysis" className="flex flex-col items-center justify-center">
                         <BarChart2 className="h-6 w-6 text-green-600 mb-2" />
                         <span className="text-sm font-medium text-green-600">Lihat & Sinkronisasi Data</span>
-                      </div>
+                      </Link>
                     </Button>
-                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto" onClick={() => setIsAboutTorinoModalOpen(true)}>
-                      <div className="flex flex-col items-center justify-center">
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <Link to="/about-torino" className="flex flex-col items-center justify-center">
                         <Info className="h-6 w-6 text-yellow-600 mb-2" />
                         <span className="text-sm font-medium text-yellow-600">Tentang Kota Torino</span>
-                      </div>
+                      </Link>
                     </Button>
                     <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto" onClick={() => setIsExportModalOpen(true)}>
                       <div className="flex flex-col items-center justify-center">
@@ -178,9 +174,9 @@ const TorinoDashboard = () => {
 
       {/* Modals */}
       <UploadCSVModal isOpen={isUploadCSVModalOpen} onClose={() => setIsUploadCSVModalOpen(false)} />
-      <PythonAnalysisInfoModal isOpen={isPythonAnalysisInfoModalOpen} onClose={() => setIsPythonAnalysisInfoModalOpen(false)} />
+      {/* <PythonAnalysisInfoModal isOpen={isPythonAnalysisInfoModalOpen} onClose={() => setIsPythonAnalysisInfoModalOpen(false)} /> */}
       <TrafficAnalysisModal isOpen={isTrafficAnalysisModalOpen} onClose={() => setIsTrafficAnalysisModalOpen(false)} />
-      <AboutTorinoModal isOpen={isAboutTorinoModalOpen} onClose={() => setIsAboutTorinoModalOpen(false)} />
+      {/* <AboutTorinoModal isOpen={isAboutTorinoModalOpen} onClose={() => setIsAboutTorinoModalOpen(false)} /> */}
       <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
     </div>
   );
