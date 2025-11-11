@@ -17,12 +17,11 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      {/* Membungkus semua anak dalam satu React.Fragment */}
-      <>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+    <> {/* Fragment ini adalah anak tunggal dari QueryClientProvider */}
+      <Toaster />
+      <Sonner />
+      <TooltipProvider> {/* Ini adalah anak tunggal dari fragment */}
+        <BrowserRouter> {/* Ini adalah anak tunggal dari TooltipProvider */}
           <Routes>
             <Route path="/" element={<Navigate to="/torino-dashboard" replace />} />
             <Route path="/torino-dashboard" element={<TorinoDashboard />} />
@@ -37,8 +36,8 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </>
-    </TooltipProvider>
+      </TooltipProvider>
+    </>
   </QueryClientProvider>
 );
 
