@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper } from 'lucide-react'; // Added Newspaper icon
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper } from 'lucide-react';
 import MapComponent from '@/components/MapComponent';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,11 +27,15 @@ const TrafficDashboard = () => {
     { name: "Sensor 4", role: "Bridge", status: "Active", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60" },
   ];
 
+  // Set Torino's coordinates and a marker for the city center
+  const torinoCenter: [number, number] = [45.0703, 7.6869];
+  const torinoZoom = 13;
+
   const mapMarkers = [
-    { lat: 51.505, lng: -0.09, popupText: "Sensor 1: Active", color: "green" },
-    { lat: 51.51, lng: -0.1, popupText: "Sensor 2: Warning", color: "orange" },
-    { lat: 51.52, lng: -0.08, popupText: "Sensor 3: Offline", color: "red" },
-    { lat: 51.50, lng: -0.12, popupText: "Sensor 4: Active", color: "green" },
+    { lat: torinoCenter[0], lng: torinoCenter[1], popupText: "Torino City Center", color: "blue" },
+    { lat: 45.08, lng: 7.67, popupText: "Sensor A: Active", color: "green" },
+    { lat: 45.06, lng: 7.70, popupText: "Sensor B: Warning", color: "orange" },
+    { lat: 45.075, lng: 7.695, popupText: "Sensor C: Offline", color: "red" },
   ];
 
   const handleLocateAll = () => {
@@ -261,7 +265,7 @@ const TrafficDashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="h-[500px] p-0">
-                  <MapComponent markers={mapMarkers} />
+                  <MapComponent center={torinoCenter} zoom={torinoZoom} markers={mapMarkers} />
                 </CardContent>
               </Card>
 
