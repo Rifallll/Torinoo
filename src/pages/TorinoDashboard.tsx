@@ -17,7 +17,7 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'; // Import Recharts components
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Import LineChart and Line
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -41,6 +41,34 @@ const TorinoDashboard = () => {
     { name: "Main Street", "Low Congestion": 70, "Moderate Congestion": 20, "High Congestion": 10 },
     { name: "Oak Avenue", "Low Congestion": 50, "Moderate Congestion": 35, "High Congestion": 15 },
     { name: "Pine Road", "Low Congestion": 30, "Moderate Congestion": 45, "High Congestion": 25 },
+  ];
+
+  // Dummy data for Traffic Volume Trends (Last 24 Hours)
+  const trafficVolumeData = [
+    { hour: '00:00', volume: 120 },
+    { hour: '01:00', volume: 90 },
+    { hour: '02:00', volume: 70 },
+    { hour: '03:00', volume: 60 },
+    { hour: '04:00', volume: 80 },
+    { hour: '05:00', volume: 150 },
+    { hour: '06:00', volume: 280 },
+    { hour: '07:00', volume: 450 },
+    { hour: '08:00', volume: 520 },
+    { hour: '09:00', volume: 480 },
+    { hour: '10:00', volume: 350 },
+    { hour: '11:00', volume: 300 },
+    { hour: '12:00', volume: 380 },
+    { hour: '13:00', volume: 400 },
+    { hour: '14:00', volume: 370 },
+    { hour: '15:00', volume: 420 },
+    { hour: '16:00', volume: 500 },
+    { hour: '17:00', volume: 600 },
+    { hour: '18:00', volume: 550 },
+    { hour: '19:00', volume: 400 },
+    { hour: '20:00', volume: 300 },
+    { hour: '21:00', volume: 250 },
+    { hour: '22:00', volume: 200 },
+    { hour: '23:00', volume: 160 },
   ];
 
   return (
@@ -149,6 +177,37 @@ const TorinoDashboard = () => {
                       <Bar dataKey="Moderate Congestion" stackId="a" fill="#ffc658" name="Moderate" />
                       <Bar dataKey="High Congestion" stackId="a" fill="#ff7300" name="High" />
                     </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* New Card for Traffic Volume Trends */}
+              <Card className="bg-white dark:bg-gray-800 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Volume Trends (Last 24 Hours)</CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={trafficVolumeData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 0,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="hour" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Line type="monotone" dataKey="volume" stroke="#8884d8" activeDot={{ r: 8 }} name="Traffic Volume" />
+                    </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
