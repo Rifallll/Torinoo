@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, Menu, X } from 'lucide-react'; // Remove ChevronDown as it's no longer needed
+import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// Remove DropdownMenu imports as they are no longer needed
 
 interface TorinoHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -16,16 +15,21 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
 
   useEffect(() => {
     const timer = setInterval(() => {
+      // Create a new Date object for Torino's timezone (CET/CEST)
+      // This is a client-side approximation. For precise timezone handling,
+      // a library like `date-fns-tz` or `moment-timezone` would be ideal,
+      // but for this scope, we'll rely on the browser's locale settings for 'it-IT'.
       setCurrentDateTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const formattedDate = currentDateTime.toLocaleDateString('id-ID', {
+  // Menggunakan 'it-IT' untuk format tanggal dan waktu Italia
+  const formattedDate = currentDateTime.toLocaleDateString('it-IT', {
     weekday: 'long', month: 'long', day: 'numeric'
   });
-  const formattedTime = currentDateTime.toLocaleTimeString('id-ID', {
-    hour: '2-digit', minute: '2-digit', hour12: true
+  const formattedTime = currentDateTime.toLocaleTimeString('it-IT', {
+    hour: '2-digit', minute: '2-digit', hour12: false // Menggunakan format 24 jam untuk Italia
   });
 
   return (
