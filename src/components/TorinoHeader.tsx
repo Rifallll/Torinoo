@@ -1,19 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, Menu, X, ChevronDown } from 'lucide-react'; // Import Menu, X, and ChevronDown icons
+import { Search, Menu, X } from 'lucide-react'; // Remove ChevronDown as it's no longer needed
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+// Remove DropdownMenu imports as they are no longer needed
 
 interface TorinoHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
-  isSidebarOpen: boolean; // Add isSidebarOpen prop
+  isSidebarOpen: boolean;
 }
 
 const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebarOpen }) => {
@@ -46,11 +41,11 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
             >
               {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <h2 className="ml-4 text-2xl font-bold text-white">Torino</h2> {/* Changed to match image style */}
+            <h2 className="ml-4 text-2xl font-bold text-white">Torino</h2>
           </div>
 
           <div className="flex items-center flex-1 justify-center space-x-4">
-            <div className="relative flex-grow max-w-md"> {/* Adjusted width for search bar */}
+            <div className="relative flex-grow max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
                 type="text"
@@ -61,20 +56,7 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
           </div>
 
           <div className="flex items-center space-x-6 text-white">
-            <Button variant="link" className="text-white hover:text-gray-200 p-0 h-auto">Go to Grid</Button>
-            <Button variant="link" className="text-white hover:text-gray-200 p-0 h-auto">Go to Map</Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="link" className="text-white hover:text-gray-200 p-0 h-auto flex items-center">
-                  Change City <ChevronDown className="ml-1 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="z-50">
-                <DropdownMenuItem>Torino</DropdownMenuItem>
-                <DropdownMenuItem>Milan</DropdownMenuItem>
-                <DropdownMenuItem>Rome</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* "Go to Grid", "Go to Map", and "Change City" dropdown have been removed */}
             <div className="text-right">
               <p className="text-sm">{formattedDate}</p>
               <p className="text-2xl font-bold">{formattedTime}</p>
