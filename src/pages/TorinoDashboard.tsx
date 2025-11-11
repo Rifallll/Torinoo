@@ -18,6 +18,7 @@ import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
 import ActiveIncidentsSummary from '@/components/ActiveIncidentsSummary'; // Import the new component
+import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart'; // Import the new component
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Import LineChart and Line
 
 const TorinoDashboard = () => {
@@ -144,6 +145,8 @@ const TorinoDashboard = () => {
                   <TorinoMapComponent />
                 </CardContent>
               </Card>
+              {/* New Traffic Speed Distribution Chart */}
+              <TrafficSpeedDistributionChart />
             </div>
 
             <div className="space-y-6">
