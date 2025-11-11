@@ -130,7 +130,7 @@ const TorinoMapComponent: React.FC = () => {
     };
   }, []);
 
-  return <div id="torino-map" className="h-full w-full rounded-md"></div>;
+  return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
 
 export default TorinoMapComponent;
