@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { Newspaper, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 
 const newsArticles = [
   {
@@ -62,7 +61,6 @@ const NewsPortal = () => {
           </Card>
         ))}
       </main>
-      <MadeWithDyad />
     </div>
   );
 };

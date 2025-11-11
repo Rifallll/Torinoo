@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper } from 'lucide-react'; // Added Newspaper icon
 import MapComponent from '@/components/MapComponent';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -385,7 +384,6 @@ const TrafficDashboard = () => {
               </Card>
             </div>
           </div>
-          <MadeWithDyad />
         </main>
       </div>
     </div>
