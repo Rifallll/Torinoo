@@ -49,13 +49,13 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
           <div className="flex items-center flex-1 justify-center space-x-4">
             {/* Search button to open command palette */}
             <Button
-              variant="ghost"
-              className="flex items-center text-white hover:bg-blue-700 px-4 py-2 rounded-full"
+              variant="ghost" // Keeping ghost variant but adding custom styles
+              className="flex items-center text-white bg-blue-700 hover:bg-blue-600 border border-blue-600 shadow-lg px-4 py-2 rounded-full transition-all duration-200"
               onClick={() => setIsCommandPaletteOpen(true)}
             >
               <Search className="h-4 w-4 mr-2" />
               <span className="text-sm hidden md:inline">Search...</span>
-              <kbd className="ml-4 hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-blue-900 px-1.5 font-mono text-[10px] font-medium text-white opacity-100">
+              <kbd className="ml-4 hidden md:inline-flex h-5 select-none items-center gap-1 rounded border border-white/50 bg-blue-900 px-1.5 font-mono text-[10px] font-medium text-white opacity-100">
                 <span className="text-xs">⌘</span>K
               </kbd>
             </Button>
