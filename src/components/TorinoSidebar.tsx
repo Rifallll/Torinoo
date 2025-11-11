@@ -14,54 +14,151 @@ interface TorinoSidebarProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
 }
 
+interface NavItemConfig {
+  label: string;
+  icon: React.ElementType;
+  isCategory?: boolean;
+  path?: string;
+  subItems?: { label: string; path: string; icon: React.ElementType }[];
+  onClick?: () => void;
+}
+
+const navItems: NavItemConfig[] = [
+  {
+    label: "Overview",
+    icon: LayoutDashboard,
+    isCategory: true,
+    subItems: [
+      { label: "Home", path: "/", icon: Home },
+      { label: "Traffic Dashboard", path: "/torino-dashboard", icon: MapPin },
+    ],
+  },
+  {
+    label: "Transportations",
+    icon: Bike,
+    isCategory: true,
+    subItems: [
+      { label: "Sensors", path: "/sensors", icon: Activity },
+      { label: "Incidents", path: "/incidents", icon: Bell },
+      { label: "Reports", path: "/reports", icon: BarChart2 },
+    ],
+  },
+  {
+    label: "Traffic",
+    icon: TrafficCone,
+    isCategory: true,
+    subItems: [
+      { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
+    ],
+  },
+  {
+    label: "Weather",
+    icon: CloudSun,
+    isCategory: true,
+    subItems: [
+      { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun },
+    ],
+  },
+  {
+    label: "News",
+    icon: Newspaper,
+    isCategory: true,
+    subItems: [
+      { label: "News Portal", path: "/news", icon: Newspaper },
+    ],
+  },
+  {
+    label: "Others",
+    icon: Info,
+    isCategory: true,
+    subItems: [
+      { label: "About Torino", path: "/about-torino", icon: Info },
+      { label: "Culture & Tourism", path: "/culture-tourism", icon: Palette },
+      { label: "Contact & Collaboration", path: "/contact-collaboration", icon: Mail },
+    ],
+  },
+  {
+    label: "Account",
+    icon: User,
+    isCategory: true,
+    subItems: [
+      { label: "Settings", path: "#settings", icon: Settings, onClick: () => toast.info("Settings page not yet implemented.") },
+      { label: "Log out", path: "#logout", icon: LogOut, onClick: () => toast.info("Logout function not yet implemented.") },
+    ],
+  },
+  {
+    label: "FAQ",
+    icon: HelpCircle,
+    isCategory: true,
+    onClick: () => toast.info("FAQ page not yet implemented."),
+  },
+];
+
 const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const location = useLocation();
 
-  const handleLogout = () => {
-    toast.info("Logout function not yet implemented.");
-    // In a real application, you would handle authentication logout here
-  };
+  const isLinkActive = (path: string) => location.pathname === path || (path === "/" && location.pathname === "/");
 
-  // Helper to check if a category or its children are active
-  const isCategoryActive = (paths: string[]) => {
-    return paths.some(path => location.pathname === path);
-  };
-
-  const NavItem = ({ to, icon: Icon, label, isCategory = false, categoryPaths = [], onClick }: { to?: string; icon: React.ElementType; label: string; isCategory?: boolean; categoryPaths?: string[]; onClick?: () => void }) => {
-    const isActiveLink = to && location.pathname === to;
-    const isActiveCategory = isCategory && isCategoryActive(categoryPaths);
-
+  const NavItem = ({ item }: { item: NavItemConfig }) => {
+    const Icon = item.icon;
     const baseClasses = "flex items-center px-4 py-2 rounded-md transition-colors duration-200";
     const activeClasses = "bg-blue-50/50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
     const inactiveClasses = "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700";
     const categoryTextClasses = "font-semibold";
     const linkIndentClasses = "pl-12"; // Indentation for sub-links
 
-    if (isCategory) {
+    if (item.isCategory) {
+      const categoryPaths = item.subItems?.map(sub => sub.path) || [];
+      const isActiveCategory = categoryPaths.some(path => isLinkActive(path));
       return (
-        <div className={`${baseClasses} ${categoryTextClasses} ${isActiveCategory ? activeClasses : inactiveClasses}`}>
-          <Icon className="h-5 w-5 mr-3" />
-          <span>{label}</span>
+        <div className="space-y-1">
+          <div
+            className={`${baseClasses} ${categoryTextClasses} ${isActiveCategory ? activeClasses : inactiveClasses} ${item.onClick ? 'cursor-pointer' : ''}`}
+            onClick={item.onClick}
+          >
+            <Icon className="h-5 w-5 mr-3" />
+            <span>{item.label}</span>
+          </div>
+          {item.subItems && (
+            <div className="space-y-1">
+              {item.subItems.map((subItem, subIndex) => (
+                <Link
+                  key={subIndex}
+                  to={subItem.path}
+                  className={`${baseClasses} ${linkIndentClasses} ${isLinkActive(subItem.path) ? activeClasses : inactiveClasses}`}
+                  onClick={() => {
+                    if (subItem.onClick) subItem.onClick();
+                    setIsSidebarOpen(false);
+                  }}
+                >
+                  <subItem.icon className="h-5 w-5 mr-3" />
+                  <span>{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       );
     }
 
+    // For standalone items (like FAQ if it were not a category)
+    const isActiveLink = item.path && isLinkActive(item.path);
     const content = (
       <>
         <Icon className="h-5 w-5 mr-3" />
-        <span>{label}</span>
+        <span>{item.label}</span>
       </>
     );
 
-    if (to) {
+    if (item.path) {
       return (
-        <Link to={to} className={`${baseClasses} ${linkIndentClasses} ${isActiveLink ? activeClasses : inactiveClasses}`} onClick={() => setIsSidebarOpen(false)}>
+        <Link to={item.path} className={`${baseClasses} ${linkIndentClasses} ${isActiveLink ? activeClasses : inactiveClasses}`} onClick={() => setIsSidebarOpen(false)}>
           {content}
         </Link>
       );
-    } else if (onClick) {
+    } else if (item.onClick) {
       return (
-        <Button variant="ghost" className={`${baseClasses} ${linkIndentClasses} w-full justify-start ${inactiveClasses}`} onClick={onClick}>
+        <Button variant="ghost" className={`${baseClasses} ${linkIndentClasses} w-full justify-start ${inactiveClasses}`} onClick={item.onClick}>
           {content}
         </Button>
       );
@@ -106,45 +203,9 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
       </div>
 
       <nav className="px-2 space-y-1">
-        {/* Overview */}
-        <NavItem icon={LayoutDashboard} label="Overview" isCategory categoryPaths={["/", "/torino-dashboard"]} />
-        <NavItem to="/" icon={Home} label="Home" />
-        <NavItem to="/torino-dashboard" icon={MapPin} label="Traffic Dashboard" />
-
-        {/* Transportations */}
-        <NavItem icon={Bike} label="Transportations" isCategory categoryPaths={["/sensors", "/incidents", "/reports"]} />
-        <NavItem to="/sensors" icon={Activity} label="Sensors" />
-        <NavItem to="/incidents" icon={Bell} label="Incidents" />
-        <NavItem to="/reports" icon={BarChart2} label="Reports" />
-
-        {/* Traffic */}
-        <NavItem icon={TrafficCone} label="Traffic" isCategory categoryPaths={["/data-analysis"]} />
-        <NavItem to="/data-analysis" icon={BarChart2} label="Data Analysis" />
-
-        {/* Weather */}
-        <NavItem icon={CloudSun} label="Weather" isCategory categoryPaths={["/weather"]} />
-        <NavItem to="/weather" icon={CloudSun} label="Torino Weather Forecast" />
-
-        {/* News */}
-        <NavItem icon={Newspaper} label="News" isCategory categoryPaths={["/news"]} />
-        <NavItem to="/news" icon={Newspaper} label="News Portal" />
-
-        {/* Others */}
-        <NavItem icon={Info} label="Others" isCategory categoryPaths={["/about-torino", "/culture-tourism", "/contact-collaboration"]} />
-        <NavItem to="/about-torino" icon={Info} label="About Torino" />
-        <NavItem to="/contact-collaboration" icon={Mail} label="Contact & Collaboration" />
-
-        {/* Account */}
-        <div className="pt-4">
-          <NavItem icon={User} label="Account" isCategory categoryPaths={["#settings", "#logout"]} />
-          <NavItem icon={Settings} label="Settings" onClick={() => toast.info("Settings page not yet implemented.")} />
-          <NavItem icon={LogOut} label="Log out" onClick={handleLogout} />
-        </div>
-
-        {/* FAQ */}
-        <div className="pt-4">
-          <NavItem icon={HelpCircle} label="FAQ" isCategory onClick={() => toast.info("FAQ page not yet implemented.")} />
-        </div>
+        {navItems.map((item, index) => (
+          <NavItem key={index} item={item} />
+        ))}
       </nav>
     </div>
   );
