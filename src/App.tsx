@@ -20,22 +20,25 @@ const App = () => (
     <> {/* Fragment ini adalah anak tunggal dari QueryClientProvider */}
       <Toaster />
       <Sonner />
-      <TooltipProvider> {/* Ini adalah anak tunggal dari fragment */}
-        <BrowserRouter> {/* Ini adalah anak tunggal dari TooltipProvider */}
-          <Routes>
-            <Route path="/" element={<Navigate to="/torino-dashboard" replace />} />
-            <Route path="/torino-dashboard" element={<TorinoDashboard />} />
-            <Route path="/news" element={<NewsPortal />} />
-            <Route path="/sensors" element={<SensorsPage />} />
-            <Route path="/incidents" element={<IncidentsPage />} />
-            <Route path="/incidents/:id" element={<IncidentDetailPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/data-analysis" element={<DataAnalysisPage />} />
-            <Route path="/about-torino" element={<AboutTorinoPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+      <TooltipProvider>
+        {/* Membungkus BrowserRouter dalam sebuah div untuk memastikan TooltipProvider memiliki satu elemen anak yang konkret */}
+        <div>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Navigate to="/torino-dashboard" replace />} />
+              <Route path="/torino-dashboard" element={<TorinoDashboard />} />
+              <Route path="/news" element={<NewsPortal />} />
+              <Route path="/sensors" element={<SensorsPage />} />
+              <Route path="/incidents" element={<IncidentsPage />} />
+              <Route path="/incidents/:id" element={<IncidentDetailPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/data-analysis" element={<DataAnalysisPage />} />
+              <Route path="/about-torino" element={<AboutTorinoPage />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
       </TooltipProvider>
     </>
   </QueryClientProvider>
