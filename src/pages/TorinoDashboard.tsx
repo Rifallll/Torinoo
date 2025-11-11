@@ -152,10 +152,10 @@ const TorinoDashboard = () => {
                       <Link to="/about-torino" className="flex flex-col items-center justify-center">
                         <Info className="h-6 w-6 text-yellow-600 mb-2" />
                         <span className="text-sm font-medium text-yellow-600">Tentang Kota Torino</span>
-                      </Link> {/* Corrected closing tag */}
+                      </Link>
                     </Button>
-                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto" onClick={() => setIsExportModalOpen(true)}>
-                      <div className="flex flex-col items-center justify-center">
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <div className="flex flex-col items-center justify-center" onClick={() => setIsExportModalOpen(true)}>
                         <Download className="h-6 w-6 text-purple-600 mb-2" />
                         <span className="text-sm font-medium text-purple-600">Ekspor</span>
                       </div>
