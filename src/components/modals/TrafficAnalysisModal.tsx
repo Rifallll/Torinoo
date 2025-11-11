@@ -13,7 +13,7 @@ interface TrafficAnalysisModalProps {
 const TrafficAnalysisModal: React.FC<TrafficAnalysisModalProps> = ({ isOpen, onClose }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Car className="mr-2 h-5 w-5" /> Analisis Lalu Lintas
