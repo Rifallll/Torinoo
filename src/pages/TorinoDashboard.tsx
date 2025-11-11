@@ -132,9 +132,9 @@ const TorinoDashboard = () => {
                     ))}
                   </div>
                   {/* Removed the button and replaced with plain text */}
-                  <p className="text-sm text-gray-500 mt-4">
+                  {/* <p className="text-sm text-gray-500 mt-4">
                     Untuk prakiraan detail, silakan lihat bagian laporan.
-                  </p>
+                  </p> */}
                 </CardContent>
               </Card>
 
