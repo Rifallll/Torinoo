@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/command";
 import {
   DialogDescription,
-  DialogHeader, // Keep import for potential future use or if other dialogs need it
+  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -103,10 +103,16 @@ const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOp
   }, [setOpen]);
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen} className="z-[9999]">
-      {/* Directly place DialogTitle and DialogDescription as children of CommandDialog */}
-      <DialogTitle className="sr-only">Command Palette</DialogTitle>
-      <DialogDescription className="sr-only">Search for commands or navigate the application.</DialogDescription>
+    <CommandDialog
+      open={open}
+      onOpenChange={setOpen}
+      className="z-[9999]"
+      aria-labelledby="dialog-title-command-palette"
+      aria-describedby="dialog-description-command-palette"
+    >
+      {/* Add DialogTitle and DialogDescription with explicit IDs for accessibility */}
+      <DialogTitle id="dialog-title-command-palette" className="sr-only">Command Palette</DialogTitle>
+      <DialogDescription id="dialog-description-command-palette" className="sr-only">Search for commands or navigate the application.</DialogDescription>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
