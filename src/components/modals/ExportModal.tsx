@@ -26,7 +26,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <Download className="mr-2 h-5 w-5" /> Ekspor Data
+            <span className="flex items-center"> {/* Wrapped icon and text in a span */}
+              <Download className="mr-2 h-5 w-5" /> Ekspor Data
+            </span>
           </DialogTitle>
           <DialogDescription>
             Pilih format untuk mengekspor tampilan peta atau data simulasi.

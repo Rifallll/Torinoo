@@ -16,7 +16,9 @@ const TrafficAnalysisModal: React.FC<TrafficAnalysisModalProps> = ({ isOpen, onC
       <DialogContent className="flex flex-col sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <Car className="mr-2 h-5 w-5" /> Analisis Lalu Lintas
+            <span className="flex items-center"> {/* Wrapped icon and text in a span */}
+              <Car className="mr-2 h-5 w-5" /> Analisis Lalu Lintas
+            </span>
           </DialogTitle>
           <DialogDescription>
             Berikut adalah beberapa insight lalu lintas simulasi untuk Kota Torino:
@@ -39,7 +41,7 @@ const TrafficAnalysisModal: React.FC<TrafficAnalysisModalProps> = ({ isOpen, onC
             *Ini adalah data simulasi. Analisis sebenarnya akan dihasilkan oleh sistem Python.
           </p>
         </div>
-        <DialogFooter className="sticky bottom-0 bg-white pt-4 border-t"> {/* Menambahkan sticky footer */}
+        <DialogFooter className="sticky bottom-0 bg-white pt-4 border-t">
           <Button onClick={onClose}>Tutup</Button>
         </DialogFooter>
       </DialogContent>

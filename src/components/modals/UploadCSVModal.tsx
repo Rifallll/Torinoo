@@ -40,7 +40,9 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <Upload className="mr-2 h-5 w-5" /> Upload CSV Data
+            <span className="flex items-center"> {/* Wrapped icon and text in a span */}
+              <Upload className="mr-2 h-5 w-5" /> Upload CSV Data
+            </span>
           </DialogTitle>
           <DialogDescription>
             Pilih file CSV yang berisi data lalu lintas untuk dianalisis.
