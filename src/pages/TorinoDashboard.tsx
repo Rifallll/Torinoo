@@ -17,6 +17,7 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
+import ActiveIncidentsSummary from '@/components/ActiveIncidentsSummary'; // Import the new component
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Import LineChart and Line
 
 const TorinoDashboard = () => {
@@ -148,6 +149,9 @@ const TorinoDashboard = () => {
             <div className="space-y-6">
               {/* New Weather Card */}
               <WeatherCard />
+
+              {/* New Active Incidents Summary Card */}
+              <ActiveIncidentsSummary />
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
