@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, Car, Clock } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Car, Clock, CheckCircle2 } from 'lucide-react'; // Added CheckCircle2
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -104,7 +104,9 @@ const IncidentsPage = () => {
                   </Badge>
                 </div>
               </div>
-              <Button variant="link" className="p-0 h-auto justify-start">View Details</Button>
+              <Button asChild variant="link" className="p-0 h-auto justify-start">
+                <Link to={`/incidents/${incident.id}`}>View Details</Link>
+              </Button>
             </CardContent>
           </Card>
         ))}
