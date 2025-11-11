@@ -1,9 +1,13 @@
 "use client";
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Newspaper, Info, Palette, Mail, CloudSun, Car, Activity } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, HelpCircle, User
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface TorinoSidebarProps {
   isSidebarOpen: boolean;
@@ -11,6 +15,60 @@ interface TorinoSidebarProps {
 }
 
 const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSidebarOpen }) => {
+  const location = useLocation();
+
+  const handleLogout = () => {
+    toast.info("Fungsi Logout belum diimplementasikan.");
+    // Dalam aplikasi nyata, Anda akan menangani logout autentikasi di sini
+  };
+
+  // Helper untuk memeriksa apakah kategori atau anak-anaknya aktif
+  const isCategoryActive = (paths: string[]) => {
+    return paths.some(path => location.pathname === path);
+  };
+
+  const NavItem = ({ to, icon: Icon, label, isCategory = false, categoryPaths = [], onClick }: { to?: string; icon: React.ElementType; label: string; isCategory?: boolean; categoryPaths?: string[]; onClick?: () => void }) => {
+    const isActiveLink = to && location.pathname === to;
+    const isActiveCategory = isCategory && isCategoryActive(categoryPaths);
+
+    const baseClasses = "flex items-center px-4 py-2 rounded-md transition-colors duration-200";
+    const activeClasses = "bg-blue-50/50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
+    const inactiveClasses = "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700";
+    const categoryTextClasses = "font-semibold";
+    const linkIndentClasses = "pl-12"; // Indentasi untuk sub-tautan
+
+    if (isCategory) {
+      return (
+        <div className={`${baseClasses} ${categoryTextClasses} ${isActiveCategory ? activeClasses : inactiveClasses}`}>
+          <Icon className="h-5 w-5 mr-3" />
+          <span>{label}</span>
+        </div>
+      );
+    }
+
+    const content = (
+      <>
+        <Icon className="h-5 w-5 mr-3" />
+        <span>{label}</span>
+      </>
+    );
+
+    if (to) {
+      return (
+        <Link to={to} className={`${baseClasses} ${linkIndentClasses} ${isActiveLink ? activeClasses : inactiveClasses}`} onClick={() => setIsSidebarOpen(false)}>
+          {content}
+        </Link>
+      );
+    } else if (onClick) {
+      return (
+        <Button variant="ghost" className={`${baseClasses} ${linkIndentClasses} w-full justify-start ${inactiveClasses}`} onClick={onClick}>
+          {content}
+        </Button>
+      );
+    }
+    return null;
+  };
+
   return (
     <div
       id="sidebar"
@@ -41,70 +99,51 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
         </Button>
       </div>
 
-      <nav className="px-2 space-y-4">
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">Overview</h3>
-          <Link to="/" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Home className="h-5 w-5 mr-3" />
-            Beranda
-          </Link>
-          <Link to="/torino-dashboard" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <MapPin className="h-5 w-5 mr-3" />
-            Dashboard Lalu Lintas
-          </Link>
+      {/* User Profile */}
+      <div className="flex items-center px-4 py-2 mb-4">
+        <img className="h-10 w-10 rounded-full mr-3" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User Avatar" />
+        <span className="font-semibold text-lg text-gray-800 dark:text-gray-100">Afrin Leena</span>
+      </div>
+
+      <nav className="px-2 space-y-1">
+        {/* Overview */}
+        <NavItem icon={LayoutDashboard} label="Overview" isCategory categoryPaths={["/", "/torino-dashboard"]} />
+        <NavItem to="/" icon={Home} label="Beranda" />
+        <NavItem to="/torino-dashboard" icon={MapPin} label="Dashboard Lalu Lintas" />
+
+        {/* Transportations */}
+        <NavItem icon={Bike} label="Transportations" isCategory categoryPaths={["/sensors", "/incidents", "/reports"]} />
+        <NavItem to="/sensors" icon={Activity} label="Sensor" />
+        <NavItem to="/incidents" icon={Bell} label="Insiden" />
+        <NavItem to="/reports" icon={BarChart2} label="Laporan" />
+
+        {/* Traffic */}
+        <NavItem icon={TrafficCone} label="Traffic" isCategory categoryPaths={["/data-analysis"]} />
+        <NavItem to="/data-analysis" icon={BarChart2} label="Analisis Data" />
+
+        {/* Weather */}
+        <NavItem icon={CloudSun} label="Weather" isCategory categoryPaths={["/weather"]} />
+        <NavItem to="/weather" icon={CloudSun} label="Prakiraan Cuaca Torino" />
+
+        {/* News */}
+        <NavItem icon={Newspaper} label="News" isCategory categoryPaths={["/news"]} />
+        <NavItem to="/news" icon={Newspaper} label="Portal Berita" />
+
+        {/* Others */}
+        <NavItem icon={Info} label="Others" isCategory categoryPaths={["/about-torino", "/culture-tourism", "/contact-collaboration"]} />
+        <NavItem to="/about-torino" icon={Info} label="Tentang Torino" />
+        <NavItem to="/contact-collaboration" icon={Mail} label="Kontak & Kolaborasi" />
+
+        {/* Account */}
+        <div className="pt-4">
+          <NavItem icon={User} label="Account" isCategory categoryPaths={["#settings", "#logout"]} />
+          <NavItem icon={Settings} label="Settings" onClick={() => toast.info("Halaman Pengaturan belum diimplementasikan.")} />
+          <NavItem icon={LogOut} label="Log out" onClick={handleLogout} />
         </div>
 
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">Transportation</h3>
-          <Link to="/sensors" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Activity className="h-5 w-5 mr-3" />
-            Sensor
-          </Link>
-          <Link to="/incidents" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Bell className="h-5 w-5 mr-3" />
-            Insiden
-          </Link>
-          <Link to="/reports" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <BarChart2 className="h-5 w-5 mr-3" />
-            Laporan
-          </Link>
-        </div>
-
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">Traffic</h3>
-          <Link to="/data-analysis" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <BarChart2 className="h-5 w-5 mr-3" />
-            Analisis Data
-          </Link>
-        </div>
-
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">Weather</h3>
-          <Link to="/weather" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <CloudSun className="h-5 w-5 mr-3" />
-            Prakiraan Cuaca Torino
-          </Link>
-        </div>
-
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">News</h3>
-          <Link to="/news" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Newspaper className="h-5 w-5 mr-3" />
-            Portal Berita
-          </Link>
-        </div>
-
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">Others</h3>
-          {/* Tautan Budaya & Pariwisata dipindahkan ke halaman Tentang Torino */}
-          <Link to="/about-torino" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Info className="h-5 w-5 mr-3" />
-            Tentang Torino
-          </Link>
-          <Link to="/contact-collaboration" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Mail className="h-5 w-5 mr-3" />
-            Kontak & Kolaborasi
-          </Link>
+        {/* FAQ */}
+        <div className="pt-4">
+          <NavItem icon={HelpCircle} label="FAQ" isCategory onClick={() => toast.info("Halaman FAQ belum diimplementasikan.")} />
         </div>
       </nav>
     </div>
