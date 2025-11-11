@@ -15,6 +15,7 @@ import UploadCSVModal from '@/components/modals/UploadCSVModal';
 import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
 import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
+import RecentNewsSection from '@/components/RecentNewsSection'; // Import the new component
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -164,6 +165,11 @@ const TorinoDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          {/* New section for Recent News */}
+          <div className="mt-6">
+            <RecentNewsSection />
           </div>
         </main>
       </div>
