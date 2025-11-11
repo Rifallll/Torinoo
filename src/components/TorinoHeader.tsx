@@ -56,7 +56,6 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
           </div>
 
           <div className="flex items-center space-x-6 text-white">
-            {/* "Go to Grid", "Go to Map", and "Change City" dropdown have been removed */}
             <div className="text-right">
               <p className="text-sm">{formattedDate}</p>
               <p className="text-2xl font-bold">{formattedTime}</p>
