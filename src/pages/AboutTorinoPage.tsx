@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Info, Building2, Users, MapPin, History, Coffee, Car, Factory } from 'lucide-react';
+import { ArrowLeft, Info, Building2, Users, MapPin, History, Coffee, Car, Factory, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -78,6 +78,16 @@ const AboutTorinoPage = () => {
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               Efisiensi lalu lintas sangat penting bagi Torino untuk mendukung pertumbuhan ekonomi dan kualitas hidup penduduknya. Dengan sistem manajemen lalu lintas yang cerdas, kota ini dapat mengurangi kemacetan, meningkatkan keamanan jalan, dan mempromosikan mobilitas yang berkelanjutan. Proyek ini bertujuan untuk membantu mencapai tujuan tersebut dengan menyediakan alat analisis dan visualisasi yang canggih.
             </p>
+
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Jelajahi Lebih Lanjut</h3>
+              <Button asChild className="w-full md:w-auto">
+                <Link to="/culture-tourism" className="flex items-center justify-center">
+                  <Palette className="h-5 w-5 mr-2" />
+                  Budaya, Kuliner & Pariwisata
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </main>

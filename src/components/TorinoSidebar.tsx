@@ -96,10 +96,7 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
 
         <div>
           <h3 className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 px-4 mb-2">Others</h3>
-          {/* <Link to="/culture-tourism" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-            <Palette className="h-5 w-5 mr-3" />
-            Budaya & Pariwisata
-          </Link> */}
+          {/* Tautan Budaya & Pariwisata dipindahkan ke halaman Tentang Torino */}
           <Link to="/about-torino" className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
             <Info className="h-5 w-5 mr-3" />
             Tentang Torino
