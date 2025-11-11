@@ -367,21 +367,29 @@ const TrafficDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
-                    <Button variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
-                      <Plus className="h-6 w-6 text-indigo-600 mb-2" />
-                      <span className="text-sm font-medium text-indigo-600">Add Incident</span>
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <Link to="/incidents" className="flex flex-col items-center justify-center">
+                        <Plus className="h-6 w-6 text-indigo-600 mb-2" />
+                        <span className="text-sm font-medium text-indigo-600">Add Incident</span>
+                      </Link>
                     </Button>
-                    <Button variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
-                      <Users className="h-6 w-6 text-green-600 mb-2" />
-                      <span className="text-sm font-medium text-green-600">Manage Sensors</span>
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <Link to="/sensors" className="flex flex-col items-center justify-center">
+                        <Users className="h-6 w-6 text-green-600 mb-2" />
+                        <span className="text-sm font-medium text-green-600">Manage Sensors</span>
+                      </Link>
                     </Button>
-                    <Button variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
-                      <MapPin className="h-6 w-6 text-yellow-600 mb-2" />
-                      <span className="text-sm font-medium text-yellow-600">View Map</span>
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <Link to="/dashboard" className="flex flex-col items-center justify-center"> {/* Navigates to dashboard */}
+                        <MapPin className="h-6 w-6 text-yellow-600 mb-2" />
+                        <span className="text-sm font-medium text-yellow-600">View Map</span>
+                      </Link>
                     </Button>
-                    <Button variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
-                      <BarChart2 className="h-6 w-6 text-purple-600 mb-2" />
-                      <span className="text-sm font-medium text-purple-600">Reports</span>
+                    <Button asChild variant="outline" className="flex flex-col items-center justify-center p-3 h-auto">
+                      <Link to="/reports" className="flex flex-col items-center justify-center">
+                        <BarChart2 className="h-6 w-6 text-purple-600 mb-2" />
+                        <span className="text-sm font-medium text-purple-600">Reports</span>
+                      </Link>
                     </Button>
                   </div>
                 </CardContent>
