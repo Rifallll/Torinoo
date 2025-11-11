@@ -20,20 +20,22 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
     return () => clearInterval(timer);
   }, []);
 
-  // Format date and time for Torino, Italy (Europe/Rome timezone)
+  // Format date for Torino, Italy (Europe/Rome timezone) including the year
   const formattedDate = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
-    month: 'long',
     day: 'numeric',
+    month: 'long',
+    year: 'numeric', // Include year as per user's text request
     timeZone: 'Europe/Rome',
   }).format(currentDateTime);
 
+  // Format time for Torino, Italy (Europe/Rome timezone) in HH.MM format
   const formattedTime = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false, // Use 24-hour format for consistency
+    hour12: false, // Ensure 24-hour format
     timeZone: 'Europe/Rome',
-  }).format(currentDateTime);
+  }).format(currentDateTime).replace(':', '.'); // Replace colon with dot
 
   return (
     <header className="bg-blue-800 shadow-sm z-20">
@@ -50,17 +52,17 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
               {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
             <div className="flex flex-col items-start ml-4">
-              <h2 className="text-2xl font-bold text-white">Torino</h2>
-              <div className="text-white text-xs mt-1">
-                <p className="font-medium">{formattedDate}</p>
-                <p className="text-lg font-bold">{formattedTime} <span className="text-sm font-normal">Torino, Italy</span></p>
+              <h2 className="text-3xl font-bold text-white">Torino</h2> {/* Adjusted size */}
+              <div className="text-white mt-1">
+                <p className="text-sm font-medium">{formattedDate}</p> {/* Adjusted size */}
+                <p className="text-4xl font-bold leading-none">{formattedTime} <span className="text-base font-normal">Torino, Italy</span></p> {/* Adjusted size and line-height */}
               </div>
             </div>
           </div>
 
           {/* Right Section: Search Bar */}
           <div className="flex items-center">
-            <div className="relative w-64"> {/* Adjusted width for search bar */}
+            <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
                 type="text"
