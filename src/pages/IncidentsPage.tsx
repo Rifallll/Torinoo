@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, Car, Clock, CheckCircle2 } from 'lucide-react'; // Added CheckCircle2
+import { ArrowLeft, AlertTriangle, Car, Clock, CheckCircle2 } from 'lucide-react'; // Ensuring CheckCircle2 is imported
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
