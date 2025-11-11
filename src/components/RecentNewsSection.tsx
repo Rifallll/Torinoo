@@ -9,23 +9,23 @@ import { Newspaper, ArrowRight } from 'lucide-react';
 const recentNewsArticles = [
   {
     id: '1',
-    title: 'New Smart Traffic Lights Reduce Congestion by 15%',
-    date: 'October 26, 2023',
-    summary: 'A pilot program implementing AI-powered traffic lights has shown promising results...',
+    title: 'Current Congestion Alert: Via Roma Heavy Traffic',
+    date: 'November 11, 2023', // Updated date to reflect "today"
+    summary: 'Heavy congestion reported on Via Roma due to an ongoing event. Drivers advised to seek alternative routes.',
     imageUrl: 'https://images.unsplash.com/photo-1532936790947-d06f70530588?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: '2',
-    title: 'City Launches Public Awareness Campaign for Pedestrian Safety',
-    date: 'October 25, 2023',
-    summary: 'Authorities are urging residents to be more vigilant on roads with a new campaign...',
+    title: 'Minor Accident Cleared on Corso Vittorio Emanuele II',
+    date: 'November 11, 2023', // Updated date to reflect "today"
+    summary: 'A minor vehicle incident has been cleared, traffic flow returning to normal. Expect residual delays.',
     imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: '3',
-    title: 'Upcoming Road Closures for Infrastructure Maintenance',
-    date: 'October 24, 2023',
-    summary: 'Several key roads will experience temporary closures next week for essential maintenance...',
+    title: 'Public Transport Delays Expected Due to Weather',
+    date: 'November 11, 2023', // Updated date to reflect "today"
+    summary: 'Light rain causing minor delays across bus and tram services. Check schedules before travel.',
     imageUrl: 'https://images.unsplash.com/photo-1541888946526-c29d02993b9f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
 ];
@@ -35,11 +35,11 @@ const RecentNewsSection: React.FC = () => {
     <Card className="lg:col-span-3"> {/* Span across all columns on large screens */}
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold text-gray-800 flex items-center">
-          <Newspaper className="h-5 w-5 mr-2 text-indigo-600" /> Latest Traffic News
+          <Newspaper className="h-5 w-5 mr-2 text-indigo-600" /> Today's Traffic News
         </CardTitle>
         <Button asChild variant="link" className="p-0 h-auto">
           <Link to="/news" className="flex items-center text-indigo-600 hover:text-indigo-700">
-            View All News <ArrowRight className="ml-1 h-4 w-4" />
+            View All Torino News <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         </Button>
       </CardHeader>
