@@ -3,7 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import TrafficDashboard from "./pages/TrafficDashboard"; // Import the new dashboard
+import TrafficDashboard from "./pages/TrafficDashboard";
+import NewsPortal from "./pages/NewsPortal"; // Import the new NewsPortal
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -15,8 +16,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} /> {/* Redirect root to dashboard */}
-          <Route path="/dashboard" element={<TrafficDashboard />} /> {/* New dashboard route */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<TrafficDashboard />} />
+          <Route path="/news" element={<NewsPortal />} /> {/* New News Portal route */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

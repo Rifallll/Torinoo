@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity } from 'lucide-react';
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper } from 'lucide-react'; // Added Newspaper icon
 import MapComponent from '@/components/MapComponent';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { Button } from '@/components/ui/button';
@@ -99,6 +99,10 @@ const TrafficDashboard = () => {
           <Link to="/reports" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
             <BarChart2 className="h-5 w-5 mr-3" />
             Reports
+          </Link>
+          <Link to="/news" className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+            <Newspaper className="h-5 w-5 mr-3" />
+            News Portal
           </Link>
         </nav>
 
