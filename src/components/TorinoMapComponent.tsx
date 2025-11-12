@@ -28,6 +28,24 @@ const TorinoMapComponent: React.FC = () => {
   const minZoomForGeoJSON = 14; // Minimum zoom level to display the GeoJSON layer
 
   useEffect(() => {
+    // Function to update GeoJSON layer visibility based on zoom
+    // Defined here so it's accessible throughout the effect, including cleanup
+    const updateGeoJSONVisibility = () => {
+      if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
+
+      if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
+        if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+          geoJsonLayerGroupRef.current.addTo(mapRef.current);
+          toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
+        }
+      } else {
+        if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+          mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
+          toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
+        }
+      }
+    };
+
     if (!mapRef.current) {
       // Initialize map with preferCanvas: true for better performance with complex vector data
       mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
@@ -100,23 +118,6 @@ const TorinoMapComponent: React.FC = () => {
         onRemove: function(map: L.Map) {},
       });
       new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
-
-      // Function to update GeoJSON layer visibility based on zoom
-      const updateGeoJSONVisibility = () => {
-        if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
-
-        if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
-          if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-            geoJsonLayerGroupRef.current.addTo(mapRef.current);
-            toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
-          }
-        } else {
-          if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-            mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
-            toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
-          }
-        }
-      };
 
       // Add event listener for zoom changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
