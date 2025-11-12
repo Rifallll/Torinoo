@@ -5,6 +5,7 @@ import {
   OTPInput,
   OTPInputContext,
   type SlotProps,
+  type RenderProps, // Import RenderProps
 } from "input-otp";
 import { Dot } from "lucide-react";
 
@@ -38,10 +39,8 @@ const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
 >(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(
-    OTPInputContext,
-  ) as { slots: Array<SlotProps & { inputProps: React.InputHTMLAttributes<HTMLInputElement> }> }; // Explicitly type the context to include slots with inputProps
-  const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index];
+  const { slots } = React.useContext(OTPInputContext) as RenderProps; // Use RenderProps directly
+  const { char, hasFakeCaret, isActive, inputProps } = slots[index]; // Destructure inputProps
 
   return (
     <div
@@ -68,10 +67,7 @@ const InputOTPMessenger = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(
-    OTPInputContext,
-  ) as { slots: Array<SlotProps & { inputProps: React.InputHTMLAttributes<HTMLInputElement> }> }; // Explicitly type the context to include slots with inputProps
-  const { slots } = inputOTPContext;
+  const { slots } = React.useContext(OTPInputContext) as RenderProps; // Use RenderProps directly
 
   return (
     <div ref={ref} className={cn("sr-only", className)} {...props}>

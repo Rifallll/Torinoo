@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 type CarouselApi = UseEmblaCarouselType[1];
 
 type CarouselProps = {
-  opts?: React.ComponentProps<typeof useEmblaCarousel>[0];
+  opts?: Parameters<typeof useEmblaCarousel>[0]; // Correctly get the type of the first parameter of useEmblaCarousel
   orientation?: "horizontal" | "vertical";
   setApi?: (api: CarouselApi) => void;
 } & React.ComponentPropsWithoutRef<"div">;
