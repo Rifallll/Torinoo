@@ -259,6 +259,26 @@ const RealtimePublicTransport: React.FC = () => {
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
         )}
+
+        {/* Temporary Raw Data Display for Debugging */}
+        {vehiclePositions.length > 0 && (
+          <Card className="mt-6 bg-gray-50 dark:bg-gray-900 border-dashed border-2 border-gray-300 dark:border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+                <Info className="h-5 w-5 mr-2 text-gray-500" /> Raw Vehicle Positions Data (Debug)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all max-h-60 overflow-y-auto p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
+                {JSON.stringify(vehiclePositions.slice(0, 5), null, 2)} {/* Display first 5 items */}
+              </pre>
+              <p className="text-xs text-gray-500 mt-2">
+                Ini adalah 5 entri pertama dari data posisi kendaraan mentah untuk tujuan debugging.
+                Harap salin dan tempelkan ini ke dalam chat.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </CardContent>
     </Card>
   );
