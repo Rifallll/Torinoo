@@ -262,7 +262,7 @@ const RealtimePublicTransport: React.FC = () => {
             ))}
             {vehiclePositions.length > 5 && (
               <div className="text-center mt-4">
-                <Button variant="outline" onClick={() => setShowAllVehiclePositions(!showAllVehiclePositions)} className="w-full">
+                <Button variant="outline" onClick={() => setShowAllVehiclePositions(!showAllVehiclePositions)} className="">
                   {showAllVehiclePositions ? (
                     <>
                       <ChevronUp className="h-4 w-4 mr-2" /> Tampilkan Lebih Sedikit
