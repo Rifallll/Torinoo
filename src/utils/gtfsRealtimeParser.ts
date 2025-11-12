@@ -153,14 +153,13 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     }
     return entities;
   } catch (error) {
-    // Only log/toast critical errors for vehicle_position, as it's the primary data source.
-    // For trip_update and alert, we'll just log a warning to console, but don't show toast or console.error
+    // Only log/toast critical errors for vehicle_position.
+    // For trip_update and alert, suppress console output for parsing errors.
     if (type === 'vehicle_position') {
       console.error(`Error parsing ${type}.bin from ${path}:`, error);
       toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
-    } else {
-      console.warn(`Warning: Failed to parse ${type}.bin from ${path}. It might be empty or malformed. Error: ${error instanceof Error ? error.message : String(error)}`);
     }
+    // For 'trip_update' and 'alert', we will now completely suppress console.warn/toast.warning for parsing errors.
     return [];
   }
 };
