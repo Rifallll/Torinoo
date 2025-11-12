@@ -184,9 +184,6 @@ const AllVehiclePositionsPage: React.FC = () => {
                   </span>
                   <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <span>Start Date: {formatStartDate(vp.trip?.start_date)}</span>
-                </div>
               </CardContent>
             </Card>
           ))

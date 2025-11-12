@@ -12,7 +12,7 @@ const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
   const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]); // Renamed state variable to avoid conflict
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = true);
   const [error, setError] = useState<string | null>(null);
   // Removed showAllVehiclePositions state as it's no longer needed for toggling within the component
 
@@ -253,11 +253,6 @@ const RealtimePublicTransport: React.FC = () => {
                   <span className="flex items-center">
                     <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
                   </span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  <span>Trip ID: {vp.trip?.trip_id || 'N/A'}</span>
-                  <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
-                  <span>Start Date: {formatStartDate(vp.trip?.start_date)}</span>
                 </div>
               </div>
             ))}
