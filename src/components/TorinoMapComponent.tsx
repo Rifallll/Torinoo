@@ -223,7 +223,7 @@ const TorinoMapComponent: React.FC = () => {
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.2 // Mengurangi opasitas menjadi 0.2 untuk membuatnya lebih transparan
+                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
               };
             }
           });
