@@ -28,13 +28,13 @@ export interface ParsedTripUpdate {
 
 export interface ParsedVehiclePosition {
   id: string;
-  trip?: { // Make trip optional as it might not always be present or fully populated
+  trip?: { // TripDescriptor is nested inside VehiclePosition
     trip_id?: string;
     route_id?: string;
     start_date?: string;
     start_time?: string;
   };
-  vehicle?: {
+  vehicle?: { // VehicleDescriptor is nested inside VehiclePosition
     id?: string;
     label?: string;
     license_plate?: string;
@@ -104,8 +104,8 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     const buffer = await response.arrayBuffer();
     const message = FeedMessage.decode(new Uint8Array(buffer));
     const payload = FeedMessage.toObject(message, {
-      longs: Number, // Changed to Number to get actual numbers for timestamps
-      enums: String,
+      longs: Number, // Ensure timestamps are numbers
+      enums: String, // Ensure enums are strings
       bytes: String,
     });
 
@@ -115,13 +115,21 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
         if (type === 'trip_update' && entity.tripUpdate) {
           entities.push({ id: entity.id, ...entity.tripUpdate } as ParsedTripUpdate);
         } else if (type === 'vehicle_position' && entity.vehicle) {
-          // Ensure trip and vehicle are correctly nested if they exist
-          entities.push({ id: entity.id, ...entity.vehicle, trip: entity.trip } as ParsedVehiclePosition);
+          // Corrected: entity.vehicle itself is the VehiclePosition object,
+          // which should already contain nested 'trip' and 'vehicle' descriptors.
+          entities.push({ id: entity.id, ...entity.vehicle } as ParsedVehiclePosition);
         } else if (type === 'alert' && entity.alert) {
           entities.push({ id: entity.id, ...entity.alert } as ParsedAlert);
         }
       }
     }
+
+    // Add detailed logging for vehicle_position to aid debugging
+    if (type === 'vehicle_position') {
+      console.log(`[GTFS Parser] Raw payload for ${path}:`, payload);
+      console.log(`[GTFS Parser] Extracted vehicle positions for ${path}:`, entities);
+    }
+
     return entities;
   } catch (error) {
     console.error(`Error parsing ${type}.bin from ${path}:`, error);
@@ -133,7 +141,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
 export const parseGtfsRealtimeData = async (
   tripUpdateBinPath: string,
   alertBinPath: string,
-  vehiclePositionBinPath: string // Added vehiclePositionBinPath
+  vehiclePositionBinPath: string
 ): Promise<ParsedGtfsRealtimeData> => {
   await loadProto();
 
