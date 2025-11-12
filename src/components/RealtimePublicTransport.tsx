@@ -72,10 +72,10 @@ const RealtimePublicTransport: React.FC = () => {
   }, []); // Empty dependency array means this effect runs once on mount and cleanup
 
   const formatDelay = (delaySeconds: number | undefined) => {
-    if (delaySeconds === undefined || delaySeconds === 0) return 'On Time';
+    if (delaySeconds === undefined || delaySeconds === 0) return 'Tepat Waktu';
     const minutes = Math.abs(Math.round(delaySeconds / 60));
-    if (delaySeconds > 0) return `${minutes} min Delayed`;
-    return `${minutes} min Early`;
+    if (delaySeconds > 0) return `${minutes} mnt Terlambat`;
+    return `${minutes} mnt Lebih Awal`;
   };
 
   const getDelayBadgeClass = (delaySeconds: number | undefined) => {
@@ -104,10 +104,36 @@ const RealtimePublicTransport: React.FC = () => {
   const formatTimestamp = (timestamp?: number | string) => {
     if (timestamp === undefined || timestamp === null) return 'N/A';
     const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-    if (isNaN(numTimestamp)) return 'Invalid Date'; // Handle NaN explicitly
+    if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid'; // Handle NaN explicitly
     const date = new Date(numTimestamp * 1000);
-    if (isNaN(date.getTime())) return 'Invalid Date'; // Check if Date object is valid
+    if (isNaN(date.getTime())) return 'Tanggal Tidak Valid'; // Check if Date object is valid
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
+  const getVehicleStatus = (status: string | undefined) => {
+    if (!status) return 'Status Tidak Tersedia';
+
+    // Common GTFS-realtime VehicleStopStatus enum values
+    // Mapping to Indonesian for better readability
+    switch (status) {
+      case 'IN_TRANSIT_TO':
+      case '0': // If it's coming as a number 0 (common default for IN_TRANSIT_TO)
+        return 'Dalam Perjalanan';
+      case 'STOPPED_AT_STATION':
+      case '1': // If it's coming as a number 1
+        return 'Berhenti di Stasiun';
+      case 'IN_VEHICLE_BAY':
+      case '2': // If it's coming as a number 2
+        return 'Di Teluk Kendaraan';
+      case 'AT_PLATFORM':
+      case '3': // If it's coming as a number 3
+        return 'Di Platform';
+      case 'UNKNOWN_STOP_STATUS': // Explicit unknown from proto
+        return 'Status Tidak Diketahui';
+      default:
+        // Fallback for other string statuses, replacing underscores
+        return status.replace(/_/g, ' ');
+    }
   };
 
   if (isLoading) {
@@ -187,7 +213,7 @@ const RealtimePublicTransport: React.FC = () => {
                   Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
                 </h4>
                 <Badge variant="secondary" className="text-xs">
-                  {vp.current_status?.replace(/_/g, ' ') || 'UNKNOWN'}
+                  {getVehicleStatus(vp.current_status)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
