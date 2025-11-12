@@ -92,15 +92,21 @@ const RealtimePublicTransport: React.FC = () => {
     if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram (often 0 for tram/light rail)
 
     // Fallback to routeId inference for TripUpdate/VehiclePosition if routeType is not provided
-    if (routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
-    if (routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />; // Example tram routes
+    if (routeId) {
+      // Example: if routeId contains 'B' for Bus, 'T' for Tram, etc.
+      if (routeId.includes('B') || routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
+      if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
+    }
 
     return <Info className="h-4 w-4 mr-1" />; // Default/Unknown
   };
 
-  const formatTimestamp = (timestamp?: number) => {
-    if (!timestamp) return 'N/A';
-    const date = new Date(Number(timestamp) * 1000); // Convert Unix timestamp to milliseconds
+  const formatTimestamp = (timestamp?: number | string) => {
+    if (timestamp === undefined || timestamp === null) return 'N/A';
+    const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
+    if (isNaN(numTimestamp)) return 'Invalid Date'; // Handle NaN explicitly
+    const date = new Date(numTimestamp * 1000);
+    if (isNaN(date.getTime())) return 'Invalid Date'; // Check if Date object is valid
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
@@ -178,7 +184,7 @@ const RealtimePublicTransport: React.FC = () => {
               <div className="flex items-center justify-between mb-1">
                 <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
                   {getRouteTypeIcon(vp.trip?.route_id)}
-                  Jalur {vp.trip?.route_id || 'N/A'} ({vp.vehicle?.label || vp.id})
+                  Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
                 </h4>
                 <Badge variant="secondary" className="text-xs">
                   {vp.current_status?.replace(/_/g, ' ') || 'UNKNOWN'}
@@ -207,7 +213,7 @@ const RealtimePublicTransport: React.FC = () => {
               <div className="flex items-center justify-between mb-1">
                 <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
                   {getRouteTypeIcon(update.trip.route_id)}
-                  Jalur {update.trip.route_id} ({update.trip.trip_id})
+                  Jalur {update.trip.route_id || update.vehicle?.label || update.id} ({update.trip.trip_id || 'N/A'})
                 </h4>
                 <Badge className={getDelayBadgeClass(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}>
                   {formatDelay(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}

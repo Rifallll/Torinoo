@@ -104,7 +104,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     const buffer = await response.arrayBuffer();
     const message = FeedMessage.decode(new Uint8Array(buffer));
     const payload = FeedMessage.toObject(message, {
-      longs: String,
+      longs: Number, // Changed to Number to get actual numbers for timestamps
       enums: String,
       bytes: String,
     });
@@ -115,7 +115,8 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
         if (type === 'trip_update' && entity.tripUpdate) {
           entities.push({ id: entity.id, ...entity.tripUpdate } as ParsedTripUpdate);
         } else if (type === 'vehicle_position' && entity.vehicle) {
-          entities.push({ id: entity.id, ...entity.vehicle } as ParsedVehiclePosition);
+          // Ensure trip and vehicle are correctly nested if they exist
+          entities.push({ id: entity.id, ...entity.vehicle, trip: entity.trip } as ParsedVehiclePosition);
         } else if (type === 'alert' && entity.alert) {
           entities.push({ id: entity.id, ...entity.alert } as ParsedAlert);
         }
