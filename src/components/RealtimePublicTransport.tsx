@@ -2,30 +2,28 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ListChecks } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button'; // Import Button component
-import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser'; // Import ParsedVehiclePosition
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Button } from '@/components/ui/button';
+import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser';
+import { Link } from 'react-router-dom';
 
 const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
-  const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]); // Renamed state variable to avoid conflict
+  const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]);
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Perbaikan di sini
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Removed showAllVehiclePositions state as it's no longer needed for toggling within the component
 
   const fetchAndParseData = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Pass all three bin paths
       const data = await parseGtfsRealtimeData('/trip_update.bin', '/alerts.bin', '/vehicle_position.bin');
       setTripUpdates(data.tripUpdates);
-      setVehiclePositionData(data.vehiclePositions); // Set vehicle positions
+      setVehiclePositionData(data.vehiclePositions);
       setAlerts(data.alerts);
-      console.log("[RealtimePublicTransport] Fetched Vehicle Positions:", data.vehiclePositions); // Added console log here
+      console.log("[RealtimePublicTransport] Fetched Vehicle Positions:", data.vehiclePositions);
       console.log("[RealtimePublicTransport] Fetched Trip Updates:", data.tripUpdates);
       console.log("[RealtimePublicTransport] Fetched Alerts:", data.alerts);
     } catch (err) {
@@ -39,7 +37,6 @@ const RealtimePublicTransport: React.FC = () => {
   useEffect(() => {
     fetchAndParseData();
 
-    // Define possible occupancy statuses in a logical order for gradual changes
     const occupancyStatuses = [
       'EMPTY',
       'MANY_SEATS_AVAILABLE',
@@ -49,9 +46,7 @@ const RealtimePublicTransport: React.FC = () => {
       'FULL',
     ];
 
-    // Simulate real-time updates for trip delays and vehicle positions
     const interval = setInterval(() => {
-      // Simulate delay changes for trip updates
       setTripUpdates(prevUpdates =>
         prevUpdates.map(update => {
           const currentDelay = update.delay || (update.stop_time_update?.[0]?.arrival?.delay || 0);
@@ -65,19 +60,16 @@ const RealtimePublicTransport: React.FC = () => {
         })
       );
 
-      // Simulate vehicle movement/status changes (example: just updating timestamp)
       setVehiclePositionData(prevPositions =>
         prevPositions.map(vp => {
-          const newTimestamp = vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000); // Increment timestamp
+          const newTimestamp = vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000);
 
-          // Simulate small random position change
-          const newLatitude = (vp.position?.latitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
-          const newLongitude = (vp.position?.longitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
+          const newLatitude = (vp.position?.latitude || 0) + (Math.random() - 0.5) * 0.0001;
+          const newLongitude = (vp.position?.longitude || 0) + (Math.random() - 0.5) * 0.0001;
 
-          // Simulate gradual random occupancy status change
           const currentOccupancyIndex = occupancyStatuses.indexOf(vp.occupancy_status || 'EMPTY');
-          let newOccupancyIndex = currentOccupancyIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0); // 30% chance to change by +/- 1
-          newOccupancyIndex = Math.max(0, Math.min(occupancyStatuses.length - 1, newOccupancyIndex)); // Clamp between min/max index
+          let newOccupancyIndex = currentOccupancyIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0);
+          newOccupancyIndex = Math.max(0, Math.min(occupancyStatuses.length - 1, newOccupancyIndex));
           const newOccupancyStatus = occupancyStatuses[newOccupancyIndex];
 
           return {
@@ -93,18 +85,15 @@ const RealtimePublicTransport: React.FC = () => {
         })
       );
 
-      // Filter active alerts based on current time (mocking active period)
-      // This assumes alerts are static and only their active_period changes relative to current time
-      // If alerts themselves change, they would need to be refetched or updated from a source
       setAlerts(prevAlerts => prevAlerts.filter(alert => {
         const now = Math.floor(Date.now() / 1000);
         const activePeriod = alert.active_period?.[0];
         return activePeriod && now >= (activePeriod.start || 0) && now <= (activePeriod.end || Infinity);
       }));
-    }, 15000); // Update every 15 seconds
+    }, 15000);
 
     return () => clearInterval(interval);
-  }, []); // Empty dependency array means this effect runs once on mount and cleanup
+  }, []);
 
   const formatDelay = (delaySeconds: number | undefined) => {
     if (delaySeconds === undefined || delaySeconds === 0) return 'Tepat Waktu';
@@ -115,44 +104,36 @@ const RealtimePublicTransport: React.FC = () => {
 
   const getDelayBadgeClass = (delaySeconds: number | undefined) => {
     if (delaySeconds === undefined) return "bg-gray-100 text-gray-600 hover:bg-gray-100";
-    if (delaySeconds > 120) return "bg-red-100 text-red-600 hover:bg-red-100"; // More than 2 min delay
-    if (delaySeconds > 0) return "bg-yellow-100 text-yellow-600 hover:bg-yellow-100"; // Delayed
-    if (delaySeconds < 0) return "bg-green-100 text-green-600 hover:bg-green-100"; // Early
-    return "bg-gray-100 text-gray-600 hover:bg-gray-100"; // On Time
+    if (delaySeconds > 120) return "bg-red-100 text-red-600 hover:bg-red-100";
+    if (delaySeconds > 0) return "bg-yellow-100 text-yellow-600 hover:bg-yellow-100";
+    if (delaySeconds < 0) return "bg-green-100 text-green-600 hover:bg-green-100";
+    return "bg-gray-100 text-gray-600 hover:bg-gray-100";
   };
 
   const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
-    // Prioritize routeType if available (e.g., from alerts)
-    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />; // Bus
-    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram (often 0 for tram/light rail)
-
-    // Fallback to routeId inference for TripUpdate/VehiclePosition if routeType is not provided
+    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />;
+    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />;
     if (routeId) {
-      // Example: if routeId contains 'B' for Bus, 'T' for Tram, etc.
       if (routeId.includes('B') || routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
       if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
-      // Based on the provided data, "10U" looks like a route ID, which could be a bus.
       if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
     }
-
-    return <Info className="h-4 w-4 mr-1" />; // Default/Unknown
+    return <Info className="h-4 w-4 mr-1" />;
   };
 
   const formatTimestamp = (timestamp?: number | string) => {
     if (timestamp === undefined || timestamp === null) return 'N/A';
     const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-    if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid'; // Handle NaN explicitly
+    if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid';
     const date = new Date(numTimestamp * 1000);
-    if (isNaN(date.getTime())) return 'Tanggal Tidak Valid'; // Check if Date object is valid
+    if (isNaN(date.getTime())) return 'Tanggal Tidak Valid';
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
-  const formatStartDate = (dateString?: string) => {
-    if (!dateString || dateString.length !== 8) return 'N/A';
-    const year = dateString.substring(0, 4);
-    const month = dateString.substring(4, 6);
-    const day = dateString.substring(6, 8);
-    return `${day}/${month}/${year}`; // Format as DD/MM/YYYY
+  const formatTime = (timestamp?: number) => {
+    if (timestamp === undefined) return 'N/A';
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
@@ -165,7 +146,6 @@ const RealtimePublicTransport: React.FC = () => {
         default: return status.replace(/_/g, ' ');
       }
     }
-    // Fallback to occupancy status if current_status is not meaningful
     if (occupancyStatus) {
       switch (occupancyStatus) {
         case 'EMPTY': return 'Kosong';
@@ -181,18 +161,18 @@ const RealtimePublicTransport: React.FC = () => {
     return 'Status Tidak Tersedia';
   };
 
-  // Sort vehicle positions to prioritize 'EMPTY' occupancy status
   const sortedVehiclePositions = [...vehiclePositions].sort((a, b) => {
     if (a.occupancy_status === 'EMPTY' && b.occupancy_status !== 'EMPTY') {
-      return -1; // 'a' comes before 'b'
+      return -1;
     }
     if (a.occupancy_status !== 'EMPTY' && b.occupancy_status === 'EMPTY') {
-      return 1; // 'b' comes before 'a'
+      return 1;
     }
-    return 0; // Maintain original order for other cases
+    return 0;
   });
 
-  const displayedVehiclePositions = sortedVehiclePositions.slice(0, 5); // Always show only 5 here
+  const displayedVehiclePositions = sortedVehiclePositions.slice(0, 5);
+  const displayedTripUpdates = tripUpdates.slice(0, 3); // Limit to 3 for dashboard view
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
@@ -273,28 +253,52 @@ const RealtimePublicTransport: React.FC = () => {
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Clock className="h-4 w-4 mr-2" /> Pembaruan Perjalanan
         </h3>
-        {tripUpdates.length > 0 ? (
-          tripUpdates.map(update => (
-            <div key={update.id} className="border-b last:border-b-0 pb-3 last:pb-0">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
-                  {getRouteTypeIcon(update.trip.route_id)}
-                  Jalur {update.trip.route_id || update.vehicle?.label || update.id} ({update.trip.trip_id || 'N/A'})
-                </h4>
-                <Badge className={getDelayBadgeClass(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}>
-                  {formatDelay(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}
-                </Badge>
+        {isLoading ? (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat pembaruan perjalanan...</p>
+        ) : error ? (
+          <p className="text-red-500 text-center py-4">{error}</p>
+        ) : tripUpdates.length > 0 ? (
+          <>
+            {displayedTripUpdates.map(update => (
+              <div key={update.id} className="border-b last:border-b-0 pb-3 last:pb-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                    {getRouteTypeIcon(update.trip.route_id)}
+                    Jalur {update.trip.route_id || update.vehicle?.label || update.id}
+                  </h4>
+                  <Badge className={getDelayBadgeClass(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}>
+                    {formatDelay(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                  <span className="flex items-center">
+                    <ListChecks className="h-3 w-3 mr-1" /> Seq: {update.stop_time_update?.[0]?.stop_sequence || 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <MapPin className="h-3 w-3 mr-1" /> Stop ID: {update.stop_time_update?.[0]?.stop_id || 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" /> Arr: {formatTime(update.stop_time_update?.[0]?.arrival?.time)}
+                  </span>
+                  <span className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" /> Dep: {formatTime(update.stop_time_update?.[0]?.departure?.time)}
+                  </span>
+                  <span className="flex items-center col-span-2">
+                    <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(update.timestamp)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                <span className="flex items-center">
-                  <MapPin className="h-3 w-3 mr-1" /> Stop ID: {update.stop_time_update?.[0]?.stop_id || 'N/A'}
-                </span>
-                <span className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(update.timestamp)}
-                </span>
+            ))}
+            {tripUpdates.length > 3 && (
+              <div className="text-center mt-4">
+                <Button asChild variant="outline" className="">
+                  <Link to="/all-trip-updates">
+                    <span>Lihat Semua ({tripUpdates.length - 3} lainnya)</span>
+                  </Link>
+                </Button>
               </div>
-            </div>
-          ))
+            )}
+          </>
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
         )}

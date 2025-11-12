@@ -5,10 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoadingSpinner from './components/LoadingSpinner';
-import { TrafficDataProvider } from './contexts/TrafficDataContext'; // Import TrafficDataProvider
+import { TrafficDataProvider } from './contexts/TrafficDataContext';
 
 // Menggunakan React.lazy untuk memuat komponen secara dinamis
-const HomePage = React.lazy(() => import("./pages/HomePage")); // Import HomePage
+const HomePage = React.lazy(() => import("./pages/HomePage"));
 const TorinoDashboard = React.lazy(() => import("./pages/TorinoDashboard"));
 const NewsPortal = React.lazy(() => import("./pages/NewsPortal"));
 const SensorsPage = React.lazy(() => import("./pages/SensorsPage"));
@@ -19,15 +19,16 @@ const DataAnalysisPage = React.lazy(() => import("./pages/DataAnalysisPage"));
 const AboutTorinoPage = React.lazy(() => import("./pages/AboutTorinoPage"));
 const CultureTourismPage = React.lazy(() => import("./pages/CultureTourismPage"));
 const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollaborationPage"));
-const WeatherPage = React.lazy(() => import("./pages/WeatherPage")); // Import WeatherPage
-const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage")); // New: Import AllVehiclePositionsPage
+const WeatherPage = React.lazy(() => import("./pages/WeatherPage"));
+const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage"));
+const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage")); // New: Import AllTripUpdatesPage
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TrafficDataProvider> {/* Wrap with TrafficDataProvider */}
+    <TrafficDataProvider>
       <>
         <Toaster />
         <Sonner />
@@ -48,7 +49,8 @@ const App = () => (
                   <Route path="/culture-tourism" element={<CultureTourismPage />} />
                   <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
                   <Route path="/weather" element={<WeatherPage />} />
-                  <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} /> {/* New route */}
+                  <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
+                  <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} /> {/* New route */}
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
