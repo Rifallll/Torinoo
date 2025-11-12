@@ -5,7 +5,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
-import { openDataPortals } from '@/data/openDataPortals'; // Import the new data
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -21,7 +20,6 @@ L.Icon.Default.mergeOptions({
 const TorinoMapComponent: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
-  const openDataLayerRef = useRef<L.LayerGroup | null>(null); // New ref for open data markers
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
@@ -83,17 +81,10 @@ const TorinoMapComponent: React.FC = () => {
         "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
         "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
       };
-      
-      // Initialize layer groups for control
+      L.control.layers(baseLayers).addTo(mapRef.current);
+
+      // Add marker layer group
       markerLayerRef.current = L.layerGroup().addTo(mapRef.current);
-      openDataLayerRef.current = L.layerGroup().addTo(mapRef.current);
-
-      const overlayLayers = {
-        "Traffic Markers": markerLayerRef.current,
-        "Open Data Portals": openDataLayerRef.current,
-      };
-
-      L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
 
       // Add main Torino city center marker
       L.marker(torinoCenter)
@@ -103,12 +94,6 @@ const TorinoMapComponent: React.FC = () => {
 
     // Clear existing dummy markers
     markerLayerRef.current?.clearLayers();
-    openDataLayerRef.current?.clearLayers(); // Clear open data markers too
-
-    // Add main Torino city center marker back (if cleared)
-    L.marker(torinoCenter)
-      .bindPopup("<b>Pusat Kota Torino</b><br/>Titik Fokus Analisis")
-      .addTo(markerLayerRef.current!);
 
     // Add dummy traffic markers
     dummyTrafficMarkers.forEach(markerData => {
@@ -120,22 +105,6 @@ const TorinoMapComponent: React.FC = () => {
       L.marker([markerData.lat, markerData.lng], { icon: customIcon })
         .bindPopup(markerData.popupText)
         .addTo(markerLayerRef.current!);
-    });
-
-    // Add Open Data Portals markers
-    openDataPortals.forEach(portal => {
-      const openDataIcon = new L.DivIcon({
-        className: `custom-div-icon bg-blue-500 rounded-full w-3 h-3 border-2 border-white shadow-md`, // Distinct color
-        iconAnchor: [6, 6],
-      });
-
-      L.marker(portal.location, { icon: openDataIcon })
-        .bindPopup(`
-          <b>${portal.title}</b><br/>
-          ${portal.description}<br/>
-          <a href="${portal.url}" target="_blank" rel="noopener noreferrer">${portal.url}</a>
-        `)
-        .addTo(openDataLayerRef.current!);
     });
 
     // Reset view control
