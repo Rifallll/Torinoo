@@ -180,7 +180,18 @@ const RealtimePublicTransport: React.FC = () => {
     return 'Status Tidak Tersedia';
   };
 
-  const displayedVehiclePositions = showAllVehiclePositions ? vehiclePositions : vehiclePositions.slice(0, 5);
+  // Sort vehicle positions to prioritize 'EMPTY' occupancy status
+  const sortedVehiclePositions = [...vehiclePositions].sort((a, b) => {
+    if (a.occupancy_status === 'EMPTY' && b.occupancy_status !== 'EMPTY') {
+      return -1; // 'a' comes before 'b'
+    }
+    if (a.occupancy_status !== 'EMPTY' && b.occupancy_status === 'EMPTY') {
+      return 1; // 'b' comes before 'a'
+    }
+    return 0; // Maintain original order for other cases
+  });
+
+  const displayedVehiclePositions = showAllVehiclePositions ? sortedVehiclePositions : sortedVehiclePositions.slice(0, 5);
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
