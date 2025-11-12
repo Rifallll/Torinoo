@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
       {/* Hero Image with Overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
+        style={{ backgroundImage: "url('/GAMBAR/1.jpg')" }} // Mengubah ke gambar lokal
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
