@@ -100,6 +100,14 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       return [];
     }
     const buffer = await response.arrayBuffer();
+    
+    // Add check for empty buffer
+    if (buffer.byteLength === 0) {
+      console.warn(`Fetched ${type}.bin from ${path} but it was empty.`);
+      toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai.`);
+      return [];
+    }
+
     const message = FeedMessage.decode(new Uint8Array(buffer));
     const payload = FeedMessage.toObject(message, {
       longs: Number, // Ensure timestamps are numbers
