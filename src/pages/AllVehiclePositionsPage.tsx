@@ -42,7 +42,6 @@ const AllVehiclePositionsPage: React.FC = () => {
       'FULL',
     ];
 
-    // Removed 'UNKNOWN_CONGESTION_LEVEL' from the simulation array
     const congestionLevels = [
       'RUNNING_SMOOTHLY',
       'STOP_AND_GO',
@@ -67,7 +66,8 @@ const AllVehiclePositionsPage: React.FC = () => {
           const newOccupancyStatus = occupancyStatuses[newOccupancyIndex];
 
           // Simulate speed change (e.g., +/- 5 km/h, min 0, max 80)
-          const currentSpeed = vp.position?.speed || 0;
+          const initialSpeed = 30; // Default starting speed in km/h
+          const currentSpeed = vp.position?.speed !== undefined ? vp.position.speed : initialSpeed;
           const newSpeed = Math.max(0, Math.min(80, currentSpeed + (Math.random() - 0.5) * 10)); // +/- 10 m/s (approx 36 km/h)
 
           // Simulate bearing change (e.g., +/- 10 degrees)
@@ -160,7 +160,7 @@ const AllVehiclePositionsPage: React.FC = () => {
       case 'STOP_AND_GO': return 'bg-yellow-100 text-yellow-600 hover:bg-yellow-100';
       case 'CONGESTION': return 'bg-orange-100 text-orange-600 hover:bg-orange-100';
       case 'SEVERE_CONGESTION': return 'bg-red-100 text-red-600 hover:bg-red-100';
-      case 'UNKNOWN_CONGESTION_LEVEL': return 'bg-gray-100 text-gray-600 hover:bg-gray-100'; // Explicitly handle as gray
+      case 'UNKNOWN_CONGESTION_LEVEL': return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
       default: return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
     }
   };
@@ -172,8 +172,8 @@ const AllVehiclePositionsPage: React.FC = () => {
       case 'STOP_AND_GO': return 'Berhenti & Jalan';
       case 'CONGESTION': return 'Macet';
       case 'SEVERE_CONGESTION': return 'Macet Parah';
-      case 'UNKNOWN_CONGESTION_LEVEL': return 'N/A'; // Map to N/A as requested
-      default: return 'N/A'; // Fallback for any unexpected string
+      case 'UNKNOWN_CONGESTION_LEVEL': return 'N/A';
+      default: return 'N/A';
     }
   };
 
