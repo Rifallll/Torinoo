@@ -4,7 +4,7 @@ import * as React from "react";
 import {
   OTPInput,
   OTPInputContext,
-  type OTPInputContextProps,
+  type SlotProps, // Correctly import SlotProps
 } from "input-otp";
 import { Dot } from "lucide-react";
 
@@ -40,7 +40,7 @@ const InputOTPSlot = React.forwardRef<
 >(({ index, className, ...props }, ref) => {
   const inputOTPContext = React.useContext(
     OTPInputContext,
-  ) as OTPInputContextProps;
+  ) as { slots: SlotProps[] }; // Explicitly type the context to include slots
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index];
 
   return (
@@ -70,7 +70,7 @@ const InputOTPMessenger = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const inputOTPContext = React.useContext(
     OTPInputContext,
-  ) as OTPInputContextProps;
+  ) as { slots: SlotProps[] }; // Explicitly type the context to include slots
   const { slots } = inputOTPContext;
 
   return (
