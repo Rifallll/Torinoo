@@ -12,7 +12,7 @@ const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
   const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]); // Renamed state variable to avoid conflict
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
-  const [isLoading, setIsLoading] = true);
+  const [isLoading, setIsLoading] = useState(true); // Fixed: Correct useState declaration
   const [error, setError] = useState<string | null>(null);
   // Removed showAllVehiclePositions state as it's no longer needed for toggling within the component
 
