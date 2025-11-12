@@ -263,9 +263,9 @@ const RealtimePublicTransport: React.FC = () => {
             ))}
             {vehiclePositions.length > 5 && (
               <div className="text-center mt-4">
-                <Button asChild variant="outline" className=""> {/* Removed w-full */}
+                <Button asChild variant="outline" className="">
                   <Link to="/all-vehicle-positions">
-                    Lihat Semua ({vehiclePositions.length - 5} lainnya)
+                    <span>Lihat Semua ({vehiclePositions.length - 5} lainnya)</span>
                   </Link>
                 </Button>
               </div>
