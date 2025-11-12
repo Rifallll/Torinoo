@@ -29,7 +29,7 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
 
   const handleUpload = () => {
     if (selectedFile) {
-      toast.info(`Mengunggah dan menganalisis file '${selectedFile.name}'...`);
+      toast.info(`Mengunggah dan memulai analisis simulasi untuk file '${selectedFile.name}'...`);
       
       Papa.parse(selectedFile, {
         header: true,

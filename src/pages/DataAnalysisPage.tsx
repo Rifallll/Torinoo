@@ -18,7 +18,7 @@ const DataAnalysisPage = () => {
       case 'idle':
         return "Menunggu unggahan data CSV untuk memulai analisis.";
       case 'processing':
-        return "Sistem Python sedang memproses data lalu lintas yang diunggah.";
+        return "Aplikasi sedang memproses data lalu lintas yang diunggah (simulasi).";
       case 'completed':
         return "Analisis data lalu lintas selesai! Data siap disinkronkan.";
       case 'error':
