@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
+import ProjectPlanningSection from '@/components/ProjectPlanningSection'; // Import the new component
 
 const DataAnalysisPage = () => {
   const [analysisProgress, setAnalysisProgress] = React.useState(70); // Dummy progress
@@ -131,6 +132,14 @@ const DataAnalysisPage = () => {
             </p>
           </CardContent>
         </Card>
+
+        {/* New section for Project Planning */}
+        <div className="lg:col-span-2 mt-6">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+            <Target className="h-6 w-6 mr-2 text-indigo-600" /> Project Planning Overview
+          </h2>
+          <ProjectPlanningSection id="project-planning-overview" />
+        </div>
       </main>
     </div>
   );
