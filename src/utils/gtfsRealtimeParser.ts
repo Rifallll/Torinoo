@@ -130,7 +130,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
               trip_id: rawTrip?.tripId,
               route_id: rawTrip?.startDate, // Assuming raw `startDate` is the actual route ID (e.g., "10U")
               start_time: rawTrip?.routeId, // Assuming raw `routeId` is the actual start time (e.g., "08:31:00")
-              start_date: new Date().toISOString().slice(0, 10).replace(/-/g, ''), // Set to current date in YYYYMMDD format
+              start_date: rawTrip?.directionId, // Reverted to use raw `directionId` for start_date
               // direction_id is not clearly available as a number, leave undefined for now
           };
 

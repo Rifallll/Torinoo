@@ -38,7 +38,7 @@ const RealtimePublicTransport: React.FC = () => {
   useEffect(() => {
     fetchAndParseData();
 
-    // Define possible occupancy statuses for simulation
+    // Define possible occupancy statuses in a logical order for gradual changes
     const occupancyStatuses = [
       'EMPTY',
       'MANY_SEATS_AVAILABLE',
@@ -73,8 +73,11 @@ const RealtimePublicTransport: React.FC = () => {
           const newLatitude = (vp.position?.latitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
           const newLongitude = (vp.position?.longitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
 
-          // Simulate random occupancy status
-          const randomOccupancy = occupancyStatuses[Math.floor(Math.random() * occupancyStatuses.length)];
+          // Simulate gradual random occupancy status change
+          const currentOccupancyIndex = occupancyStatuses.indexOf(vp.occupancy_status || 'EMPTY');
+          let newOccupancyIndex = currentOccupancyIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0); // 30% chance to change by +/- 1
+          newOccupancyIndex = Math.max(0, Math.min(occupancyStatuses.length - 1, newOccupancyIndex)); // Clamp between min/max index
+          const newOccupancyStatus = occupancyStatuses[newOccupancyIndex];
 
           return {
             ...vp,
@@ -84,7 +87,7 @@ const RealtimePublicTransport: React.FC = () => {
               latitude: newLatitude,
               longitude: newLongitude,
             },
-            occupancy_status: randomOccupancy,
+            occupancy_status: newOccupancyStatus,
           };
         })
       );
