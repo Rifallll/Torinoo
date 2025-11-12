@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car } from 'lucide-react';
+import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Speedometer, Compass, TrafficCone, LicensePlate } from 'lucide-react'; // Added Speedometer, Compass, TrafficCone, LicensePlate
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,14 @@ const AllVehiclePositionsPage: React.FC = () => {
       'FULL',
     ];
 
+    const congestionLevels = [
+      'UNKNOWN_CONGESTION_LEVEL',
+      'RUNNING_SMOOTHLY',
+      'STOP_AND_GO',
+      'CONGESTION',
+      'SEVERE_CONGESTION',
+    ];
+
     // Simulate real-time updates for vehicle positions
     const interval = setInterval(() => {
       setVehiclePositionData(prevPositions =>
@@ -58,6 +66,20 @@ const AllVehiclePositionsPage: React.FC = () => {
           newOccupancyIndex = Math.max(0, Math.min(occupancyStatuses.length - 1, newOccupancyIndex)); // Clamp between min/max index
           const newOccupancyStatus = occupancyStatuses[newOccupancyIndex];
 
+          // Simulate speed change (e.g., +/- 5 km/h, min 0, max 80)
+          const currentSpeed = vp.position?.speed || 0;
+          const newSpeed = Math.max(0, Math.min(80, currentSpeed + (Math.random() - 0.5) * 10)); // +/- 10 m/s (approx 36 km/h)
+
+          // Simulate bearing change (e.g., +/- 10 degrees)
+          const currentBearing = vp.position?.bearing || 0;
+          const newBearing = (currentBearing + (Math.random() - 0.5) * 20 + 360) % 360;
+
+          // Simulate gradual random congestion level change
+          const currentCongestionIndex = congestionLevels.indexOf(vp.congestion_level || 'UNKNOWN_CONGESTION_LEVEL');
+          let newCongestionIndex = currentCongestionIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0);
+          newCongestionIndex = Math.max(0, Math.min(congestionLevels.length - 1, newCongestionIndex));
+          const newCongestionLevel = congestionLevels[newCongestionIndex];
+
           return {
             ...vp,
             timestamp: newTimestamp,
@@ -65,8 +87,11 @@ const AllVehiclePositionsPage: React.FC = () => {
               ...vp.position,
               latitude: newLatitude,
               longitude: newLongitude,
+              speed: newSpeed,
+              bearing: newBearing,
             },
             occupancy_status: newOccupancyStatus,
+            congestion_level: newCongestionLevel,
           };
         })
       );
@@ -95,12 +120,10 @@ const AllVehiclePositionsPage: React.FC = () => {
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
-  const formatStartDate = (dateString?: string) => {
-    if (!dateString || dateString.length !== 8) return 'N/A';
-    const year = dateString.substring(0, 4);
-    const month = dateString.substring(4, 6);
-    const day = dateString.substring(6, 8);
-    return `${day}/${month}/${year}`;
+  const formatTime = (timestamp?: number) => {
+    if (timestamp === undefined) return 'N/A';
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
@@ -126,6 +149,28 @@ const AllVehiclePositionsPage: React.FC = () => {
       }
     }
     return 'Status Tidak Tersedia';
+  };
+
+  const getCongestionBadgeClass = (congestionLevel: string | undefined) => {
+    switch (congestionLevel) {
+      case 'RUNNING_SMOOTHLY': return 'bg-green-100 text-green-600 hover:bg-green-100';
+      case 'STOP_AND_GO': return 'bg-yellow-100 text-yellow-600 hover:bg-yellow-100';
+      case 'CONGESTION': return 'bg-orange-100 text-orange-600 hover:bg-orange-100';
+      case 'SEVERE_CONGESTION': return 'bg-red-100 text-red-600 hover:bg-red-100';
+      default: return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
+    }
+  };
+
+  const formatCongestionLevel = (congestionLevel: string | undefined) => {
+    if (!congestionLevel) return 'N/A';
+    switch (congestionLevel) {
+      case 'RUNNING_SMOOTHLY': return 'Lancar';
+      case 'STOP_AND_GO': return 'Berhenti & Jalan';
+      case 'CONGESTION': return 'Macet';
+      case 'SEVERE_CONGESTION': return 'Macet Parah';
+      case 'UNKNOWN_CONGESTION_LEVEL': return 'Tidak Diketahui';
+      default: return congestionLevel.replace(/_/g, ' ');
+    }
   };
 
   // Sort vehicle positions to prioritize 'EMPTY' occupancy status
@@ -178,11 +223,22 @@ const AllVehiclePositionsPage: React.FC = () => {
                     {getVehicleStatus(vp.current_status, vp.occupancy_status)}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <span className="flex items-center">
+                    <Speedometer className="h-4 w-4 mr-2" /> Kecepatan: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <Compass className="h-4 w-4 mr-2" /> Arah: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
+                  </span>
+                  <span className="flex items-center col-span-2">
+                    <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
+                  </span>
+                  <span className="flex items-center col-span-2">
+                    <LicensePlate className="h-4 w-4 mr-2" /> Plat: {vp.vehicle?.license_plate || 'N/A'}
+                  </span>
+                  <span className="flex items-center col-span-2">
                     <Clock className="h-4 w-4 mr-2" /> Update: {formatTimestamp(vp.timestamp)}
                   </span>
-                  <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
                 </div>
               </CardContent>
             </Card>
