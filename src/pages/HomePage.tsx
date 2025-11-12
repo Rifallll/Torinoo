@@ -1,17 +1,32 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
+const backgroundImages = [
+  '/GAMBAR/1.jpg',
+  '/GAMBAR/2.jpg',
+  '/GAMBAR/3.jpg',
+];
+
 const HomePage: React.FC = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 30000); // Ganti gambar setiap 30 detik
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-gray-100 flex flex-col items-center justify-center text-center overflow-hidden">
       {/* Hero Image with Overlay */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/GAMBAR/1.jpg')" }} // Mengubah ke gambar lokal
+        className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+        style={{ backgroundImage: `url('${backgroundImages[currentImageIndex]}')` }}
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
@@ -32,10 +47,7 @@ const HomePage: React.FC = () => {
         </Button>
       </div>
 
-      {/* Footer/Credit (optional) */}
-      <div className="absolute bottom-4 text-gray-300 text-sm z-10">
-        Photo by <a href="https://unsplash.com/@alessandro_c" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">Alessandro Capuzzi</a> on Unsplash
-      </div>
+      {/* Kredit foto telah dihapus */}
     </div>
   );
 };
