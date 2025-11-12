@@ -184,6 +184,7 @@ const RealtimePublicTransport: React.FC = () => {
       case 'STOP_AND_GO': return 'bg-yellow-100 text-yellow-600 hover:bg-yellow-100';
       case 'CONGESTION': return 'bg-orange-100 text-orange-600 hover:bg-orange-100';
       case 'SEVERE_CONGESTION': return 'bg-red-100 text-red-600 hover:bg-red-100';
+      case 'UNKNOWN_CONGESTION_LEVEL': return 'bg-gray-100 text-gray-600 hover:bg-gray-100'; // Explicitly handle as gray
       default: return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
     }
   };
@@ -195,7 +196,7 @@ const RealtimePublicTransport: React.FC = () => {
       case 'STOP_AND_GO': return 'Berhenti & Jalan';
       case 'CONGESTION': return 'Macet';
       case 'SEVERE_CONGESTION': return 'Macet Parah';
-      // Removed 'UNKNOWN_CONGESTION_LEVEL' case
+      case 'UNKNOWN_CONGESTION_LEVEL': return 'N/A'; // Map to N/A as requested
       default: return 'N/A'; // Fallback for any unexpected string
     }
   };
