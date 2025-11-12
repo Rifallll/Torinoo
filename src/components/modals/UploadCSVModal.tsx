@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Upload } from 'lucide-react';
+import Papa from 'papaparse';
+import { toast } from 'sonner';
+import { useTrafficData } from '@/contexts/TrafficDataContext'; // Import the new hook
 
 interface UploadCSVModalProps {
   isOpen: boolean;
@@ -14,6 +17,7 @@ interface UploadCSVModalProps {
 
 const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { uploadData, resetAnalysis } = useTrafficData();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -25,33 +29,58 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
 
   const handleUpload = () => {
     if (selectedFile) {
-      console.log("Uploading file (dummy):", selectedFile.name);
-      // In a real application, you would handle the file upload here.
-      // For this frontend-only app, we just simulate it.
-      alert(`File '${selectedFile.name}' selected. Data will be processed by the Python system.`);
-      onClose();
+      toast.info(`Mengunggah dan menganalisis file '${selectedFile.name}'...`);
+      
+      Papa.parse(selectedFile, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            console.error("CSV parsing errors:", results.errors);
+            toast.error(`Gagal mengurai CSV: ${results.errors[0].message}`);
+            setSelectedFile(null);
+            return;
+          }
+          
+          const parsedData = results.data as { [key: string]: string | number }[];
+          uploadData(parsedData); // Pass parsed data to context
+          toast.success(`File '${selectedFile.name}' berhasil diunggah dan analisis dimulai.`);
+          onClose();
+          setSelectedFile(null); // Clear selected file after upload
+        },
+        error: (error: Error) => {
+          console.error("Error parsing CSV:", error);
+          toast.error(`Terjadi kesalahan saat mengurai file: ${error.message}`);
+          setSelectedFile(null);
+        }
+      });
     } else {
-      alert("Please select a CSV file first.");
+      toast.warning("Harap pilih file CSV terlebih dahulu.");
     }
   };
 
+  const handleCancel = () => {
+    setSelectedFile(null);
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleCancel}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <span className="flex items-center">
-              <Upload className="mr-2 h-5 w-5" /> Upload CSV Data
+              <Upload className="mr-2 h-5 w-5" /> Unggah Data CSV
             </span>
           </DialogTitle>
           <DialogDescription>
-            Select a CSV file containing traffic data for analysis.
+            Pilih file CSV yang berisi data lalu lintas untuk analisis.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="csvFile" className="text-right">
-              CSV File
+              File CSV
             </Label>
             <Input
               id="csvFile"
@@ -62,12 +91,12 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
           {selectedFile && (
-            <p className="text-sm text-gray-600 text-center">File selected: <span className="font-medium">{selectedFile.name}</span></p>
+            <p className="text-sm text-gray-600 text-center">File dipilih: <span className="font-medium">{selectedFile.name}</span></p>
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleUpload} disabled={!selectedFile}>Upload</Button>
+          <Button variant="outline" onClick={handleCancel}>Batal</Button>
+          <Button onClick={handleUpload} disabled={!selectedFile}>Unggah</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
