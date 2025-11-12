@@ -4,14 +4,17 @@ import * as protobuf from 'protobufjs';
 import { toast } from 'sonner';
 
 // Define interfaces for the parsed data based on the .proto schema
+export interface ParsedTripDescriptor {
+  trip_id?: string;
+  route_id?: string;
+  direction_id?: number;
+  start_time?: string;
+  start_date?: string;
+}
+
 export interface ParsedTripUpdate {
   id: string;
-  trip: {
-    trip_id?: string;
-    route_id?: string;
-    start_date?: string;
-    start_time?: string;
-  };
+  trip: ParsedTripDescriptor;
   vehicle?: {
     id?: string;
     label?: string;
@@ -28,13 +31,8 @@ export interface ParsedTripUpdate {
 
 export interface ParsedVehiclePosition {
   id: string;
-  trip?: { // TripDescriptor is nested inside VehiclePosition
-    trip_id?: string;
-    route_id?: string;
-    start_date?: string;
-    start_time?: string;
-  };
-  vehicle?: { // VehicleDescriptor is nested inside VehiclePosition
+  trip?: ParsedTripDescriptor;
+  vehicle?: {
     id?: string;
     label?: string;
     license_plate?: string;
@@ -47,7 +45,7 @@ export interface ParsedVehiclePosition {
   };
   current_stop_sequence?: number;
   stop_id?: string;
-  current_status?: string; // Enum string
+  current_status?: string; // Enum string, made optional as it might be missing
   timestamp?: number;
   congestion_level?: string; // Enum string
   occupancy_status?: string; // Enum string
@@ -107,6 +105,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       longs: Number, // Ensure timestamps are numbers
       enums: String, // Ensure enums are strings
       bytes: String,
+      oneofs: true, // Include oneof fields
     });
 
     const entities: any[] = [];
@@ -115,21 +114,35 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
         if (type === 'trip_update' && entity.tripUpdate) {
           entities.push({ id: entity.id, ...entity.tripUpdate } as ParsedTripUpdate);
         } else if (type === 'vehicle_position' && entity.vehicle) {
-          // Corrected: entity.vehicle itself is the VehiclePosition object,
-          // which should already contain nested 'trip' and 'vehicle' descriptors.
-          entities.push({ id: entity.id, ...entity.vehicle } as ParsedVehiclePosition);
+          const rawVehiclePosition = entity.vehicle;
+          const rawTrip = rawVehiclePosition.trip;
+
+          // Remap the non-standard fields from the provided JSON snippet
+          const remappedTrip: ParsedTripDescriptor = {
+              trip_id: rawTrip?.tripId,
+              route_id: rawTrip?.startDate, // Assuming raw `startDate` is the actual route ID (e.g., "10U")
+              start_time: rawTrip?.routeId, // Assuming raw `routeId` is the actual start time (e.g., "08:31:00")
+              start_date: rawTrip?.directionId, // Assuming raw `directionId` is the actual start date (e.g., "20251112")
+              // direction_id is not clearly available as a number, leave undefined for now
+          };
+
+          entities.push({
+              id: entity.id,
+              trip: remappedTrip,
+              vehicle: rawVehiclePosition.vehicle,
+              position: rawVehiclePosition.position,
+              timestamp: rawVehiclePosition.timestamp,
+              occupancy_status: rawVehiclePosition.occupancyStatus,
+              current_stop_sequence: rawVehiclePosition.currentStopSequence,
+              stop_id: rawVehiclePosition.stopId,
+              current_status: rawVehiclePosition.currentStatus || 'UNKNOWN_STOP_STATUS', // Default if missing
+              congestion_level: rawVehiclePosition.congestionLevel,
+          } as ParsedVehiclePosition);
         } else if (type === 'alert' && entity.alert) {
           entities.push({ id: entity.id, ...entity.alert } as ParsedAlert);
         }
       }
     }
-
-    // Add detailed logging for vehicle_position to aid debugging
-    if (type === 'vehicle_position') {
-      console.log(`[GTFS Parser] Raw payload for ${path}:`, payload);
-      console.log(`[GTFS Parser] Extracted vehicle positions for ${path}:`, entities);
-    }
-
     return entities;
   } catch (error) {
     console.error(`Error parsing ${type}.bin from ${path}:`, error);

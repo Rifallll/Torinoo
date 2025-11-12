@@ -23,6 +23,8 @@ const RealtimePublicTransport: React.FC = () => {
       setVehiclePositionData(data.vehiclePositions); // Set vehicle positions
       setAlerts(data.alerts);
       console.log("[RealtimePublicTransport] Fetched Vehicle Positions:", data.vehiclePositions); // Added console log here
+      console.log("[RealtimePublicTransport] Fetched Trip Updates:", data.tripUpdates);
+      console.log("[RealtimePublicTransport] Fetched Alerts:", data.alerts);
     } catch (err) {
       console.error("Failed to fetch or parse GTFS-realtime data:", err);
       setError("Gagal memuat atau mengurai data transportasi publik.");
@@ -97,6 +99,8 @@ const RealtimePublicTransport: React.FC = () => {
       // Example: if routeId contains 'B' for Bus, 'T' for Tram, etc.
       if (routeId.includes('B') || routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
       if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
+      // Based on the provided data, "10U" looks like a route ID, which could be a bus.
+      if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
     }
 
     return <Info className="h-4 w-4 mr-1" />; // Default/Unknown
@@ -111,30 +115,30 @@ const RealtimePublicTransport: React.FC = () => {
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
-  const getVehicleStatus = (status: string | undefined) => {
-    if (!status) return 'Status Tidak Tersedia';
-
-    // Common GTFS-realtime VehicleStopStatus enum values
-    // Mapping to Indonesian for better readability
-    switch (status) {
-      case 'IN_TRANSIT_TO':
-      case '0': // If it's coming as a number 0 (common default for IN_TRANSIT_TO)
-        return 'Dalam Perjalanan';
-      case 'STOPPED_AT_STATION':
-      case '1': // If it's coming as a number 1
-        return 'Berhenti di Stasiun';
-      case 'IN_VEHICLE_BAY':
-      case '2': // If it's coming as a number 2
-        return 'Di Teluk Kendaraan';
-      case 'AT_PLATFORM':
-      case '3': // If it's coming as a number 3
-        return 'Di Platform';
-      case 'UNKNOWN_STOP_STATUS': // Explicit unknown from proto
-        return 'Status Tidak Diketahui';
-      default:
-        // Fallback for other string statuses, replacing underscores
-        return status.replace(/_/g, ' ');
+  const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
+    if (status && status !== 'UNKNOWN_STOP_STATUS') {
+      switch (status) {
+        case 'IN_TRANSIT_TO': return 'Dalam Perjalanan';
+        case 'STOPPED_AT_STATION': return 'Berhenti di Stasiun';
+        case 'IN_VEHICLE_BAY': return 'Di Teluk Kendaraan';
+        case 'AT_PLATFORM': return 'Di Platform';
+        default: return status.replace(/_/g, ' ');
+      }
     }
+    // Fallback to occupancy status if current_status is not meaningful
+    if (occupancyStatus) {
+      switch (occupancyStatus) {
+        case 'EMPTY': return 'Kosong';
+        case 'MANY_SEATS_AVAILABLE': return 'Banyak Kursi Tersedia';
+        case 'FEW_SEATS_AVAILABLE': return 'Beberapa Kursi Tersedia';
+        case 'STANDING_ROOM_ONLY': return 'Hanya Berdiri';
+        case 'CRUSHED_STANDING_ROOM_ONLY': return 'Sangat Penuh';
+        case 'FULL': return 'Penuh';
+        case 'NOT_APPLICABLE': return 'Tidak Berlaku';
+        default: return occupancyStatus.replace(/_/g, ' ');
+      }
+    }
+    return 'Status Tidak Tersedia';
   };
 
   if (isLoading) {
@@ -214,7 +218,7 @@ const RealtimePublicTransport: React.FC = () => {
                   Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
                 </h4>
                 <Badge variant="secondary" className="text-xs">
-                  {getVehicleStatus(vp.current_status)}
+                  {getVehicleStatus(vp.current_status, vp.occupancy_status)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
@@ -224,6 +228,11 @@ const RealtimePublicTransport: React.FC = () => {
                 <span className="flex items-center">
                   <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
                 </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <span>Trip ID: {vp.trip?.trip_id || 'N/A'}</span>
+                <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
+                <span>Start Date: {vp.trip?.start_date || 'N/A'}</span>
               </div>
             </div>
           ))
@@ -248,36 +257,16 @@ const RealtimePublicTransport: React.FC = () => {
               </div>
               <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span className="flex items-center">
-                  <MapPin className="h-3 w-3 mr-1" /> Stop Seq: {update.stop_time_update?.[0]?.stop_sequence || 'N/A'}
+                  <MapPin className="h-3 w-3 mr-1" /> Stop ID: {update.stop_time_update?.[0]?.stop_id || 'N/A'}
                 </span>
                 <span className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" /> Status: {update.vehicle?.label || 'IN_TRANSIT'} {/* Placeholder, actual status from VehiclePosition */}
+                  <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(update.timestamp)}
                 </span>
               </div>
             </div>
           ))
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
-        )}
-
-        {/* Temporary Raw Data Display for Debugging */}
-        {vehiclePositions.length > 0 && (
-          <Card className="mt-6 bg-gray-50 dark:bg-gray-900 border-dashed border-2 border-gray-300 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-                <Info className="h-5 w-5 mr-2 text-gray-500" /> Raw Vehicle Positions Data (Debug)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all max-h-60 overflow-y-auto p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                {JSON.stringify(vehiclePositions.slice(0, 5), null, 2)} {/* Display first 5 items */}
-              </pre>
-              <p className="text-xs text-gray-500 mt-2">
-                Ini adalah 5 entri pertama dari data posisi kendaraan mentah untuk tujuan debugging.
-                Harap salin dan tempelkan ini ke dalam chat.
-              </p>
-            </CardContent>
-          </Card>
         )}
       </CardContent>
     </Card>
