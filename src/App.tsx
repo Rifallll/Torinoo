@@ -20,6 +20,7 @@ const AboutTorinoPage = React.lazy(() => import("./pages/AboutTorinoPage"));
 const CultureTourismPage = React.lazy(() => import("./pages/CultureTourismPage"));
 const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollaborationPage"));
 const WeatherPage = React.lazy(() => import("./pages/WeatherPage")); // Import WeatherPage
+const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage")); // New: Import AllVehiclePositionsPage
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -46,7 +47,8 @@ const App = () => (
                   <Route path="/about-torino" element={<AboutTorinoPage />} />
                   <Route path="/culture-tourism" element={<CultureTourismPage />} />
                   <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
-                  <Route path="/weather" element={<WeatherPage />} /> {/* New route for WeatherPage */}
+                  <Route path="/weather" element={<WeatherPage />} />
+                  <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} /> {/* New route */}
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

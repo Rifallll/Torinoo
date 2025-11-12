@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button'; // Import Button component
 import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser'; // Import ParsedVehiclePosition
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
 const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
@@ -13,7 +14,7 @@ const RealtimePublicTransport: React.FC = () => {
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAllVehiclePositions, setShowAllVehiclePositions] = useState(false); // New state for "View All"
+  // Removed showAllVehiclePositions state as it's no longer needed for toggling within the component
 
   const fetchAndParseData = async () => {
     setIsLoading(true);
@@ -191,7 +192,7 @@ const RealtimePublicTransport: React.FC = () => {
     return 0; // Maintain original order for other cases
   });
 
-  const displayedVehiclePositions = showAllVehiclePositions ? sortedVehiclePositions : sortedVehiclePositions.slice(0, 5);
+  const displayedVehiclePositions = sortedVehiclePositions.slice(0, 5); // Always show only 5 here
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
@@ -262,16 +263,10 @@ const RealtimePublicTransport: React.FC = () => {
             ))}
             {vehiclePositions.length > 5 && (
               <div className="text-center mt-4">
-                <Button variant="outline" onClick={() => setShowAllVehiclePositions(!showAllVehiclePositions)} className="">
-                  {showAllVehiclePositions ? (
-                    <>
-                      <ChevronUp className="h-4 w-4 mr-2" /> Tampilkan Lebih Sedikit
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-4 w-4 mr-2" /> Lihat Semua ({vehiclePositions.length - 5} lainnya)
-                    </>
-                  )}
+                <Button asChild variant="outline" className=""> {/* Removed w-full */}
+                  <Link to="/all-vehicle-positions">
+                    Lihat Semua ({vehiclePositions.length - 5} lainnya)
+                  </Link>
                 </Button>
               </div>
             )}
