@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Speedometer, Compass, TrafficCone, LicensePlate } from 'lucide-react'; // Added Speedometer, Compass, TrafficCone, LicensePlate
+import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Speedometer, Compass, TrafficCone } from 'lucide-react'; // Removed LicensePlate
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -233,8 +233,9 @@ const AllVehiclePositionsPage: React.FC = () => {
                   <span className="flex items-center col-span-2">
                     <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
+                  {/* Removed LicensePlate icon as it's not available */}
                   <span className="flex items-center col-span-2">
-                    <LicensePlate className="h-4 w-4 mr-2" /> Plat: {vp.vehicle?.license_plate || 'N/A'}
+                    <Car className="h-4 w-4 mr-2" /> Plat: {vp.vehicle?.license_plate || 'N/A'}
                   </span>
                   <span className="flex items-center col-span-2">
                     <Clock className="h-4 w-4 mr-2" /> Update: {formatTimestamp(vp.timestamp)}
