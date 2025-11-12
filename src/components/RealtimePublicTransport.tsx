@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button'; // Import Button component
 import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser'; // Import ParsedVehiclePosition
 
 const RealtimePublicTransport: React.FC = () => {
@@ -12,6 +13,7 @@ const RealtimePublicTransport: React.FC = () => {
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAllVehiclePositions, setShowAllVehiclePositions] = useState(false); // New state for "View All"
 
   const fetchAndParseData = async () => {
     setIsLoading(true);
@@ -141,38 +143,7 @@ const RealtimePublicTransport: React.FC = () => {
     return 'Status Tidak Tersedia';
   };
 
-  if (isLoading) {
-    return (
-      <Card className="bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <Bus className="h-5 w-5 mr-2 text-indigo-600 animate-pulse" />
-            <span className="ml-2">Memuat Transportasi Publik Real-Time...</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Mengambil dan mengurai data GTFS-realtime.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className="bg-white dark:bg-gray-800 shadow-lg border-red-500">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-red-500 flex items-center">
-            <AlertTriangle className="h-5 w-5 mr-2" />
-            Kesalahan Data Transportasi
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>{error}</p>
-          <p className="text-sm text-gray-500">Pastikan file `.bin` tersedia dan formatnya benar.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const displayedVehiclePositions = showAllVehiclePositions ? vehiclePositions : vehiclePositions.slice(0, 5);
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
@@ -209,33 +180,54 @@ const RealtimePublicTransport: React.FC = () => {
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Car className="h-4 w-4 mr-2" /> Posisi Kendaraan
         </h3>
-        {vehiclePositions.length > 0 ? (
-          vehiclePositions.map(vp => (
-            <div key={vp.id} className="border-b last:border-b-0 pb-3 last:pb-0">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
-                  {getRouteTypeIcon(vp.trip?.route_id)}
-                  Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
-                </h4>
-                <Badge variant="secondary" className="text-xs">
-                  {getVehicleStatus(vp.current_status, vp.occupancy_status)}
-                </Badge>
+        {isLoading ? (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat posisi kendaraan...</p>
+        ) : error ? (
+          <p className="text-red-500 text-center py-4">{error}</p>
+        ) : vehiclePositions.length > 0 ? (
+          <>
+            {displayedVehiclePositions.map(vp => (
+              <div key={vp.id} className="border-b last:border-b-0 pb-3 last:pb-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                    {getRouteTypeIcon(vp.trip?.route_id)}
+                    Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
+                  </h4>
+                  <Badge variant="secondary" className="text-xs">
+                    {getVehicleStatus(vp.current_status, vp.occupancy_status)}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <span className="flex items-center">
+                    <MapPin className="h-3 w-3 mr-1" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>Trip ID: {vp.trip?.trip_id || 'N/A'}</span>
+                  <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
+                  <span>Start Date: {vp.trip?.start_date || 'N/A'}</span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                <span className="flex items-center">
-                  <MapPin className="h-3 w-3 mr-1" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
-                </span>
-                <span className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
-                </span>
+            ))}
+            {vehiclePositions.length > 5 && (
+              <div className="text-center mt-4">
+                <Button variant="outline" onClick={() => setShowAllVehiclePositions(!showAllVehiclePositions)} className="w-full">
+                  {showAllVehiclePositions ? (
+                    <>
+                      <ChevronUp className="h-4 w-4 mr-2" /> Tampilkan Lebih Sedikit
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4 mr-2" /> Lihat Semua ({vehiclePositions.length - 5} lainnya)
+                    </>
+                  )}
+                </Button>
               </div>
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                <span>Trip ID: {vp.trip?.trip_id || 'N/A'}</span>
-                <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
-                <span>Start Date: {vp.trip?.start_date || 'N/A'}</span>
-              </div>
-            </div>
-          ))
+            )}
+          </>
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada posisi kendaraan yang tersedia.</p>
         )}
