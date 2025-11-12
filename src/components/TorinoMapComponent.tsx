@@ -25,7 +25,7 @@ const TorinoMapComponent: React.FC = () => {
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
-  const minZoomForGeoJSON = 14; // Minimum zoom level to display the GeoJSON layer
+  const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
 
   useEffect(() => {
     // Function to update GeoJSON layer visibility based on zoom
