@@ -26,6 +26,7 @@ interface WeatherData {
 
 const fetchWeather = async (city: string) => {
   const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+  console.log("OpenWeatherMap API Key:", apiKey ? "Loaded" : "Not Loaded", apiKey); // Tambahkan log ini
   if (!apiKey) {
     throw new Error("OpenWeatherMap API key is not set in environment variables (VITE_OPENWEATHER_API_KEY).");
   }
