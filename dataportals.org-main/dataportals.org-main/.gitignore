@@ -1,0 +1,5 @@
+node_modules/*
+sandbox/*
+.*.swp
+pyenv
+_site/

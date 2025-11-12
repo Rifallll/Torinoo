@@ -1,0 +1,19 @@
+name: portals
+
+on: push
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      # unable to use frictionless-ci
+      # https://github.com/frictionlessdata/frictionless-ci/issues/57
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: pip install "frictionless==5.*"
+      - name: Validate data
+        run: frictionless validate data/datapackage.json
