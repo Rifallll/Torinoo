@@ -2,95 +2,113 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-
-interface TransportItem {
-  id: string;
-  type: 'Bus' | 'Tram';
-  route: string;
-  status: 'On Time' | 'Delayed' | 'Approaching';
-  eta: string; // Estimated Time of Arrival
-  location: string;
-}
-
-const initialTransportData: TransportItem[] = [
-  { id: 'b001', type: 'Bus', route: 'Line 101', status: 'On Time', eta: '5 min', location: 'Via Roma' },
-  { id: 't001', type: 'Tram', route: 'Line 4', status: 'Delayed', eta: '12 min', location: 'Piazza Castello' },
-  { id: 'b002', type: 'Bus', route: 'Line 68', status: 'Approaching', eta: '1 min', location: 'Corso Vittorio Emanuele II' },
-  { id: 't002', type: 'Tram', route: 'Line 15', status: 'On Time', eta: '8 min', location: 'Porta Nuova' },
-];
+import { mockTripUpdates, mockAlerts, MockTripUpdate, MockAlert } from '@/data/mockGtfsRealtime'; // Import mock data
 
 const RealtimePublicTransport: React.FC = () => {
-  const [transportData, setTransportData] = useState<TransportItem[]>(initialTransportData);
+  const [tripUpdates, setTripUpdates] = useState<MockTripUpdate[]>(mockTripUpdates);
+  const [alerts, setAlerts] = useState<MockAlert[]>(mockAlerts);
 
-  // Simulate real-time updates
+  // Simulate real-time updates for trip delays
   useEffect(() => {
     const interval = setInterval(() => {
-      setTransportData(prevData =>
-        prevData.map(item => {
-          // Simulate status changes and ETA updates
-          const newEta = parseInt(item.eta) - 1;
-          if (newEta <= 0) {
-            return { ...item, eta: 'Arrived', status: 'On Time' }; // Reset or mark as arrived
-          }
-          const newStatus = Math.random() > 0.8 ? 'Delayed' : (newEta <= 2 ? 'Approaching' : 'On Time');
-          return { ...item, eta: `${newEta} min`, status: newStatus };
+      setTripUpdates(prevUpdates =>
+        prevUpdates.map(update => {
+          // Simulate delay changes
+          const newDelay = update.delaySeconds + Math.floor(Math.random() * 60) - 30; // +/- 30 seconds
+          return { ...update, delaySeconds: newDelay };
         })
       );
-    }, 10000); // Update every 10 seconds
+      // Filter active alerts (mocking active period)
+      setAlerts(mockAlerts.filter(alert => {
+        const now = Math.floor(Date.now() / 1000);
+        return now >= alert.activePeriod.start && now <= alert.activePeriod.end;
+      }));
+    }, 15000); // Update every 15 seconds
 
     return () => clearInterval(interval);
   }, []);
 
-  const getStatusBadgeClass = (status: TransportItem['status']) => {
-    switch (status) {
-      case 'On Time': return "bg-green-100 text-green-600 hover:bg-green-100";
-      case 'Delayed': return "bg-red-100 text-red-600 hover:bg-red-100";
-      case 'Approaching': return "bg-yellow-100 text-yellow-600 hover:bg-yellow-100";
-      default: return "bg-gray-100 text-gray-600 hover:bg-gray-100";
-    }
+  const formatDelay = (delaySeconds: number) => {
+    if (delaySeconds === 0) return 'On Time';
+    const minutes = Math.abs(Math.round(delaySeconds / 60));
+    if (delaySeconds > 0) return `${minutes} min Delayed`;
+    return `${minutes} min Early`;
   };
 
-  const getTypeIcon = (type: TransportItem['type']) => {
-    return type === 'Bus' ? <Bus className="h-4 w-4 mr-1" /> : <TramFront className="h-4 w-4 mr-1" />;
+  const getDelayBadgeClass = (delaySeconds: number) => {
+    if (delaySeconds > 120) return "bg-red-100 text-red-600 hover:bg-red-100"; // More than 2 min delay
+    if (delaySeconds > 0) return "bg-yellow-100 text-yellow-600 hover:bg-yellow-100"; // Delayed
+    if (delaySeconds < 0) return "bg-green-100 text-green-600 hover:bg-green-100"; // Early
+    return "bg-gray-100 text-gray-600 hover:bg-gray-100"; // On Time
+  };
+
+  const getRouteTypeIcon = (routeType?: number) => {
+    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />; // Bus
+    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram
+    return <Info className="h-4 w-4 mr-1" />; // Default/Unknown
   };
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-          {getTypeIcon('Bus')} {/* Using Bus icon as primary for title */}
-          <span className="ml-2">Transportasi Publik Real-Time</span>
+          <Bus className="h-5 w-5 mr-2 text-indigo-600" />
+          Transportasi Publik Real-Time
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {transportData.length > 0 ? (
-          transportData.map(item => (
-            <div key={item.id} className="border-b last:border-b-0 pb-3 last:pb-0">
+        {alerts.length > 0 && (
+          <div className="space-y-2 mb-4">
+            <h3 className="font-semibold text-orange-600 dark:text-orange-400 flex items-center">
+              <AlertTriangle className="h-4 w-4 mr-2" /> Peringatan Aktif
+            </h3>
+            {alerts.map(alert => (
+              <div key={alert.id} className="border-l-4 border-orange-500 pl-3 py-1 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-md">
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{alert.headerText}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{alert.descriptionText}</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {alert.informedEntities.map((entity, idx) => (
+                    entity.routeId && (
+                      <Badge key={idx} variant="secondary" className="text-xs flex items-center">
+                        {getRouteTypeIcon(entity.routeType)} Jalur {entity.routeId}
+                      </Badge>
+                    )
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+          <Clock className="h-4 w-4 mr-2" /> Pembaruan Perjalanan
+        </h3>
+        {tripUpdates.length > 0 ? (
+          tripUpdates.map(update => (
+            <div key={update.id} className="border-b last:border-b-0 pb-3 last:pb-0">
               <div className="flex items-center justify-between mb-1">
                 <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
-                  {getTypeIcon(item.type)} {item.type} {item.route}
+                  {getRouteTypeIcon(update.routeId === '101' || update.routeId === '68' ? 3 : 0)} {/* Simple type inference */}
+                  Jalur {update.routeId} ({update.tripId})
                 </h4>
-                <Badge className={getStatusBadgeClass(item.status)}>
-                  {item.status === 'Delayed' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                  {item.status === 'On Time' && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                  {item.status === 'Approaching' && <Clock className="h-3 w-3 mr-1" />}
-                  {item.status}
+                <Badge className={getDelayBadgeClass(update.delaySeconds)}>
+                  {formatDelay(update.delaySeconds)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span className="flex items-center">
-                  <MapPin className="h-3 w-3 mr-1" /> {item.location}
+                  <MapPin className="h-3 w-3 mr-1" /> Stop Seq: {update.currentStopSequence}
                 </span>
                 <span className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" /> ETA: {item.eta}
+                  <Clock className="h-3 w-3 mr-1" /> Status: {update.currentStatus.replace('_', ' ')}
                 </span>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada data transportasi publik yang tersedia.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
         )}
       </CardContent>
     </Card>
