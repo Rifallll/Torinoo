@@ -2,44 +2,45 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert } from '@/utils/gtfsRealtimeParser'; // Import parser
+import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser'; // Import ParsedVehiclePosition
 
 const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
+  const [vehiclePositions, setVehiclePositions] = useState<ParsedVehiclePosition[]>([]); // New state
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchAndParseData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Pass all three bin paths
+      const data = await parseGtfsRealtimeData('/trip_update.bin', '/alerts.bin', '/vehicle_position.bin');
+      setTripUpdates(data.tripUpdates);
+      setVehiclePositions(data.vehiclePositions); // Set vehicle positions
+      setAlerts(data.alerts);
+    } catch (err) {
+      console.error("Failed to fetch or parse GTFS-realtime data:", err);
+      setError("Gagal memuat atau mengurai data transportasi publik.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        // Assuming alerts.bin and trip_update.bin are in the public folder
-        const data = await parseGtfsRealtimeData('/alerts.bin', '/trip_update.bin');
-        setTripUpdates(data.tripUpdates);
-        setAlerts(data.alerts);
-      } catch (err) {
-        console.error("Failed to fetch or parse GTFS-realtime data:", err);
-        setError("Gagal memuat atau mengurai data transportasi publik.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    fetchAndParseData();
 
-    fetchData();
-
-    // Simulate real-time updates for trip delays (if data is loaded)
+    // Simulate real-time updates for trip delays and vehicle positions
     const interval = setInterval(() => {
+      // Simulate delay changes for trip updates
       setTripUpdates(prevUpdates =>
         prevUpdates.map(update => {
-          // Only simulate if there's an existing delay or we want to introduce one
           const currentDelay = update.delay || (update.stop_time_update?.[0]?.arrival?.delay || 0);
           const newDelay = currentDelay + Math.floor(Math.random() * 60) - 30; // +/- 30 seconds
           
-          // Update the first stop_time_update's delay, or the top-level delay if available
           const updatedStopTimeUpdates = update.stop_time_update ? update.stop_time_update.map((stu, idx) => 
             idx === 0 ? { ...stu, arrival: { ...stu.arrival, delay: newDelay }, departure: { ...stu.departure, delay: newDelay } } : stu
           ) : [];
@@ -47,7 +48,19 @@ const RealtimePublicTransport: React.FC = () => {
           return { ...update, delay: newDelay, stop_time_update: updatedStopTimeUpdates };
         })
       );
+
+      // Simulate vehicle movement/status changes (example: just updating timestamp)
+      setVehiclePositions(prevPositions =>
+        prevPositions.map(vp => ({
+          ...vp,
+          timestamp: vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000), // Increment timestamp
+          // Could also simulate position changes here if desired
+        }))
+      );
+
       // Filter active alerts based on current time (mocking active period)
+      // This assumes alerts are static and only their active_period changes relative to current time
+      // If alerts themselves change, they would need to be refetched or updated from a source
       setAlerts(prevAlerts => prevAlerts.filter(alert => {
         const now = Math.floor(Date.now() / 1000);
         const activePeriod = alert.active_period?.[0];
@@ -56,7 +69,7 @@ const RealtimePublicTransport: React.FC = () => {
     }, 15000); // Update every 15 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup
 
   const formatDelay = (delaySeconds: number | undefined) => {
     if (delaySeconds === undefined || delaySeconds === 0) return 'On Time';
@@ -73,10 +86,17 @@ const RealtimePublicTransport: React.FC = () => {
     return "bg-gray-100 text-gray-600 hover:bg-gray-100"; // On Time
   };
 
-  const getRouteTypeIcon = (routeType?: number) => {
-    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />; // Bus
-    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram
-    return <Info className="h-4 w-4 mr-1" />; // Default/Unknown
+  const getRouteTypeIcon = (routeId?: string) => {
+    // Simple inference: assuming '101' and '68' are bus routes, others are tram for example
+    if (routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />; 
+    // You might need a more robust mapping based on your GTFS static data
+    return <TramFront className="h-4 w-4 mr-1" />; // Default to tram or generic icon
+  };
+
+  const formatTimestamp = (timestamp?: number) => {
+    if (!timestamp) return 'N/A';
+    const date = new Date(Number(timestamp) * 1000); // Convert Unix timestamp to milliseconds
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
   if (isLoading) {
@@ -134,7 +154,7 @@ const RealtimePublicTransport: React.FC = () => {
                   {alert.informed_entity?.map((entity, idx) => (
                     entity.route_id && (
                       <Badge key={idx} variant="secondary" className="text-xs flex items-center">
-                        {getRouteTypeIcon(entity.route_type)} Jalur {entity.route_id}
+                        {getRouteTypeIcon(entity.route_id)} Jalur {entity.route_id}
                       </Badge>
                     )
                   ))}
@@ -145,6 +165,35 @@ const RealtimePublicTransport: React.FC = () => {
         )}
 
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+          <Car className="h-4 w-4 mr-2" /> Posisi Kendaraan
+        </h3>
+        {vehiclePositions.length > 0 ? (
+          vehiclePositions.map(vp => (
+            <div key={vp.id} className="border-b last:border-b-0 pb-3 last:pb-0">
+              <div className="flex items-center justify-between mb-1">
+                <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                  {getRouteTypeIcon(vp.trip?.route_id)}
+                  Jalur {vp.trip?.route_id || 'N/A'} ({vp.vehicle?.label || vp.id})
+                </h4>
+                <Badge variant="secondary" className="text-xs">
+                  {vp.current_status?.replace(/_/g, ' ') || 'UNKNOWN'}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span className="flex items-center">
+                  <MapPin className="h-3 w-3 mr-1" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
+                </span>
+                <span className="flex items-center">
+                  <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
+                </span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada posisi kendaraan yang tersedia.</p>
+        )}
+
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Clock className="h-4 w-4 mr-2" /> Pembaruan Perjalanan
         </h3>
         {tripUpdates.length > 0 ? (
@@ -152,7 +201,7 @@ const RealtimePublicTransport: React.FC = () => {
             <div key={update.id} className="border-b last:border-b-0 pb-3 last:pb-0">
               <div className="flex items-center justify-between mb-1">
                 <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
-                  {getRouteTypeIcon(update.trip.route_id === '101' || update.trip.route_id === '68' ? 3 : 0)} {/* Simple type inference */}
+                  {getRouteTypeIcon(update.trip.route_id)}
                   Jalur {update.trip.route_id} ({update.trip.trip_id})
                 </h4>
                 <Badge className={getDelayBadgeClass(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}>
