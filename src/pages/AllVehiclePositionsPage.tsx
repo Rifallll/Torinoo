@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Speedometer, Compass, TrafficCone } from 'lucide-react'; // Removed LicensePlate
+import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Gauge, ArrowRight, TrafficCone } from 'lucide-react'; // Replaced Speedometer with Gauge, Compass with ArrowRight
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -225,15 +225,14 @@ const AllVehiclePositionsPage: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <span className="flex items-center">
-                    <Speedometer className="h-4 w-4 mr-2" /> Kecepatan: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
+                    <Gauge className="h-4 w-4 mr-2" /> Kecepatan: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
                   </span>
                   <span className="flex items-center">
-                    <Compass className="h-4 w-4 mr-2" /> Arah: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
+                    <ArrowRight className="h-4 w-4 mr-2" /> Arah: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
                   </span>
                   <span className="flex items-center col-span-2">
                     <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
-                  {/* Removed LicensePlate icon as it's not available */}
                   <span className="flex items-center col-span-2">
                     <Car className="h-4 w-4 mr-2" /> Plat: {vp.vehicle?.license_plate || 'N/A'}
                   </span>
