@@ -206,7 +206,7 @@ const TorinoMapComponent: React.FC = () => {
             style: (feature) => {
               // Custom style for lines/polygons based on properties
               const trafficLevel = feature?.properties?.traffic_level;
-              let color = '#3388ff'; // Default blue
+              let color = '#e0e0e0'; // Changed default to very light gray
               let weight = 3;
 
               if (trafficLevel === 'high') {
