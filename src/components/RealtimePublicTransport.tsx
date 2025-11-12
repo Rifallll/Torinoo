@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ListChecks } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ListChecks, TrafficCone, Gauge, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser';
@@ -46,6 +46,14 @@ const RealtimePublicTransport: React.FC = () => {
       'FULL',
     ];
 
+    // Removed 'UNKNOWN_CONGESTION_LEVEL' from the simulation array
+    const congestionLevels = [
+      'RUNNING_SMOOTHLY',
+      'STOP_AND_GO',
+      'CONGESTION',
+      'SEVERE_CONGESTION',
+    ];
+
     const interval = setInterval(() => {
       setTripUpdates(prevUpdates =>
         prevUpdates.map(update => {
@@ -72,6 +80,14 @@ const RealtimePublicTransport: React.FC = () => {
           newOccupancyIndex = Math.max(0, Math.min(occupancyStatuses.length - 1, newOccupancyIndex));
           const newOccupancyStatus = occupancyStatuses[newOccupancyIndex];
 
+          // Simulate gradual random congestion level change
+          const currentCongestionLevel = vp.congestion_level && congestionLevels.includes(vp.congestion_level) ? vp.congestion_level : 'RUNNING_SMOOTHLY';
+          const currentCongestionIndex = congestionLevels.indexOf(currentCongestionLevel);
+          
+          let newCongestionIndex = currentCongestionIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0);
+          newCongestionIndex = Math.max(0, Math.min(congestionLevels.length - 1, newCongestionIndex));
+          const newCongestionLevel = congestionLevels[newCongestionIndex];
+
           return {
             ...vp,
             timestamp: newTimestamp,
@@ -81,6 +97,7 @@ const RealtimePublicTransport: React.FC = () => {
               longitude: newLongitude,
             },
             occupancy_status: newOccupancyStatus,
+            congestion_level: newCongestionLevel,
           };
         })
       );
@@ -161,6 +178,28 @@ const RealtimePublicTransport: React.FC = () => {
     return 'Status Tidak Tersedia';
   };
 
+  const getCongestionBadgeClass = (congestionLevel: string | undefined) => {
+    switch (congestionLevel) {
+      case 'RUNNING_SMOOTHLY': return 'bg-green-100 text-green-600 hover:bg-green-100';
+      case 'STOP_AND_GO': return 'bg-yellow-100 text-yellow-600 hover:bg-yellow-100';
+      case 'CONGESTION': return 'bg-orange-100 text-orange-600 hover:bg-orange-100';
+      case 'SEVERE_CONGESTION': return 'bg-red-100 text-red-600 hover:bg-red-100';
+      default: return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
+    }
+  };
+
+  const formatCongestionLevel = (congestionLevel: string | undefined) => {
+    if (!congestionLevel) return 'N/A';
+    switch (congestionLevel) {
+      case 'RUNNING_SMOOTHLY': return 'Lancar';
+      case 'STOP_AND_GO': return 'Berhenti & Jalan';
+      case 'CONGESTION': return 'Macet';
+      case 'SEVERE_CONGESTION': return 'Macet Parah';
+      case 'UNKNOWN_CONGESTION_LEVEL': return 'Tidak Diketahui';
+      default: return congestionLevel.replace(/_/g, ' ');
+    }
+  };
+
   const sortedVehiclePositions = [...vehiclePositions].sort((a, b) => {
     if (a.occupancy_status === 'EMPTY' && b.occupancy_status !== 'EMPTY') {
       return -1;
@@ -232,6 +271,14 @@ const RealtimePublicTransport: React.FC = () => {
                   </span>
                   <span className="flex items-center">
                     <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <span className="flex items-center">
+                    <Gauge className="h-3 w-3 mr-1" /> Kecepatan: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <TrafficCone className="h-3 w-3 mr-1" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
                 </div>
               </div>
