@@ -154,7 +154,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     return entities;
   } catch (error) {
     console.error(`Error parsing ${type}.bin from ${path}:`, error);
-    toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}`);
+    toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
     return [];
   }
 };
