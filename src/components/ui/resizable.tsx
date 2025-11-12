@@ -27,11 +27,11 @@ interface ResizableHandleProps
 }
 
 const ResizableHandle = React.forwardRef<
-  React.ElementRef<typeof ResizablePrimitive.PanelResizeHandle>,
+  HTMLDivElement, // Explicitly type ref to HTMLDivElement
   ResizableHandleProps
 >(({ className, withHandle, ...props }, ref) => (
   <ResizablePrimitive.PanelResizeHandle
-    ref={ref} // `ref` is now correctly passed here
+    ref={ref}
     className={cn(
       "relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[state=active]:bg-primary data-[state=active]:after:bg-primary",
       withHandle &&
