@@ -19,16 +19,10 @@ L.Icon.Default.mergeOptions({
 
 const TorinoMapComponent: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
-  const markerLayerRef = useRef<L.LayerGroup | null>(null);
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON layer
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
-
-  const dummyTrafficMarkers = [
-    { lat: 45.075, lng: 7.675, popupText: "Area Padat: Via Roma", color: "red" },
-    { lat: 45.065, lng: 7.690, popupText: "Area Lancar: Piazza Castello", color: "green" },
-    { lat: 45.080, lng: 7.680, popupText: "Area Sedang: Corso Vittorio Emanuele II", color: "orange" },
-  ];
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -83,44 +77,82 @@ const TorinoMapComponent: React.FC = () => {
       };
       L.control.layers(baseLayers).addTo(mapRef.current);
 
-      // Add marker layer group
-      markerLayerRef.current = L.layerGroup().addTo(mapRef.current);
-
-      // Add main Torino city center marker
-      L.marker(torinoCenter)
-        .bindPopup("<b>Pusat Kota Torino</b><br/>Titik Fokus Analisis")
-        .addTo(markerLayerRef.current);
+      // Reset view control
+      const ResetViewControl = L.Control.extend({
+        onAdd: function(map: L.Map) {
+          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+          container.innerHTML = '<button title="Reset View" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x21BA;</button>';
+          container.onclick = () => {
+            map.setView(torinoCenter, defaultZoom);
+          };
+          return container;
+        },
+        onRemove: function(map: L.Map) {},
+      });
+      new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
     }
 
-    // Clear existing dummy markers
-    markerLayerRef.current?.clearLayers();
+    // Fetch and add GeoJSON data
+    const fetchGeoJSON = async () => {
+      try {
+        const response = await fetch('/export.geojson'); // Path to the GeoJSON file in the public folder
+        const data = await response.json();
 
-    // Add dummy traffic markers
-    dummyTrafficMarkers.forEach(markerData => {
-      const customIcon = new L.DivIcon({
-        className: `custom-div-icon bg-${markerData.color}-500 rounded-full w-3 h-3 border-2 border-white shadow-md`,
-        iconAnchor: [6, 6],
-      });
+        if (mapRef.current) {
+          // Clear existing GeoJSON layer if any
+          if (geoJsonLayerRef.current) {
+            mapRef.current.removeLayer(geoJsonLayerRef.current);
+          }
 
-      L.marker([markerData.lat, markerData.lng], { icon: customIcon })
-        .bindPopup(markerData.popupText)
-        .addTo(markerLayerRef.current!);
-    });
+          geoJsonLayerRef.current = L.geoJSON(data, {
+            onEachFeature: (feature, layer) => {
+              // Bind popup with all properties
+              if (feature.properties) {
+                let popupContent = "<table>";
+                for (const key in feature.properties) {
+                  popupContent += `<tr><td><b>${key}:</b></td><td>${feature.properties[key]}</td></tr>`;
+                }
+                popupContent += "</table>";
+                layer.bindPopup(popupContent);
+              }
+            },
+            pointToLayer: (feature, latlng) => {
+              // Custom marker for points (e.g., if GeoJSON contains points)
+              return L.marker(latlng);
+            },
+            style: (feature) => {
+              // Custom style for lines/polygons based on properties
+              // Example: color based on a 'traffic_level' property
+              const trafficLevel = feature?.properties?.traffic_level;
+              let color = '#3388ff'; // Default blue
 
-    // Reset view control
-    const ResetViewControl = L.Control.extend({
-      onAdd: function(map: L.Map) {
-        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        container.innerHTML = '<button title="Reset View" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x21BA;</button>';
-        container.onclick = () => {
-          map.setView(torinoCenter, defaultZoom);
-        };
-        return container;
-      },
-      onRemove: function(map: L.Map) {},
-    });
-    new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
+              if (trafficLevel === 'high') {
+                color = 'red';
+              } else if (trafficLevel === 'moderate') {
+                color = 'orange';
+              } else if (trafficLevel === 'low') {
+                color = 'green';
+              }
 
+              return {
+                color: color,
+                weight: 3,
+                opacity: 0.7
+              };
+            }
+          }).addTo(mapRef.current);
+
+          // Optionally, fit map bounds to the GeoJSON layer
+          if (geoJsonLayerRef.current.getBounds().isValid()) {
+            mapRef.current.fitBounds(geoJsonLayerRef.current.getBounds());
+          }
+        }
+      } catch (error) {
+        console.error("Error loading GeoJSON data:", error);
+      }
+    };
+
+    fetchGeoJSON();
 
     return () => {
       if (mapRef.current) {
@@ -128,7 +160,7 @@ const TorinoMapComponent: React.FC = () => {
         mapRef.current = null;
       }
     };
-  }, []);
+  }, []); // Empty dependency array means this effect runs once on mount
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
