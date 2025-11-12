@@ -195,8 +195,8 @@ const RealtimePublicTransport: React.FC = () => {
       case 'STOP_AND_GO': return 'Berhenti & Jalan';
       case 'CONGESTION': return 'Macet';
       case 'SEVERE_CONGESTION': return 'Macet Parah';
-      case 'UNKNOWN_CONGESTION_LEVEL': return 'Tidak Diketahui';
-      default: return congestionLevel.replace(/_/g, ' ');
+      // Removed 'UNKNOWN_CONGESTION_LEVEL' case
+      default: return 'N/A'; // Fallback for any unexpected string
     }
   };
 

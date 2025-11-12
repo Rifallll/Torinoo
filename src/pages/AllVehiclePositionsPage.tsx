@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Gauge, ArrowRight, TrafficCone } from 'lucide-react'; // Replaced Speedometer with Gauge, Compass with ArrowRight
+import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Gauge, ArrowRight, TrafficCone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,8 +42,8 @@ const AllVehiclePositionsPage: React.FC = () => {
       'FULL',
     ];
 
+    // Removed 'UNKNOWN_CONGESTION_LEVEL' from the simulation array
     const congestionLevels = [
-      'UNKNOWN_CONGESTION_LEVEL',
       'RUNNING_SMOOTHLY',
       'STOP_AND_GO',
       'CONGESTION',
@@ -75,7 +75,10 @@ const AllVehiclePositionsPage: React.FC = () => {
           const newBearing = (currentBearing + (Math.random() - 0.5) * 20 + 360) % 360;
 
           // Simulate gradual random congestion level change
-          const currentCongestionIndex = congestionLevels.indexOf(vp.congestion_level || 'UNKNOWN_CONGESTION_LEVEL');
+          // Ensure currentCongestionIndex defaults to a known state if vp.congestion_level is undefined or 'UNKNOWN_CONGESTION_LEVEL'
+          const currentCongestionLevel = vp.congestion_level && congestionLevels.includes(vp.congestion_level) ? vp.congestion_level : 'RUNNING_SMOOTHLY';
+          const currentCongestionIndex = congestionLevels.indexOf(currentCongestionLevel);
+          
           let newCongestionIndex = currentCongestionIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0);
           newCongestionIndex = Math.max(0, Math.min(congestionLevels.length - 1, newCongestionIndex));
           const newCongestionLevel = congestionLevels[newCongestionIndex];
@@ -168,8 +171,8 @@ const AllVehiclePositionsPage: React.FC = () => {
       case 'STOP_AND_GO': return 'Berhenti & Jalan';
       case 'CONGESTION': return 'Macet';
       case 'SEVERE_CONGESTION': return 'Macet Parah';
-      case 'UNKNOWN_CONGESTION_LEVEL': return 'Tidak Diketahui';
-      default: return congestionLevel.replace(/_/g, ' ');
+      // Removed 'UNKNOWN_CONGESTION_LEVEL' case
+      default: return 'N/A'; // Fallback for any unexpected string
     }
   };
 
@@ -233,7 +236,6 @@ const AllVehiclePositionsPage: React.FC = () => {
                   <span className="flex items-center col-span-2">
                     <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
-                  {/* Removed the license plate display as requested */}
                   <span className="flex items-center col-span-2">
                     <Clock className="h-4 w-4 mr-2" /> Update: {formatTimestamp(vp.timestamp)}
                   </span>
