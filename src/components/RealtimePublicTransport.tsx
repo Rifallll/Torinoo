@@ -38,6 +38,16 @@ const RealtimePublicTransport: React.FC = () => {
   useEffect(() => {
     fetchAndParseData();
 
+    // Define possible occupancy statuses for simulation
+    const occupancyStatuses = [
+      'EMPTY',
+      'MANY_SEATS_AVAILABLE',
+      'FEW_SEATS_AVAILABLE',
+      'STANDING_ROOM_ONLY',
+      'CRUSHED_STANDING_ROOM_ONLY',
+      'FULL',
+    ];
+
     // Simulate real-time updates for trip delays and vehicle positions
     const interval = setInterval(() => {
       // Simulate delay changes for trip updates
@@ -56,11 +66,27 @@ const RealtimePublicTransport: React.FC = () => {
 
       // Simulate vehicle movement/status changes (example: just updating timestamp)
       setVehiclePositionData(prevPositions =>
-        prevPositions.map(vp => ({
-          ...vp,
-          timestamp: vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000), // Increment timestamp
-          // Could also simulate position changes here if desired
-        }))
+        prevPositions.map(vp => {
+          const newTimestamp = vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000); // Increment timestamp
+
+          // Simulate small random position change
+          const newLatitude = (vp.position?.latitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
+          const newLongitude = (vp.position?.longitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
+
+          // Simulate random occupancy status
+          const randomOccupancy = occupancyStatuses[Math.floor(Math.random() * occupancyStatuses.length)];
+
+          return {
+            ...vp,
+            timestamp: newTimestamp,
+            position: {
+              ...vp.position,
+              latitude: newLatitude,
+              longitude: newLongitude,
+            },
+            occupancy_status: randomOccupancy,
+          };
+        })
       );
 
       // Filter active alerts based on current time (mocking active period)
@@ -115,6 +141,14 @@ const RealtimePublicTransport: React.FC = () => {
     const date = new Date(numTimestamp * 1000);
     if (isNaN(date.getTime())) return 'Tanggal Tidak Valid'; // Check if Date object is valid
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
+  const formatStartDate = (dateString?: string) => {
+    if (!dateString || dateString.length !== 8) return 'N/A';
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    return `${day}/${month}/${year}`; // Format as DD/MM/YYYY
   };
 
   const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
@@ -208,7 +242,7 @@ const RealtimePublicTransport: React.FC = () => {
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                   <span>Trip ID: {vp.trip?.trip_id || 'N/A'}</span>
                   <span>Start Time: {vp.trip?.start_time || 'N/A'}</span>
-                  <span>Start Date: {vp.trip?.start_date || 'N/A'}</span>
+                  <span>Start Date: {formatStartDate(vp.trip?.start_date)}</span>
                 </div>
               </div>
             ))}
