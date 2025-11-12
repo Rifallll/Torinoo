@@ -86,11 +86,16 @@ const RealtimePublicTransport: React.FC = () => {
     return "bg-gray-100 text-gray-600 hover:bg-gray-100"; // On Time
   };
 
-  const getRouteTypeIcon = (routeId?: string) => {
-    // Simple inference: assuming '101' and '68' are bus routes, others are tram for example
-    if (routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />; 
-    // You might need a more robust mapping based on your GTFS static data
-    return <TramFront className="h-4 w-4 mr-1" />; // Default to tram or generic icon
+  const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
+    // Prioritize routeType if available (e.g., from alerts)
+    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />; // Bus
+    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram (often 0 for tram/light rail)
+
+    // Fallback to routeId inference for TripUpdate/VehiclePosition if routeType is not provided
+    if (routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
+    if (routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />; // Example tram routes
+
+    return <Info className="h-4 w-4 mr-1" />; // Default/Unknown
   };
 
   const formatTimestamp = (timestamp?: number) => {
@@ -154,7 +159,7 @@ const RealtimePublicTransport: React.FC = () => {
                   {alert.informed_entity?.map((entity, idx) => (
                     entity.route_id && (
                       <Badge key={idx} variant="secondary" className="text-xs flex items-center">
-                        {getRouteTypeIcon(entity.route_id)} Jalur {entity.route_id}
+                        {getRouteTypeIcon(entity.route_id, entity.route_type)} Jalur {entity.route_id}
                       </Badge>
                     )
                   ))}

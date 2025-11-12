@@ -93,6 +93,42 @@ const loadProto = async () => {
   }
 };
 
+const parseSingleBinFile = async (path: string, type: string, FeedMessage: protobuf.Type): Promise<any[]> => {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) {
+      console.warn(`Failed to fetch ${type}.bin from ${path}: ${response.statusText}.`);
+      toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public.`);
+      return [];
+    }
+    const buffer = await response.arrayBuffer();
+    const message = FeedMessage.decode(new Uint8Array(buffer));
+    const payload = FeedMessage.toObject(message, {
+      longs: String,
+      enums: String,
+      bytes: String,
+    });
+
+    const entities: any[] = [];
+    if (payload.entity) {
+      for (const entity of payload.entity) {
+        if (type === 'trip_update' && entity.tripUpdate) {
+          entities.push({ id: entity.id, ...entity.tripUpdate } as ParsedTripUpdate);
+        } else if (type === 'vehicle_position' && entity.vehicle) {
+          entities.push({ id: entity.id, ...entity.vehicle } as ParsedVehiclePosition);
+        } else if (type === 'alert' && entity.alert) {
+          entities.push({ id: entity.id, ...entity.alert } as ParsedAlert);
+        }
+      }
+    }
+    return entities;
+  } catch (error) {
+    console.error(`Error parsing ${type}.bin from ${path}:`, error);
+    toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}`);
+    return [];
+  }
+};
+
 export const parseGtfsRealtimeData = async (
   tripUpdateBinPath: string,
   alertBinPath: string,
@@ -104,88 +140,15 @@ export const parseGtfsRealtimeData = async (
     throw new Error("FeedMessage type not loaded from .proto.");
   }
 
-  const tripUpdates: ParsedTripUpdate[] = [];
-  const vehiclePositions: ParsedVehiclePosition[] = [];
-  const alerts: ParsedAlert[] = [];
+  const tripUpdates = await parseSingleBinFile(tripUpdateBinPath, 'trip_update', FeedMessage);
+  const vehiclePositions = await parseSingleBinFile(vehiclePositionBinPath, 'vehicle_position', FeedMessage);
+  const alerts = await parseSingleBinFile(alertBinPath, 'alert', FeedMessage);
 
-  try {
-    // Fetch and parse TripUpdate data
-    const tripUpdateResponse = await fetch(tripUpdateBinPath);
-    if (!tripUpdateResponse.ok) {
-      console.warn(`Failed to fetch trip_update.bin: ${tripUpdateResponse.statusText}. Continuing without trip updates.`);
-    } else {
-      const tripUpdateBuffer = await tripUpdateResponse.arrayBuffer();
-      const tripUpdateMessage = FeedMessage.decode(new Uint8Array(tripUpdateBuffer));
-      const tripUpdatePayload = FeedMessage.toObject(tripUpdateMessage, {
-        longs: String,
-        enums: String,
-        bytes: String,
-      });
-
-      if (tripUpdatePayload.entity) {
-        for (const entity of tripUpdatePayload.entity) {
-          if (entity.tripUpdate) {
-            tripUpdates.push({ id: entity.id, ...entity.tripUpdate } as ParsedTripUpdate);
-          }
-        }
-      }
-    }
-
-    // Fetch and parse VehiclePosition data
-    const vehiclePositionResponse = await fetch(vehiclePositionBinPath);
-    if (!vehiclePositionResponse.ok) {
-      console.warn(`Failed to fetch vehicle_position.bin: ${vehiclePositionResponse.statusText}. Continuing without vehicle positions.`);
-    } else {
-      const vehiclePositionBuffer = await vehiclePositionResponse.arrayBuffer();
-      const vehiclePositionMessage = FeedMessage.decode(new Uint8Array(vehiclePositionBuffer));
-      const vehiclePositionPayload = FeedMessage.toObject(vehiclePositionMessage, {
-        longs: String,
-        enums: String,
-        bytes: String,
-      });
-
-      if (vehiclePositionPayload.entity) {
-        for (const entity of vehiclePositionPayload.entity) {
-          if (entity.vehicle) {
-            vehiclePositions.push({ id: entity.id, ...entity.vehicle } as ParsedVehiclePosition);
-          }
-        }
-      }
-    }
-
-    // Fetch and parse Alert data
-    const alertResponse = await fetch(alertBinPath);
-    if (!alertResponse.ok) {
-      console.warn(`Failed to fetch alerts.bin: ${alertResponse.statusText}. Continuing without alerts.`);
-    } else {
-      const alertBuffer = await alertResponse.arrayBuffer();
-      const alertMessage = FeedMessage.decode(new Uint8Array(alertBuffer));
-      const alertPayload = FeedMessage.toObject(alertMessage, {
-        longs: String,
-        enums: String,
-        bytes: String,
-      });
-
-      if (alertPayload.entity) {
-        for (const entity of alertPayload.entity) {
-          if (entity.alert) {
-            alerts.push({ id: entity.id, ...entity.alert } as ParsedAlert);
-          }
-        }
-      }
-    }
-
-    if (tripUpdates.length > 0 || vehiclePositions.length > 0 || alerts.length > 0) {
-      toast.success("Data GTFS-realtime berhasil diurai!");
-    } else {
-      toast.info("Tidak ada data GTFS-realtime yang ditemukan di file yang diunggah.");
-    }
-    
-    return { tripUpdates, vehiclePositions, alerts };
-
-  } catch (error) {
-    console.error("Error parsing GTFS-realtime data:", error);
-    toast.error(`Gagal mengurai data GTFS-realtime: ${error instanceof Error ? error.message : String(error)}`);
-    return { tripUpdates: [], vehiclePositions: [], alerts: [] }; // Return empty on error
+  if (tripUpdates.length > 0 || vehiclePositions.length > 0 || alerts.length > 0) {
+    toast.success("Data GTFS-realtime berhasil diurai!");
+  } else {
+    toast.info("Tidak ada data GTFS-realtime yang ditemukan di file yang diunggah atau diurai.");
   }
+  
+  return { tripUpdates, vehiclePositions, alerts };
 };
