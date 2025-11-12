@@ -40,7 +40,7 @@ const InputOTPSlot = React.forwardRef<
   React.ComponentPropsWithoutRef<"div"> & { index: number }
 >(({ index, className, ...props }, ref) => {
   const { slots } = React.useContext(OTPInputContext) as RenderProps;
-  const { char, hasFakeCaret, isActive } = slots[index]; // inputProps is not part of individual SlotProps
+  const { char, hasFakeCaret, isActive } = slots[index];
 
   return (
     <div
@@ -67,11 +67,11 @@ const InputOTPMessenger = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => {
-  const { inputProps } = React.useContext(OTPInputContext) as RenderProps; // Get inputProps from RenderProps
+  const { getHiddenInputProps } = React.useContext(OTPInputContext) as RenderProps; // Use getHiddenInputProps
 
   return (
     <div ref={ref} className={cn("sr-only", className)} {...props}>
-      <input {...inputProps} /> {/* Apply inputProps to a single hidden input */}
+      <input {...getHiddenInputProps()} /> {/* Apply props from getHiddenInputProps */}
     </div>
   );
 });

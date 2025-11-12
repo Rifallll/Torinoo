@@ -22,12 +22,12 @@ const ResizablePanelGroup = ({
 const ResizablePanel = ResizablePrimitive.Panel;
 
 interface ResizableHandleProps
-  extends React.ComponentPropsWithoutRef<typeof ResizablePrimitive.PanelResizeHandle> {
+  extends React.ComponentPropsWithRef<typeof ResizablePrimitive.PanelResizeHandle> { // Use ComponentPropsWithRef
   withHandle?: boolean;
 }
 
 const ResizableHandle = React.forwardRef<
-  HTMLDivElement, // Explicitly type ref to HTMLDivElement
+  React.ElementRef<typeof ResizablePrimitive.PanelResizeHandle>, // Use ElementRef for the ref type
   ResizableHandleProps
 >(({ className, withHandle, ...props }, ref) => (
   <ResizablePrimitive.PanelResizeHandle
