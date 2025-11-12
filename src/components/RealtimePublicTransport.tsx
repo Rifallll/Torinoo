@@ -8,7 +8,7 @@ import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosi
 
 const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
-  const [vehiclePositions, setVehiclePositions] = useState<ParsedVehiclePosition[]>([]); // New state
+  const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]); // Renamed state variable to avoid conflict
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,8 +20,9 @@ const RealtimePublicTransport: React.FC = () => {
       // Pass all three bin paths
       const data = await parseGtfsRealtimeData('/trip_update.bin', '/alerts.bin', '/vehicle_position.bin');
       setTripUpdates(data.tripUpdates);
-      setVehiclePositions(data.vehiclePositions); // Set vehicle positions
+      setVehiclePositionData(data.vehiclePositions); // Set vehicle positions
       setAlerts(data.alerts);
+      console.log("[RealtimePublicTransport] Fetched Vehicle Positions:", data.vehiclePositions); // Added console log here
     } catch (err) {
       console.error("Failed to fetch or parse GTFS-realtime data:", err);
       setError("Gagal memuat atau mengurai data transportasi publik.");
@@ -50,7 +51,7 @@ const RealtimePublicTransport: React.FC = () => {
       );
 
       // Simulate vehicle movement/status changes (example: just updating timestamp)
-      setVehiclePositions(prevPositions =>
+      setVehiclePositionData(prevPositions =>
         prevPositions.map(vp => ({
           ...vp,
           timestamp: vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000), // Increment timestamp
