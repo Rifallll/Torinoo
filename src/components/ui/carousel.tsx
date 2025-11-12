@@ -3,14 +3,13 @@
 import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
-  type EmblaCarouselType,
 } from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-type CarouselApi = EmblaCarouselType;
+type CarouselApi = UseEmblaCarouselType[1];
 
 type CarouselProps = {
   opts?: React.ComponentProps<typeof useEmblaCarousel>[0];
@@ -20,7 +19,7 @@ type CarouselProps = {
 
 type CarouselContextType = {
   carouselRef: UseEmblaCarouselType[0];
-  api: ReturnType<typeof useEmblaCarousel>[1];
+  api: CarouselApi;
   orientation: "horizontal" | "vertical";
   scrollPrev: () => void;
   scrollNext: () => void;
@@ -139,7 +138,7 @@ const CarouselContent = React.forwardRef<
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div ref={carouselRef} className="overflow-hidden">
+    <div ref={carouselRef as React.Ref<HTMLDivElement>} className="overflow-hidden">
       <div
         ref={ref}
         className={cn(
