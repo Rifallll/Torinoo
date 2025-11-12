@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
+import { toast } from 'sonner'; // Import toast for user feedback
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -28,8 +29,8 @@ const TorinoMapComponent: React.FC = () => {
 
   useEffect(() => {
     if (!mapRef.current) {
-      // Initialize map
-      mapRef.current = L.map('torino-map').setView(torinoCenter, defaultZoom);
+      // Initialize map with preferCanvas: true for better performance with complex vector data
+      mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
 
       // Add OpenStreetMap tile layer
       const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -107,10 +108,12 @@ const TorinoMapComponent: React.FC = () => {
         if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
           if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
             geoJsonLayerGroupRef.current.addTo(mapRef.current);
+            toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
           }
         } else {
           if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
             mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
+            toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
           }
         }
       };
