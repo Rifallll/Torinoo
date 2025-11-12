@@ -233,9 +233,7 @@ const AllVehiclePositionsPage: React.FC = () => {
                   <span className="flex items-center col-span-2">
                     <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
-                  <span className="flex items-center col-span-2">
-                    <Car className="h-4 w-4 mr-2" /> Plat: {vp.vehicle?.license_plate || 'N/A'}
-                  </span>
+                  {/* Removed the license plate display as requested */}
                   <span className="flex items-center col-span-2">
                     <Clock className="h-4 w-4 mr-2" /> Update: {formatTimestamp(vp.timestamp)}
                   </span>
