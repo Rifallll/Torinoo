@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { MadeWithDyad } from './made-with-dyad'; // Import MadeWithDyad component
 
 interface TorinoSidebarProps {
   isSidebarOpen: boolean;
@@ -148,7 +149,7 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
       id="sidebar"
       className={`sidebar bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition duration-200 ease-in-out z-30 shadow-lg overflow-y-auto`}
+      } transition duration-200 ease-in-out z-30 shadow-lg overflow-y-auto flex flex-col`}
     >
       <div className="flex items-center justify-between px-4 mb-6">
         <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Torino Traffic</h1>
@@ -173,13 +174,15 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
         </Button>
       </div>
 
-      {/* Bagian profil pengguna telah dihapus */}
-
-      <nav className="px-2 space-y-1">
+      <nav className="px-2 space-y-1 flex-1"> {/* flex-1 to push MadeWithDyad to bottom */}
         {navItems.map((item, index) => (
           <NavItem key={index} item={item} />
         ))}
       </nav>
+
+      <div className="mt-auto"> {/* Pushes content to the bottom */}
+        <MadeWithDyad />
+      </div>
     </div>
   );
 };

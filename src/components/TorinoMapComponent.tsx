@@ -295,7 +295,7 @@ const TorinoMapComponent: React.FC = () => {
             style: (feature) => {
               // Custom style for lines/polygons based on properties
               const trafficLevel = feature?.properties?.traffic_level;
-              let color = '#e0e0e0'; // Changed default to very light gray
+              let color = '#6b7280'; // Changed default to a darker gray
               let weight = 3;
 
               if (trafficLevel === 'high') {
@@ -312,7 +312,7 @@ const TorinoMapComponent: React.FC = () => {
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
+                opacity: 0.7 // Meningkatkan opasitas menjadi 0.7 untuk membuatnya lebih terlihat
               };
             }
           });
