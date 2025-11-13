@@ -25,7 +25,6 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
     setIsLoading(true);
     setError(null);
 
-    // ✅ Geoapify API Key from environment variable
     const GEOAPIFY_API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
 
     if (!GEOAPIFY_API_KEY) {
@@ -37,18 +36,15 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
       return;
     }
 
-    // Coordinates for Torino (Mole Antonelliana)
     const lat = 45.0686;
     const lon = 7.6891;
-    // Search radius (e.g., 500 meters around the point)
     const radius = 500; 
-    // Zoom level for traffic segments (required for /traffic/segment endpoint)
-    const zoom = 14; 
+    const zoom = 14; // Zoom level is required for /traffic/flow
 
-    // URL Traffic API Geoapify
-    const apiUrl = `https://api.geoapify.com/v1/traffic/segment?lat=${lat}&lon=${lon}&radius=${radius}&zoom=${zoom}&apiKey=${GEOAPIFY_API_KEY}`;
+    // Corrected URL to use /traffic/flow endpoint
+    const apiUrl = `https://api.geoapify.com/v1/traffic/flow?lat=${lat}&lon=${lon}&radius=${radius}&zoom=${zoom}&apiKey=${GEOAPIFY_API_KEY}`;
 
-    console.log(`Attempting to fetch real-time traffic density around Torino using Geoapify...`);
+    console.log(`Attempting to fetch real-time traffic flow around Torino using Geoapify...`);
 
     try {
       const response = await fetch(apiUrl);
@@ -57,7 +53,7 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
       }
       const data = await response.json();
 
-      console.log("✅ Torino Traffic Density Data Found (Geoapify):", data);
+      console.log("✅ Torino Traffic Flow Data Found (Geoapify):", data);
       
       const parsedResults: TorinoTrafficSegment[] = [];
 
@@ -66,7 +62,9 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
           const properties = feature.properties;
           const name = properties.name || 'Unknown Road';
           const speed = properties.speed_km_h ? `${properties.speed_km_h} km/h` : 'N/A';
-          const jam = properties.jam || false; // True/False if there is congestion
+          // jam_factor ranges from 0 (no jam) to 10 (full jam)
+          const jamFactor = properties.jam_factor || 0; 
+          const jam = jamFactor > 3; // Consider it jammed if jam_factor is above a certain threshold (e.g., 3)
 
           parsedResults.push({
             roadName: name,
@@ -75,8 +73,8 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
           });
         });
       } else {
-        console.log("⚠️ No traffic density data found within 500m radius.");
-        toast.warning("Tidak ada data kepadatan lalu lintas yang ditemukan dalam radius 500m dari Geoapify.");
+        console.log("⚠️ No traffic flow data found within 500m radius.");
+        toast.warning("Tidak ada data aliran lalu lintas yang ditemukan dalam radius 500m dari Geoapify.");
       }
       setData(parsedResults);
       toast.success("Real-time Torino traffic data loaded from Geoapify!");
