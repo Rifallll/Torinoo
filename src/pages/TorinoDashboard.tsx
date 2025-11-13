@@ -17,8 +17,9 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
-import RealtimePublicTransport from '@/components/RealtimePublicTransport'; // Import the new component
+import RealtimePublicTransport from '@/components/RealtimePublicTransport';
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
+import TopDelayedTrips from '@/components/TopDelayedTrips'; // Import the new component
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const TorinoDashboard = () => {
@@ -150,9 +151,8 @@ const TorinoDashboard = () => {
 
             <div className="space-y-6">
               <WeatherCard />
-              <RealtimePublicTransport /> {/* Replaced ActiveIncidentsSummary with this */}
-              {/* Removed SensorStatusOverviewCard */}
-              {/* Removed TrafficCongestionCard */}
+              <RealtimePublicTransport />
+              <TopDelayedTrips /> {/* New component added here */}
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
