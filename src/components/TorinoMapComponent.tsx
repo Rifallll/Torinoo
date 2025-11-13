@@ -60,63 +60,62 @@ const TorinoMapComponent: React.FC = () => {
     { name: "Bengasi", x: 1506000, y: 4996400 },
   ];
 
+  // Function to update GeoJSON layer visibility based on zoom
+  const updateGeoJSONVisibility = () => {
+    if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
+
+    if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
+      if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+        geoJsonLayerGroupRef.current.addTo(mapRef.current);
+        toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
+      }
+    } else {
+      if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+        mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
+        toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
+      }
+    }
+  };
+
+  // Function to update Subway Stations layer visibility based on zoom
+  const updateSubwayStationsVisibility = () => {
+    if (!mapRef.current || !subwayStationsLayerGroupRef.current) return;
+
+    if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
+      if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
+        subwayStationsLayerGroupRef.current.addTo(mapRef.current);
+        toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+      }
+    } else {
+      if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
+        mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
+        toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
+      }
+    }
+  };
+
+  // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
+  const updateTomTomTrafficVisibility = () => {
+    if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
+
+    const currentMapBounds = mapRef.current.getBounds();
+    const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
+    const isWithinTorino = currentMapBounds.intersects(torinoBounds);
+
+    if (isTomTomLayerEnabled && isWithinTorino) {
+      if (!isTomTomLayerActive) {
+        tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
+        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
+      }
+    } else {
+      if (isTomTomLayerActive) {
+        mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
+        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
+      }
+    }
+  };
+
   useEffect(() => {
-    // Function to update GeoJSON layer visibility based on zoom
-    const updateGeoJSONVisibility = () => {
-      if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
-
-      if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
-        if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-          geoJsonLayerGroupRef.current.addTo(mapRef.current);
-          toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
-        }
-      } else {
-        if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-          mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
-          toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
-        }
-      }
-    };
-
-    // Function to update Subway Stations layer visibility based on zoom
-    const updateSubwayStationsVisibility = () => {
-      if (!mapRef.current || !subwayStationsLayerGroupRef.current) return;
-
-      if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
-        if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
-          subwayStationsLayerGroupRef.current.addTo(mapRef.current);
-          toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
-        }
-      } else {
-        if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
-          mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
-          toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
-        }
-      }
-    };
-
-    // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
-    const updateTomTomTrafficVisibility = () => {
-      if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
-
-      const currentMapBounds = mapRef.current.getBounds();
-      const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
-      const isWithinTorino = currentMapBounds.intersects(torinoBounds);
-
-      if (isTomTomLayerEnabled && isWithinTorino) {
-        if (!isTomTomLayerActive) {
-          tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
-          toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
-        }
-      } else {
-        if (isTomTomLayerActive) {
-          mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
-          toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
-        }
-      }
-    };
-
-
     if (!mapRef.current) {
       // Initialize map with preferCanvas: true for better performance with complex vector data
       mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
@@ -217,19 +216,13 @@ const TorinoMapComponent: React.FC = () => {
       // Add event listeners for zoom and move changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
       mapRef.current.on('zoomend', updateSubwayStationsVisibility);
-      mapRef.current.on('moveend', updateTomTomTrafficVisibility); // New: Add listener for TomTom traffic
-      mapRef.current.on('zoomend', updateTomTomTrafficVisibility); // New: Add listener for TomTom traffic
+      mapRef.current.on('moveend', updateTomTomTrafficVisibility);
+      mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
 
       // Initial check for visibility
       updateGeoJSONVisibility();
       updateSubwayStationsVisibility();
-      // Initial check for TomTom traffic is now handled by the separate useEffect below
     }
-
-    // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
-    useEffect(() => {
-      updateTomTomTrafficVisibility();
-    }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
 
     // Fetch and add GeoJSON data
     const fetchGeoJSON = async () => {
@@ -357,13 +350,18 @@ const TorinoMapComponent: React.FC = () => {
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
         mapRef.current.off('zoomend', updateSubwayStationsVisibility);
-        mapRef.current.off('moveend', updateTomTomTrafficVisibility); // Clean up listener
-        mapRef.current.off('zoomend', updateTomTomTrafficVisibility); // Clean up listener
+        mapRef.current.off('moveend', updateTomTomTrafficVisibility);
+        mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
   }, []); // Empty dependency array means this effect runs once on mount
+
+  // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
+  useEffect(() => {
+    updateTomTomTrafficVisibility();
+  }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
