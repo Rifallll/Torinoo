@@ -42,9 +42,11 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
     const lon = 7.6891;
     // Search radius (e.g., 500 meters around the point)
     const radius = 500; 
+    // Zoom level for traffic segments (required for /traffic/segment endpoint)
+    const zoom = 14; 
 
     // URL Traffic API Geoapify
-    const apiUrl = `https://api.geoapify.com/v1/traffic/segment?lat=${lat}&lon=${lon}&radius=${radius}&apiKey=${GEOAPIFY_API_KEY}`;
+    const apiUrl = `https://api.geoapify.com/v1/traffic/segment?lat=${lat}&lon=${lon}&radius=${radius}&zoom=${zoom}&apiKey=${GEOAPIFY_API_KEY}`;
 
     console.log(`Attempting to fetch real-time traffic density around Torino using Geoapify...`);
 
