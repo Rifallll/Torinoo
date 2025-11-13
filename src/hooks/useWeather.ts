@@ -39,10 +39,13 @@ const fetchWeather = async (city: string) => {
 };
 
 export const useWeather = (city: string = "Torino,it") => {
+  const isTorino = city === "Torino,it"; // Memeriksa apakah kota yang diminta adalah Torino
+
   return useQuery<WeatherData, Error>({
     queryKey: ["weather", city],
-    queryFn: () => fetchWeather(city),
-    staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes
-    refetchOnWindowFocus: false, // Prevent refetching on window focus
+    queryFn: isTorino ? () => fetchWeather(city) : undefined, // Hanya jalankan queryFn jika kota adalah Torino
+    enabled: isTorino, // Hanya aktifkan query jika kota adalah Torino
+    staleTime: 5 * 60 * 1000, // Data dianggap segar selama 5 menit
+    refetchOnWindowFocus: false, // Mencegah pengambilan ulang saat jendela fokus
   });
 };
