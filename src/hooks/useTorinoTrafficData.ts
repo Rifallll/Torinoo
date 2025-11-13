@@ -24,7 +24,8 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
   const fetchTorinoTrafficData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    const urlXML = 'https://opendata.5t.torino.it/get_fdt';
+    // ✅ URL UPDATED WITH CORS PROXY
+    const urlXML = 'https://corsproxy.io/?http://opendata.5t.torino.it/get_fdt';
 
     console.log('Attempting to fetch Torino traffic XML data...');
 
