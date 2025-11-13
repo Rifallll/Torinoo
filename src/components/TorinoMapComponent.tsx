@@ -28,6 +28,7 @@ const TorinoMapComponent: React.FC = () => {
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
+  const minZoomForSubwayStations = 14; // New: Minimum zoom level for subway stations to appear
 
   // Dummy data for subway stations (using original EPSG:3003 coordinates)
   const subwayStationsData = [
@@ -54,7 +55,6 @@ const TorinoMapComponent: React.FC = () => {
 
   useEffect(() => {
     // Function to update GeoJSON layer visibility based on zoom
-    // Defined here so it's accessible throughout the effect, including cleanup
     const updateGeoJSONVisibility = () => {
       if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
 
@@ -71,6 +71,24 @@ const TorinoMapComponent: React.FC = () => {
       }
     };
 
+    // Function to update Subway Stations layer visibility based on zoom
+    const updateSubwayStationsVisibility = () => {
+      if (!mapRef.current || !subwayStationsLayerGroupRef.current) return;
+
+      if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
+        if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
+          subwayStationsLayerGroupRef.current.addTo(mapRef.current);
+          toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+        }
+      } else {
+        if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
+          mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
+          toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
+        }
+      }
+    };
+
+
     if (!mapRef.current) {
       // Initialize map with preferCanvas: true for better performance with complex vector data
       mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
@@ -85,8 +103,8 @@ const TorinoMapComponent: React.FC = () => {
       // Initialize GeoJSON Layer Group
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
-      subwayStationsLayerGroupRef.current.addTo(mapRef.current); // Add subway stations layer to map by default
-      toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+      // subwayStationsLayerGroupRef.current.addTo(mapRef.current); // Removed this line, visibility now controlled by updateSubwayStationsVisibility
+      // toast.info("Lapisan halte kereta bawah tanah ditampilkan."); // Removed this toast, now in updateSubwayStationsVisibility
 
 
       // Add Geocoder control
@@ -151,21 +169,24 @@ const TorinoMapComponent: React.FC = () => {
 
       // Add event listener for zoom changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
+      mapRef.current.on('zoomend', updateSubwayStationsVisibility); // New: Add listener for subway stations
 
       // Initial check for visibility
       updateGeoJSONVisibility();
+      updateSubwayStationsVisibility(); // New: Initial check for subway stations
 
       // Add subway stations to the map
       const subwayIcon = L.divIcon({
         className: 'custom-subway-icon',
-        html: '<div style="background-color:#8B0000; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:bold;">M</div>',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-        popupAnchor: [0, -12]
+        html: '<div style="background-color:#8B0000; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">M</div>', // Increased size and font
+        iconSize: [30, 30], // Increased icon size
+        iconAnchor: [15, 15], // Adjusted anchor
+        popupAnchor: [0, -15] // Adjusted popup anchor
       });
 
       subwayStationsData.forEach(station => {
         const { latitude, longitude } = convertCoordinates(station.x, station.y);
+        console.log(`Station: ${station.name}, Converted Lat: ${latitude}, Lon: ${longitude}`); // Log converted coordinates
         if (latitude !== 0 || longitude !== 0) { // Only add if conversion was successful
           L.marker([latitude, longitude], { icon: subwayIcon })
             .bindPopup(`<b>${station.name}</b><br>Subway Station`)
@@ -271,7 +292,7 @@ const TorinoMapComponent: React.FC = () => {
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
+                opacity: 0.7 // Increased opacity from 0.1 to 0.7
               };
             }
           });
@@ -299,6 +320,7 @@ const TorinoMapComponent: React.FC = () => {
     return () => {
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
+        mapRef.current.off('zoomend', updateSubwayStationsVisibility); // Clean up listener
         mapRef.current.remove();
         mapRef.current = null;
       }
