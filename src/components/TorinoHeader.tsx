@@ -16,9 +16,10 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false); // State for command palette
 
   useEffect(() => {
+    // Mengubah interval menjadi 5 menit (5 * 60 * 1000 ms)
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
-    }, 1000);
+    }, 5 * 60 * 1000); // Update every 5 minutes
     return () => clearInterval(timer);
   }, []);
 
