@@ -5,9 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudSun, Thermometer, Wind, Droplet, CloudRain, Sun, Cloud, Snowflake, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWeather } from '@/hooks/useWeather';
+import { useSettings } from '@/contexts/SettingsContext'; // New: Import useSettings
 
 const WeatherCard: React.FC = () => {
-  const { data, isLoading, error } = useWeather("Torino"); // Pass city name to hook
+  const { isWeatherFeatureEnabled } = useSettings(); // New: Get weather feature status
+
+  // Only fetch weather data if the feature is enabled
+  const { data, isLoading, error } = useWeather("Torino", isWeatherFeatureEnabled); // Pass city name and enabled status to hook
 
   const getWeatherIcon = (weathercode: number) => {
     // WMO Weather interpretation codes (https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM)
@@ -40,6 +44,22 @@ const WeatherCard: React.FC = () => {
     if (weathercode >= 95 && weathercode <= 99) return "Thunderstorm";
     return "N/A";
   };
+
+  if (!isWeatherFeatureEnabled) {
+    return (
+      <Card className="bg-white dark:bg-gray-800 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+            <CloudSun className="h-5 w-5 mr-2 text-gray-500" />
+            <span className="ml-2">Fitur Cuaca Dinonaktifkan</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
+          <p>Fitur prakiraan cuaca saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data cuaca.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (

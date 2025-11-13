@@ -76,11 +76,12 @@ const fetchOpenMeteoWeather = async (city: string): Promise<OpenMeteoParsedData>
   return weatherData;
 };
 
-export const useWeather = (city: string = "Torino") => {
+export const useWeather = (city: string = "Torino", enabled: boolean = true) => {
   return useQuery<OpenMeteoParsedData, Error>({
     queryKey: ["weather", city],
     queryFn: () => fetchOpenMeteoWeather(city),
     staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes
     refetchOnWindowFocus: false, // Prevent refetching on window focus
+    enabled: enabled, // Only run the query if enabled is true
   });
 };

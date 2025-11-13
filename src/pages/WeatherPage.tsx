@@ -7,9 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useWeather } from '@/hooks/useWeather'; // Import the new hook
+import { useSettings } from '@/contexts/SettingsContext'; // New: Import useSettings
 
 const WeatherPage: React.FC = () => {
-  const { data, isLoading, error } = useWeather("Torino");
+  const { isWeatherFeatureEnabled } = useSettings(); // New: Get weather feature status
+
+  // Only fetch weather data if the feature is enabled
+  const { data, isLoading, error } = useWeather("Torino", isWeatherFeatureEnabled);
 
   const getWeatherIcon = (weathercode: number) => {
     // WMO Weather interpretation codes (https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM)
@@ -42,6 +46,38 @@ const WeatherPage: React.FC = () => {
     if (weathercode >= 95 && weathercode <= 99) return "Thunderstorm";
     return "N/A";
   };
+
+  if (!isWeatherFeatureEnabled) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
+        <header className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+            <CloudSun className="h-8 w-8 mr-3 text-gray-500" />
+            Prakiraan Cuaca Torino
+          </h1>
+          <Button asChild variant="outline">
+            <Link to="/torino-dashboard" className="flex items-center">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali ke Dashboard
+            </Link>
+          </Button>
+        </header>
+        <main className="flex-1 flex items-center justify-center">
+          <Card className="bg-white dark:bg-gray-800 shadow-lg max-w-md w-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+                <CloudSun className="h-5 w-5 mr-2 text-gray-500" />
+                Fitur Cuaca Dinonaktifkan
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
+              <p>Fitur prakiraan cuaca saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data cuaca.</p>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
