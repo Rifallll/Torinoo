@@ -8,7 +8,6 @@ import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
 import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
-import { Car, Bus, TramFront, Bike, Truck, TrainFront, Info } from 'lucide-react'; // Import icons
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -21,11 +20,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-interface TorinoMapComponentProps {
-  selectedVehicleType: string;
-}
-
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType }) => {
+const TorinoMapComponent: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
@@ -235,40 +230,11 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
         const response = await fetch('/export.geojson'); // Path to the GeoJSON file in the public folder
         const data = await response.json();
 
-        // --- Simulate adding vehicle_type to some points for demonstration ---
-        const simulatedData = {
-          ...data,
-          features: data.features.map((feature: any) => {
-            if (feature.geometry.type === 'Point') {
-              const random = Math.random();
-              if (random < 0.2) {
-                feature.properties = { ...feature.properties, vehicle_type: 'car' };
-              } else if (random < 0.4) {
-                feature.properties = { ...feature.properties, vehicle_type: 'bus' };
-              } else if (random < 0.6) {
-                feature.properties = { ...feature.properties, vehicle_type: 'tram' };
-              } else if (random < 0.7) {
-                feature.properties = { ...feature.properties, vehicle_type: 'motorcycle' };
-              } else if (random < 0.8) {
-                feature.properties = { ...feature.properties, vehicle_type: 'truck' };
-              } else if (random < 0.9) {
-                feature.properties = { ...feature.properties, vehicle_type: 'subway' }; // Subway points might be less common
-              }
-            }
-            return feature;
-          }),
-        };
-        // --- End simulation ---
-
         if (mapRef.current && geoJsonLayerGroupRef.current) {
           // Clear existing GeoJSON layer from the group
           geoJsonLayerGroupRef.current.clearLayers();
 
-          geoJsonLayerRef.current = L.geoJSON(simulatedData, {
-            filter: (feature) => {
-              if (selectedVehicleType === 'all') return true;
-              return feature.properties && feature.properties.vehicle_type === selectedVehicleType;
-            },
+          geoJsonLayerRef.current = L.geoJSON(data, {
             onEachFeature: (feature, layer) => {
               // Bind popup with all properties
               if (feature.properties) {
@@ -281,66 +247,59 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
               }
             },
             pointToLayer: (feature, latlng) => {
-              const vehicleType = feature.properties?.vehicle_type;
-              const amenity = feature.properties?.amenity;
-              let IconComponent: React.ElementType = Info; // Default icon
-              let iconColor = '#3b82f6'; // Default blue
-              let iconSize = 24;
+              // Custom marker for points based on 'amenity' property
+              if (feature.properties && feature.properties.amenity) {
+                const amenity = feature.properties.amenity;
+                let iconColor = '#3b82f6'; // Default blue
+                let iconText = '';
+                let iconSize = 24;
 
-              switch (vehicleType) {
-                case 'car':
-                  IconComponent = Car;
-                  iconColor = '#3b82f6'; // Blue
-                  break;
-                case 'bus':
-                  IconComponent = Bus;
-                  iconColor = '#22c55e'; // Green
-                  break;
-                case 'motorcycle':
-                  IconComponent = Bike;
-                  iconColor = '#f97316'; // Orange
-                  break;
-                case 'truck':
-                  IconComponent = Truck;
-                  iconColor = '#6b7280'; // Gray
-                  break;
-                case 'tram':
-                  IconComponent = TramFront;
-                  iconColor = '#a855f7'; // Purple
-                  break;
-                case 'subway':
-                  IconComponent = TrainFront; // Using TrainFront for subway
-                  iconColor = '#ef4444'; // Red
-                  break;
-                default:
-                  // Fallback to amenity icons if no vehicle_type
-                  if (amenity) {
-                    switch (amenity) {
-                      case 'hospital': IconComponent = Info; iconColor = '#ef4444'; break; // Red
-                      case 'school': IconComponent = Info; iconColor = '#22c55e'; break; // Green
-                      case 'park': IconComponent = Info; iconColor = '#10b981'; break; // Teal
-                      case 'building': IconComponent = Info; iconColor = '#6b7280'; break; // Gray
-                      case 'restaurant': IconComponent = Info; iconColor = '#f97316'; break; // Orange
-                      case 'cafe': IconComponent = Info; iconColor = '#a855f7'; break; // Purple
-                      case 'shop': IconComponent = Info; iconColor = '#ec4899'; break; // Pink
-                      default: IconComponent = Info; iconColor = '#3b82f6'; // Default blue
-                    }
-                  }
+                switch (amenity) {
+                  case 'hospital':
+                    iconColor = '#ef4444'; // Red
+                    iconText = '+';
+                    break;
+                  case 'school':
+                    iconColor = '#22c55e'; // Green
+                    iconText = 'S';
+                    break;
+                  case 'park':
+                    iconColor = '#10b981'; // Teal
+                    iconText = 'P';
+                    break;
+                  case 'building': // Generic building
+                    iconColor = '#6b7280'; // Gray
+                    iconText = 'B';
+                    break;
+                  case 'restaurant':
+                    iconColor = '#f97316'; // Orange
+                    iconText = 'R';
+                    break;
+                  case 'cafe':
+                    iconColor = '#a855f7'; // Purple
+                    iconText = 'C';
+                    break;
+                  case 'shop':
+                    iconColor = '#ec4899'; // Pink
+                    iconText = 'S';
+                    break;
+                  // Add more cases as needed for other amenities
+                  default:
+                    iconColor = '#3b82f6'; // Default blue
+                    iconText = '?';
+                }
+
+                return L.marker(latlng, {
+                  icon: L.divIcon({
+                    className: 'custom-poi-marker',
+                    html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize/2}px; font-weight:bold;">${iconText}</div>`,
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconSize / 2, iconSize / 2]
+                  })
+                });
               }
-
-              // Create a div icon with the Lucide React component rendered inside
-              const iconHtml = L.Util.create('div');
-              const root = ReactDOM.createRoot(iconHtml);
-              root.render(<IconComponent className="h-full w-full" style={{ color: iconColor }} />);
-
-              return L.marker(latlng, {
-                icon: L.divIcon({
-                  className: 'custom-vehicle-marker',
-                  html: `<div style="background-color:white; border: 2px solid ${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">${iconHtml.innerHTML}</div>`,
-                  iconSize: [iconSize, iconSize],
-                  iconAnchor: [iconSize / 2, iconSize / 2]
-                })
-              });
+              // For other point features without amenity, use a default Leaflet marker
+              return L.marker(latlng);
             },
             style: (feature) => {
               // Custom style for lines/polygons based on properties
@@ -397,7 +356,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
         mapRef.current = null;
       }
     };
-  }, [selectedVehicleType]); // Empty dependency array means this effect runs once on mount
+  }, []); // Empty dependency array means this effect runs once on mount
 
   // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
   useEffect(() => {
