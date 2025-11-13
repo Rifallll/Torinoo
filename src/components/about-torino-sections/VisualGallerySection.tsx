@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Image as ImageIcon } from 'lucide-react'; // Renamed Palette to ImageIcon for clarity
 
 const visualGalleryImages = [
-  { src: "/torino-piazza-san-carlo.jpeg", alt: "Piazza San Carlo, Torino" },
-  { src: "/torino-river-po-view.jpeg", alt: "Pemandangan Sungai Po dengan Mole Antonelliana, Torino" },
-  { src: "/torino-bus-traffic.jpeg", alt: "Lalu Lintas Bus di Torino" },
-  { src: "/placeholder-image.jpg", alt: "Pemandangan Kota Torino" }, // Tetap menggunakan satu placeholder
+  { src: "https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", alt: "Piazza Castello, Torino" },
+  { src: "https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", alt: "Mole Antonelliana, Torino" },
+  { src: "https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", alt: "Po River, Torino" },
+  { src: "https://images.unsplash.com/photo-1590664239601-3111d11177d5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", alt: "Egyptian Museum, Torino" },
 ];
 
 interface VisualGallerySectionProps {

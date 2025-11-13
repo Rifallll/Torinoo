@@ -12,21 +12,21 @@ const newsArticles = [
     title: 'New Smart Traffic Lights Reduce Congestion by 15%',
     date: 'November 10, 2023',
     summary: 'A pilot program implementing AI-powered traffic lights has shown promising results, significantly easing rush hour congestion in downtown areas.',
-    imageUrl: '/placeholder-image.jpg', // Menggunakan gambar placeholder lokal
+    imageUrl: 'https://images.unsplash.com/photo-1532936790947-d06f70530588?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: '2',
     title: 'City Launches Public Awareness Campaign for Pedestrian Safety',
     date: 'November 9, 2023',
     summary: 'Authorities are urging residents to be more vigilant on roads with a new campaign aimed at reducing pedestrian-related accidents.',
-    imageUrl: '/11.png', // Menggunakan gambar placeholder lokal
+    imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: '3',
     title: 'Upcoming Road Closures for Infrastructure Maintenance',
     date: 'November 8, 2023',
     summary: 'Several key roads will experience temporary closures next week for essential maintenance work. Drivers are advised to seek alternative routes.',
-    imageUrl: '/placeholder.svg', // Menggunakan gambar placeholder lokal
+    imageUrl: 'https://images.unsplash.com/photo-1541888946526-c29d02993b9f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
 ];
 

@@ -6,8 +6,6 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
-import { TrafficModification } from '@/utils/trafficModificationsApi'; // Import TrafficModification type
-import { TrafficCone } from 'lucide-react'; // Import TrafficCone icon
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -20,15 +18,10 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-interface TorinoMapComponentProps {
-  trafficModifications?: TrafficModification[];
-}
-
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifications }) => {
+const TorinoMapComponent: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
-  const modificationMarkersRef = useRef<L.LayerGroup | null>(null); // Ref for traffic modification markers
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
@@ -36,18 +29,19 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
 
   useEffect(() => {
     // Function to update GeoJSON layer visibility based on zoom
+    // Defined here so it's accessible throughout the effect, including cleanup
     const updateGeoJSONVisibility = () => {
       if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
 
       if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
         if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
           geoJsonLayerGroupRef.current.addTo(mapRef.current);
-          toast.info("Data lalu lintas (garis) ditampilkan. Perbesar untuk detail lebih lanjut.");
+          toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
         }
       } else {
         if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
           mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
-          toast.info("Data lalu lintas (garis) disembunyikan. Perbesar peta untuk melihatnya.");
+          toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
         }
       }
     };
@@ -63,9 +57,8 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
       });
       osmLayer.addTo(mapRef.current);
 
-      // Initialize GeoJSON Layer Group and Modification Markers Layer Group
+      // Initialize GeoJSON Layer Group
       geoJsonLayerGroupRef.current = L.layerGroup();
-      modificationMarkersRef.current = L.layerGroup(); // Initialize modification markers layer
 
       // Add Geocoder control
       L.Control.geocoder({
@@ -108,8 +101,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
         "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
       };
       const overlayLayers = {
-        "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
-        "Traffic Modifications": modificationMarkersRef.current // Add modification markers to layer control
+        "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current // Add the layer group here
       };
       L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
 
@@ -214,7 +206,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
             style: (feature) => {
               // Custom style for lines/polygons based on properties
               const trafficLevel = feature?.properties?.traffic_level;
-              let color = '#9ca3af'; // Changed default to a more visible gray
+              let color = '#e0e0e0'; // Changed default to very light gray
               let weight = 3;
 
               if (trafficLevel === 'high') {
@@ -231,7 +223,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.7 // Mengurangi opasitas menjadi 0.7 untuk membuatnya lebih terlihat
+                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
               };
             }
           });
@@ -251,7 +243,6 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
         }
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
-        toast.error("Gagal memuat data GeoJSON. Pastikan file 'export.geojson' ada di folder public.");
       }
     };
 
@@ -265,80 +256,6 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
       }
     };
   }, []); // Empty dependency array means this effect runs once on mount
-
-  // Effect to handle traffic modifications markers
-  useEffect(() => {
-    if (!mapRef.current || !modificationMarkersRef.current || !trafficModifications) return;
-
-    // Clear existing markers
-    modificationMarkersRef.current.clearLayers();
-
-    trafficModifications.forEach(mod => {
-      const statusColorClass =
-        mod.status === 'red' ? 'bg-red-600' :
-        mod.status === 'yellow' ? 'bg-yellow-600' :
-        'bg-green-600';
-
-      // Create a div element for the icon and render the Lucide icon into it
-      const iconDiv = document.createElement('div');
-      iconDiv.className = `relative flex items-center justify-center w-8 h-8 rounded-full ${statusColorClass} text-white shadow-md border-2 border-white`;
-      
-      // Manually create SVG for TrafficCone
-      const svgIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svgIcon.setAttribute("width", "20");
-      svgIcon.setAttribute("height", "20");
-      svgIcon.setAttribute("viewBox", "0 0 24 24");
-      svgIcon.setAttribute("fill", "none");
-      svgIcon.setAttribute("stroke", "currentColor");
-      svgIcon.setAttribute("stroke-width", "2");
-      svgIcon.setAttribute("stroke-linecap", "round");
-      svgIcon.setAttribute("stroke-linejoin", "round");
-      svgIcon.classList.add("lucide", "lucide-traffic-cone");
-      
-      const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path1.setAttribute("d", "M9.7 21H7.3a2 2 0 0 1-2-2V7.3a2 2 0 0 1 2-2h5.4a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2h-2.4");
-      const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path2.setAttribute("d", "M18 11h-8");
-      const path3 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path3.setAttribute("d", "M10 6L9 2");
-      const path4 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path4.setAttribute("d", "M14 16h-4");
-      
-      svgIcon.appendChild(path1);
-      svgIcon.appendChild(path2);
-      svgIcon.appendChild(path3);
-      svgIcon.appendChild(path4);
-      
-      iconDiv.appendChild(svgIcon);
-
-      const customIcon = L.divIcon({
-        className: 'custom-traffic-modification-icon',
-        html: iconDiv.outerHTML, // Use outerHTML to get the full div string
-        iconSize: [32, 32], // Size of the div
-        iconAnchor: [16, 32], // Anchor at the bottom center
-        popupAnchor: [0, -32] // Popup appears above the icon
-      });
-
-      const marker = L.marker([mod.latitude, mod.longitude], { icon: customIcon });
-
-      const popupContent = `
-        <div class="font-bold text-lg mb-1">${mod.title}</div>
-        <div class="text-sm text-gray-700 mb-2">${mod.shortDescription}</div>
-        ${mod.fullDescription && mod.fullDescription !== mod.shortDescription ? `<details class="text-xs text-gray-600"><summary class="cursor-pointer font-medium text-indigo-600">Baca Selengkapnya</summary><p class="mt-1">${mod.fullDescription}</p></details>` : ''}
-        <div class="text-xs text-gray-500 mt-2">Status: <span class="font-semibold">${mod.status.toUpperCase()}</span></div>
-      `;
-      marker.bindPopup(popupContent);
-
-      modificationMarkersRef.current.addLayer(marker);
-    });
-
-    // Optional: Fit bounds to include all modification markers if desired
-    // if (trafficModifications.length > 0) {
-    //   const bounds = L.latLngBounds(trafficModifications.map(mod => [mod.latitude, mod.longitude]));
-    //   mapRef.current.fitBounds(bounds, { padding: [50, 50] });
-    // }
-
-  }, [trafficModifications]); // Dependency array: re-run when trafficModifications changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };

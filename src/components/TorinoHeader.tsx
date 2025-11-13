@@ -16,10 +16,9 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false); // State for command palette
 
   useEffect(() => {
-    // Mengubah interval menjadi 1 detik (1000 ms) untuk menampilkan detik
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
-    }, 1000); // Update every 1 second
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -28,7 +27,7 @@ const TorinoHeader: React.FC<TorinoHeaderProps> = ({ setIsSidebarOpen, isSidebar
     weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Europe/Rome'
   });
   const formattedTime = currentDateTime.toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Europe/Rome' // Menambahkan 'second'
+    hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Rome' // Using 24-hour format
   });
 
   return (

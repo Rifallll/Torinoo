@@ -222,7 +222,7 @@ const RealtimePublicTransport: React.FC = () => {
   });
 
   const displayedVehiclePositions = sortedVehiclePositions.slice(0, 5);
-  // const displayedTripUpdates = tripUpdates.slice(0, 3); // Limit to 3 for dashboard view
+  const displayedTripUpdates = tripUpdates.slice(0, 3); // Limit to 3 for dashboard view
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
@@ -306,6 +306,59 @@ const RealtimePublicTransport: React.FC = () => {
           </>
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada posisi kendaraan yang tersedia.</p>
+        )}
+
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+          <Clock className="h-4 w-4 mr-2" /> Pembaruan Perjalanan
+        </h3>
+        {isLoading ? (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat pembaruan perjalanan...</p>
+        ) : error ? (
+          <p className="text-red-500 text-center py-4">{error}</p>
+        ) : tripUpdates.length > 0 ? (
+          <>
+            {displayedTripUpdates.map(update => (
+              <div key={update.id} className="border-b last:border-b-0 pb-3 last:pb-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                    {getRouteTypeIcon(update.trip.route_id)}
+                    Jalur {update.trip.route_id || update.vehicle?.label || update.id}
+                  </h4>
+                  <Badge className={getDelayBadgeClass(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}>
+                    {formatDelay(update.delay || update.stop_time_update?.[0]?.arrival?.delay)}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                  <span className="flex items-center">
+                    <ListChecks className="h-3 w-3 mr-1" /> Seq: {update.stop_time_update?.[0]?.stop_sequence || 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <MapPin className="h-3 w-3 mr-1" /> Stop ID: {update.stop_time_update?.[0]?.stop_id || 'N/A'}
+                  </span>
+                  <span className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" /> Arr: {formatTime(update.stop_time_update?.[0]?.arrival?.time)}
+                  </span>
+                  <span className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" /> Dep: {formatTime(update.stop_time_update?.[0]?.departure?.time)}
+                  </span>
+                  <span className="flex items-center col-span-2">
+                    <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(update.timestamp)}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {tripUpdates.length > 3 && (
+              <div className="text-center mt-4">
+                <Button asChild variant="outline" className="">
+                  <Link to="/all-trip-updates">
+                    <span>Lihat Semua ({tripUpdates.length - 3} lainnya)</span>
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
         )}
       </CardContent>
     </Card>

@@ -20,15 +20,12 @@ import WeatherCard from '@/components/WeatherCard';
 import RealtimePublicTransport from '@/components/RealtimePublicTransport'; // Import the new component
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { useTrafficModifications } from '@/utils/trafficModificationsApi'; // Import the hook
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUploadCSVModalOpen, setIsUploadCSVModalOpen] = useState(false);
   const [isTrafficAnalysisModalOpen, setIsTrafficAnalysisModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-
-  const { data: trafficModifications } = useTrafficModifications(); // Fetch traffic modifications
 
   // Dummy data for quick actions and statistics
   const dummyStats = {
@@ -145,7 +142,7 @@ const TorinoDashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="h-[500px] p-0">
-                  <TorinoMapComponent trafficModifications={trafficModifications} />
+                  <TorinoMapComponent />
                 </CardContent>
               </Card>
               <TrafficSpeedDistributionChart />
