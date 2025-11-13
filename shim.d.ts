@@ -21,6 +21,9 @@ declare module 'leaflet' {
 // Extend Window interface for Vite environment variables
 interface ImportMetaEnv {
   readonly VITE_OPENWEATHER_API_KEY: string;
+  readonly VITE_TOMTOM_API_KEY: string; // Added TomTom API Key
+  readonly VITE_GEOAPIFY_API_KEY: string; // Added Geoapify API Key
+  readonly VITE_AQICN_API_TOKEN: string; // New: AQICN API Token
   // more env variables...
 }
 

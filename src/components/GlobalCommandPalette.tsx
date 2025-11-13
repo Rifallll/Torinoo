@@ -37,9 +37,10 @@ import {
   Lightbulb,
   Quote,
   Image as ImageIcon,
-  Settings, // Import Settings icon
-  Route as RouteIcon, // Renamed to avoid conflict with React Router's Route
-  Clock, // For All Trip Updates
+  Settings,
+  Route as RouteIcon,
+  Clock,
+  Leaf, // New: Import Leaf icon for Air Quality
 } from "lucide-react";
 
 // Define searchable items
@@ -58,10 +59,11 @@ const searchableItems = [
       { label: "Culture, Cuisine & Tourism", value: "culture cuisine tourism", path: "/culture-tourism", icon: Palette },
       { label: "Contact & Collaboration", value: "contact collaboration", path: "/contact-collaboration", icon: Mail },
       { label: "Torino Weather Forecast", value: "torino weather forecast", path: "/weather", icon: CloudSun },
+      { label: "Torino Air Quality", value: "torino air quality", path: "/air-quality", icon: Leaf }, // New: Air Quality
       { label: "All Vehicle Positions", value: "all vehicle positions", path: "/all-vehicle-positions", icon: Car },
       { label: "All Trip Updates", value: "all trip updates", path: "/all-trip-updates", icon: Clock },
-      { label: "All GTFS Routes", value: "all gtfs routes", path: "/all-gtfs-routes", icon: RouteIcon }, // New: All GTFS Routes
-      { label: "Settings", value: "settings", path: "/settings", icon: Settings }, // Updated path for Settings
+      { label: "All GTFS Routes", value: "all gtfs routes", path: "/all-gtfs-routes", icon: RouteIcon },
+      { label: "Settings", value: "settings", path: "/settings", icon: Settings },
     ],
   },
   {
@@ -86,7 +88,7 @@ const searchableItems = [
 
 interface GlobalCommandPaletteProps {
   open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>; // Updated type to accept functional updates
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOpen }) => {
@@ -113,11 +115,9 @@ const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({ open, setOp
     <CommandDialog
       open={open}
       onOpenChange={setOpen}
-      // className="z-[9999]" // Removed className as CommandDialog does not directly accept it
       aria-labelledby="dialog-title-command-palette"
       aria-describedby="dialog-description-command-palette"
     >
-      {/* Add DialogTitle and DialogDescription with explicit IDs for accessibility */}
       <DialogTitle id="dialog-title-command-palette" className="sr-only">Command Palette</DialogTitle>
       <DialogDescription id="dialog-description-command-palette" className="sr-only">Search for commands or navigate the application.</DialogDescription>
       <CommandInput placeholder="Type a command or search..." />

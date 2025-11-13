@@ -17,6 +17,7 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
+import AirQualityCard from '@/components/AirQualityCard'; // New: Import AirQualityCard
 import RealtimePublicTransport from '@/components/RealtimePublicTransport';
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
 import QuickActionsCard from '@/components/QuickActionsCard';
@@ -167,6 +168,7 @@ const TorinoDashboard = () => {
 
             <div className="space-y-6">
               <WeatherCard />
+              <AirQualityCard /> {/* New: Add AirQualityCard here */}
               <RealtimePublicTransport />
 
               {/* New Card for Real-time Torino Traffic Segments */}

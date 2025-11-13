@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import TomTomLayerToggle from '@/components/TomTomLayerToggle'; // Import the TomTom toggle component
-import WeatherFeatureToggle from '@/components/WeatherFeatureToggle'; // New: Import the weather toggle component
+import TomTomLayerToggle from '@/components/TomTomLayerToggle';
+import WeatherFeatureToggle from '@/components/WeatherFeatureToggle';
+import AirQualityFeatureToggle from '@/components/AirQualityFeatureToggle'; // New: Import AirQualityFeatureToggle
 
 const SettingsPage: React.FC = () => {
   return (
@@ -46,9 +47,13 @@ const SettingsPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <WeatherFeatureToggle /> {/* New: Add the weather feature toggle here */}
+            <WeatherFeatureToggle />
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Aktifkan atau nonaktifkan fitur prakiraan cuaca di seluruh aplikasi. Menonaktifkan dapat menghemat penggunaan API.
+            </p>
+            <AirQualityFeatureToggle /> {/* New: Add the air quality feature toggle here */}
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Aktifkan atau nonaktifkan fitur kualitas udara di seluruh aplikasi. Menonaktifkan dapat menghemat penggunaan API.
             </p>
             <p className="text-gray-700 dark:text-gray-300">
               Pengaturan umum lainnya akan ditambahkan di sini.
