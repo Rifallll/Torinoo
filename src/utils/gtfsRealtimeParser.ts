@@ -96,7 +96,10 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     const response = await fetch(path);
     if (!response.ok) {
       console.warn(`Failed to fetch ${type}.bin from ${path}: ${response.statusText}.`);
-      toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public.`);
+      // Suppress toast for missing trip_update and alert files, as we'll provide dummy data
+      if (type === 'vehicle_position') {
+        toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public.`);
+      }
       return [];
     }
     const buffer = await response.arrayBuffer();
@@ -104,7 +107,10 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     // Add check for empty buffer
     if (buffer.byteLength === 0) {
       console.warn(`Fetched ${type}.bin from ${path} but it was empty.`);
-      toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai.`);
+      // Suppress toast for empty trip_update and alert files
+      if (type === 'vehicle_position') {
+        toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai.`);
+      }
       return [];
     }
 
@@ -159,7 +165,6 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       console.error(`Error parsing ${type}.bin from ${path}:`, error);
       toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
     }
-    // For 'trip_update' and 'alert', we will now completely suppress console.warn/toast.warning for parsing errors.
     return [];
   }
 };
@@ -175,12 +180,85 @@ export const parseGtfsRealtimeData = async (
     throw new Error("FeedMessage type not loaded from .proto.");
   }
 
-  const tripUpdates = await parseSingleBinFile(tripUpdateBinPath, 'trip_update', FeedMessage);
-  const vehiclePositions = await parseSingleBinFile(vehiclePositionBinPath, 'vehicle_position', FeedMessage);
-  const alerts = await parseSingleBinFile(alertBinPath, 'alert', FeedMessage);
+  let tripUpdates = await parseSingleBinFile(tripUpdateBinPath, 'trip_update', FeedMessage);
+  let vehiclePositions = await parseSingleBinFile(vehiclePositionBinPath, 'vehicle_position', FeedMessage);
+  let alerts = await parseSingleBinFile(alertBinPath, 'alert', FeedMessage);
+
+  // Generate dummy data if actual data is empty
+  if (tripUpdates.length === 0) {
+    const now = Math.floor(Date.now() / 1000);
+    tripUpdates = [
+      {
+        id: 'dummy-trip-1',
+        trip: {
+          trip_id: '12345',
+          route_id: 'BUS-A',
+          direction_id: 0,
+          start_time: '08:00:00',
+          start_date: '20231115',
+        },
+        stop_time_update: [
+          {
+            stop_sequence: 1,
+            stop_id: 'STOP-101',
+            arrival: { delay: 60, time: now + 60 }, // 1 min delay
+            departure: { delay: 60, time: now + 60 },
+          },
+        ],
+        timestamp: now,
+        delay: 60,
+      },
+      {
+        id: 'dummy-trip-2',
+        trip: {
+          trip_id: '67890',
+          route_id: 'TRAM-4',
+          direction_id: 1,
+          start_time: '09:15:00',
+          start_date: '20231115',
+        },
+        stop_time_update: [
+          {
+            stop_sequence: 5,
+            stop_id: 'STOP-205',
+            arrival: { delay: -30, time: now - 30 }, // 30 sec early
+            departure: { delay: -30, time: now - 30 },
+          },
+        ],
+        timestamp: now,
+        delay: -30,
+      },
+    ];
+    toast.info("Menggunakan data dummy untuk Pembaruan Perjalanan.");
+  }
+
+  if (alerts.length === 0) {
+    const now = Math.floor(Date.now() / 1000);
+    alerts = [
+      {
+        id: 'dummy-alert-1',
+        active_period: [{ start: now - 3600, end: now + 3600 }], // Active for 1 hour before and after now
+        informed_entity: [{ route_id: 'BUS-A', route_type: 3 }], // Bus route
+        cause: 'ACCIDENT',
+        effect: 'DETOUR',
+        header_text: { translation: [{ text: 'Jalur BUS-A dialihkan karena kecelakaan', language: 'id' }] },
+        description_text: { translation: [{ text: 'Kecelakaan di Via Roma menyebabkan pengalihan jalur BUS-A. Harap gunakan rute alternatif.', language: 'id' }] },
+      },
+      {
+        id: 'dummy-alert-2',
+        active_period: [{ start: now - 1800, end: now + 7200 }], // Active for 30 min before and 2 hours after now
+        informed_entity: [{ route_id: 'TRAM-4', route_type: 0 }], // Tram route
+        cause: 'MAINTENANCE',
+        effect: 'STOP_MOVED',
+        header_text: { translation: [{ text: 'Perbaikan Jalur TRAM-4, halte sementara dipindahkan', language: 'id' }] },
+        description_text: { translation: [{ text: 'Perbaikan mendesak di jalur TRAM-4. Halte di Piazza Castello dipindahkan 50m ke utara.', language: 'id' }] },
+      },
+    ];
+    toast.info("Menggunakan data dummy untuk Peringatan.");
+  }
 
   if (tripUpdates.length > 0 || vehiclePositions.length > 0 || alerts.length > 0) {
-    toast.success("Data GTFS-realtime berhasil diurai!");
+    toast.success("Data GTFS-realtime berhasil diurai atau data dummy dimuat!");
   } else {
     toast.info("Tidak ada data GTFS-realtime yang ditemukan di file yang diunggah atau diurai.");
   }
