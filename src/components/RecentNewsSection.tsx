@@ -12,21 +12,21 @@ const recentNewsArticles = [
     title: 'Current Congestion Alert: Via Roma Heavy Traffic',
     date: 'November 11, 2023', // Updated date to reflect "today"
     summary: 'Heavy congestion reported on Via Roma due to an ongoing event. Drivers advised to seek alternative routes.',
-    imageUrl: 'https://images.unsplash.com/photo-1532936790947-d06f70530588?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    imageUrl: '/placeholder-image.jpg', // Menggunakan gambar placeholder lokal
   },
   {
     id: '2',
     title: 'Minor Accident Cleared on Corso Vittorio Emanuele II',
     date: 'November 11, 2023', // Updated date to reflect "today"
     summary: 'A minor vehicle incident has been cleared, traffic flow returning to normal. Expect residual delays.',
-    imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    imageUrl: '/11.png', // Menggunakan gambar placeholder lokal
   },
   {
     id: '3',
     title: 'Public Transport Delays Expected Due to Weather',
     date: 'November 11, 2023', // Updated date to reflect "today"
     summary: 'Light rain causing minor delays across bus and tram services. Check schedules before travel.',
-    imageUrl: 'https://images.unsplash.com/photo-1541888946526-c29d02993b9f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    imageUrl: '/placeholder.svg', // Menggunakan gambar placeholder lokal
   },
 ];
 

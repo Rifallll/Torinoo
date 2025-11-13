@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 const backgroundImages = [
-  '/GAMBAR/1.jpg',
-  '/GAMBAR/2.jpg',
-  '/GAMBAR/3.jpg',
+  '/11.png', // Menggunakan gambar lokal yang sudah ada
+  '/placeholder-image.jpg', // Menggunakan gambar placeholder baru
+  '/placeholder.svg', // Menggunakan gambar placeholder SVG yang sudah ada
 ];
 
 const HomePage: React.FC = () => {
