@@ -25,7 +25,7 @@ interface TorinoMapComponentProps {
 }
 
 const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifications }) => {
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<L.Map | null>(mapRef.current);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const modificationMarkersRef = useRef<L.LayerGroup | null>(null); // Ref for traffic modification markers
@@ -42,12 +42,12 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
       if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
         if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
           geoJsonLayerGroupRef.current.addTo(mapRef.current);
-          toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
+          toast.info("Data lalu lintas (garis) ditampilkan. Perbesar untuk detail lebih lanjut.");
         }
       } else {
         if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
           mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
-          toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
+          toast.info("Data lalu lintas (garis) disembunyikan. Perbesar peta untuk melihatnya.");
         }
       }
     };
@@ -231,7 +231,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
+                opacity: 0.7 // Mengurangi opasitas menjadi 0.7 untuk membuatnya lebih terlihat
               };
             }
           });
