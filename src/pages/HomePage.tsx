@@ -53,6 +53,9 @@ const HomePage: React.FC = () => {
         style={{ backgroundImage: `url('${nextBg}')` }}
       ></div>
 
+      {/* Overlay gelap untuk meningkatkan keterbacaan teks */}
+      <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
+
       {/* Konten Halaman */}
       <div className="relative z-30 text-white p-4 md:p-8 max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
