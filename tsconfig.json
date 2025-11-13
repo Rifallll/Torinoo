@@ -1,19 +1,23 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
   "compilerOptions": {
-    "baseUrl": ".",
+    "target": "es2022",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],           /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    "allowJs": true,                                     /* Allow JavaScript files to be compiled alongside TypeScript files. */
+    "skipLibCheck": true,                                /* Skip type checking all .d.ts files. */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "allowSyntheticDefaultImports": true,                /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is preserved when referencing modules. */
+    "module": "esnext",                                  /* Specify what module code is generated. */
+    "moduleResolution": "bundler",                       /* Specify how modules are resolved. */
+    "resolveJsonModule": true,                           /* Enable importing .json files. */
+    "isolatedModules": true,                             /* Ensure that each file can be safely transpiled without relying on other imports. */
+    "noEmit": true,                                      /* Disable emitting files from a compilation. */
+    "jsx": "react-jsx",                                  /* Specify what JSX code is generated. */
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "noUnusedLocals": false,
-    "strictNullChecks": false
-  }
+    }
+  },
+  "include": ["src", "vite.config.ts", "shim.d.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
