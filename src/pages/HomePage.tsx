@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 const backgroundImages = [
-  '/mole-antonelliana-illustration.png', // Menggunakan gambar ilustrasi Mole Antonelliana yang baru
-  '/placeholder-image.jpg', // Tetap menggunakan gambar placeholder ini
+  '/torino-city-view-1.jpeg',
+  '/torino-bus-street.jpeg',
+  '/torino-piazza-view.jpeg',
 ];
 
 const HomePage: React.FC = () => {
