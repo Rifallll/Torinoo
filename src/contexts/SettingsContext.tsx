@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 interface SettingsContextType {
   isTomTomLayerEnabled: boolean;
   toggleTomTomLayer: () => void;
+  isWeatherFeatureEnabled: boolean; // New: State for weather feature
+  toggleWeatherFeature: () => void; // New: Toggle function for weather feature
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -20,12 +22,26 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     return true;
   });
 
+  const [isWeatherFeatureEnabled, setIsWeatherFeatureEnabled] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('isWeatherFeatureEnabled');
+      return saved ? JSON.parse(saved) : true; // Default to true
+    }
+    return true;
+  });
+
   // Persist state to localStorage whenever it changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('isTomTomLayerEnabled', JSON.stringify(isTomTomLayerEnabled));
     }
   }, [isTomTomLayerEnabled]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isWeatherFeatureEnabled', JSON.stringify(isWeatherFeatureEnabled));
+    }
+  }, [isWeatherFeatureEnabled]);
 
   const toggleTomTomLayer = useCallback(() => {
     setIsTomTomLayerEnabled(prev => {
@@ -35,8 +51,16 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
   }, []);
 
+  const toggleWeatherFeature = useCallback(() => {
+    setIsWeatherFeatureEnabled(prev => {
+      const newState = !prev;
+      toast.info(`Fitur cuaca ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`);
+      return newState;
+    });
+  }, []);
+
   return (
-    <SettingsContext.Provider value={{ isTomTomLayerEnabled, toggleTomTomLayer }}>
+    <SettingsContext.Provider value={{ isTomTomLayerEnabled, toggleTomTomLayer, isWeatherFeatureEnabled, toggleWeatherFeature }}>
       {children}
     </SettingsContext.Provider>
   );
