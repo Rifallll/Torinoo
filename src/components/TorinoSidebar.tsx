@@ -4,12 +4,12 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle // Added Car, Clock, AlertTriangle
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { MadeWithDyad } from './made-with-dyad'; // Import MadeWithDyad component
-import TomTomLayerToggle from './TomTomLayerToggle'; // Import the new toggle component
+// import TomTomLayerToggle from './TomTomLayerToggle'; // Removed: Toggle is now on SettingsPage
 
 interface TorinoSidebarProps {
   isSidebarOpen: boolean;
@@ -48,7 +48,7 @@ const navItems: NavItemConfig[] = [
   { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun },
   { label: "News Portal", path: "/news", icon: Newspaper },
   {
-    label: "City Info", // Renamed from "Others"
+    label: "City Info",
     icon: Info,
     isCategory: true,
     subItems: [
@@ -62,11 +62,10 @@ const navItems: NavItemConfig[] = [
     icon: User,
     isCategory: true,
     subItems: [
-      { label: "Settings", path: "#settings", icon: Settings, onClick: () => toast.info("Settings page not yet implemented.") },
+      { label: "Settings", path: "/settings", icon: Settings }, // Changed to direct link to SettingsPage
       { label: "Log out", path: "#logout", icon: LogOut, onClick: () => toast.info("Logout function not yet implemented.") },
     ],
   },
-  // FAQ dihapus
 ];
 
 const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSidebarOpen }) => {
@@ -175,18 +174,18 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
         </Button>
       </div>
 
-      <nav className="px-2 space-y-1 flex-1"> {/* flex-1 to push MadeWithDyad to bottom */}
+      <nav className="px-2 space-y-1 flex-1">
         {navItems.map((item, index) => (
           <NavItem key={index} item={item} />
         ))}
       </nav>
 
-      {/* Add the TomTomLayerToggle here */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+      {/* Removed: TomTomLayerToggle is now on SettingsPage */}
+      {/* <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
         <TomTomLayerToggle />
-      </div>
+      </div> */}
 
-      <div className="mt-auto"> {/* Pushes content to the bottom */}
+      <div className="mt-auto">
         <MadeWithDyad />
       </div>
     </div>

@@ -37,6 +37,7 @@ import {
   Lightbulb,
   Quote,
   Image as ImageIcon,
+  Settings, // Import Settings icon
 } from "lucide-react";
 
 // Define searchable items
@@ -55,6 +56,7 @@ const searchableItems = [
       { label: "Culture, Cuisine & Tourism", value: "culture cuisine tourism", path: "/culture-tourism", icon: Palette },
       { label: "Contact & Collaboration", value: "contact collaboration", path: "/contact-collaboration", icon: Mail },
       { label: "Torino Weather Forecast", value: "torino weather forecast", path: "/weather", icon: CloudSun },
+      { label: "Settings", value: "settings", path: "/settings", icon: Settings }, // Updated path for Settings
     ],
   },
   {
