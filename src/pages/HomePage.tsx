@@ -59,10 +59,10 @@ const HomePage: React.FC = () => {
       {/* Konten Halaman */}
       <div className="relative z-30 text-white p-4 md:p-8 max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
-          Torino – Industrial & Cultural City at the Foot of the Alps
+          Torino: Automotive Heritage, Maximum Travel Efficiency
         </h1>
         <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
-          Explore the heart of Piedmont, Northern Italy. Torino is a perfect blend of Roman history, magnificent Baroque architecture, automotive industry innovation, and delicious chocolate cuisine.
+          Find the fastest routes and all the information needed for an efficient journey. We provide traffic data, transport service status, and parking guides for a seamless city exploration.
         </p>
         <Button asChild size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
           <Link to="/torino-dashboard" className="flex items-center">
