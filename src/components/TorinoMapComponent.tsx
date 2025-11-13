@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
-import { convertCoordinates } from '@/utils/coordinateConverter'; // Import the coordinate converter
+import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
