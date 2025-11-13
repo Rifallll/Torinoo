@@ -34,7 +34,7 @@ const App = () => (
         <SonnerToaster /> {/* Toaster untuk sonner */}
         <TooltipProvider>
           <div>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <BrowserRouter>
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
