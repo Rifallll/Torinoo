@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ListChecks, TrafficCone, Gauge, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser';
+import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition, formatRelativeTime, formatTime } from '@/utils/gtfsRealtimeParser';
 import { Link } from 'react-router-dom';
 
 const RealtimePublicTransport: React.FC = () => {
@@ -63,13 +63,13 @@ const RealtimePublicTransport: React.FC = () => {
             idx === 0 ? { ...stu, arrival: { ...stu.arrival, delay: newDelay }, departure: { ...stu.departure, delay: newDelay } } : stu
           ) : [];
 
-          return { ...update, delay: newDelay, stop_time_update: updatedStopTimeUpdates };
+          return { ...update, delay: newDelay, stop_time_update: updatedStopTimeUpdates, timestamp: Math.floor(Date.now() / 1000) };
         })
       );
 
       setVehiclePositionData(prevPositions =>
         prevPositions.map(vp => {
-          const newTimestamp = vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000);
+          const newTimestamp = Math.floor(Date.now() / 1000); // Always use current time for update
 
           const newLatitude = (vp.position?.latitude || 0) + (Math.random() - 0.5) * 0.0001;
           const newLongitude = (vp.position?.longitude || 0) + (Math.random() - 0.5) * 0.0001;
@@ -146,21 +146,6 @@ const RealtimePublicTransport: React.FC = () => {
       if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
     }
     return <Info className="h-4 w-4 mr-1" />;
-  };
-
-  const formatTimestamp = (timestamp?: number | string) => {
-    if (timestamp === undefined || timestamp === null) return 'N/A';
-    const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-    if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid';
-    const date = new Date(numTimestamp * 1000);
-    if (isNaN(date.getTime())) return 'Tanggal Tidak Valid';
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  };
-
-  const formatTime = (timestamp?: number) => {
-    if (timestamp === undefined) return 'N/A';
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
@@ -281,7 +266,7 @@ const RealtimePublicTransport: React.FC = () => {
                     <MapPin className="h-3 w-3 mr-1" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
                   </span>
                   <span className="flex items-center">
-                    <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(vp.timestamp)}
+                    <Clock className="h-3 w-3 mr-1" /> Update: {formatRelativeTime(vp.timestamp)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -342,7 +327,7 @@ const RealtimePublicTransport: React.FC = () => {
                     <Clock className="h-3 w-3 mr-1" /> Dep: {formatTime(update.stop_time_update?.[0]?.departure?.time)}
                   </span>
                   <span className="flex items-center col-span-2">
-                    <Clock className="h-3 w-3 mr-1" /> Update: {formatTimestamp(update.timestamp)}
+                    <Clock className="h-3 w-3 mr-1" /> Update: {formatRelativeTime(update.timestamp)}
                   </span>
                 </div>
               </div>

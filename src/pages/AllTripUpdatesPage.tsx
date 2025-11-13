@@ -6,7 +6,7 @@ import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, ListChecks } from 'luci
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { parseGtfsRealtimeData, ParsedTripUpdate } from '@/utils/gtfsRealtimeParser';
+import { parseGtfsRealtimeData, ParsedTripUpdate, formatRelativeTime, formatTime } from '@/utils/gtfsRealtimeParser';
 
 const AllTripUpdatesPage: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
@@ -42,7 +42,7 @@ const AllTripUpdatesPage: React.FC = () => {
             idx === 0 ? { ...stu, arrival: { ...stu.arrival, delay: newDelay }, departure: { ...stu.departure, delay: newDelay } } : stu
           ) : [];
 
-          return { ...update, delay: newDelay, stop_time_update: updatedStopTimeUpdates };
+          return { ...update, delay: newDelay, stop_time_update: updatedStopTimeUpdates, timestamp: Math.floor(Date.now() / 1000) };
         })
       );
     }, 15000); // Update every 15 seconds
@@ -74,21 +74,6 @@ const AllTripUpdatesPage: React.FC = () => {
       if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
     }
     return <Info className="h-4 w-4 mr-1" />;
-  };
-
-  const formatTimestamp = (timestamp?: number | string) => {
-    if (timestamp === undefined || timestamp === null) return 'N/A';
-    const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-    if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid';
-    const date = new Date(numTimestamp * 1000);
-    if (isNaN(date.getTime())) return 'Tanggal Tidak Valid';
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  };
-
-  const formatTime = (timestamp?: number) => {
-    if (timestamp === undefined) return 'N/A';
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -141,7 +126,7 @@ const AllTripUpdatesPage: React.FC = () => {
                     <Clock className="h-4 w-4 mr-2" /> Dep: {formatTime(update.stop_time_update?.[0]?.departure?.time)}
                   </span>
                   <span className="flex items-center col-span-2">
-                    <Clock className="h-4 w-4 mr-2" /> Update: {formatTimestamp(update.timestamp)}
+                    <Clock className="h-4 w-4 mr-2" /> Update: {formatRelativeTime(update.timestamp)}
                   </span>
                 </div>
               </CardContent>

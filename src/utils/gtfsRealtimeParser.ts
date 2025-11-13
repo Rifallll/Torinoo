@@ -169,6 +169,45 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
   }
 };
 
+/**
+ * Formats a timestamp into a relative time string (e.g., "just now", "5 minutes ago").
+ * @param timestamp The timestamp in seconds since epoch.
+ * @returns A relative time string or 'N/A'.
+ */
+export const formatRelativeTime = (timestamp?: number | string) => {
+  if (timestamp === undefined || timestamp === null) return 'N/A';
+  const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
+  if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid';
+
+  const now = Math.floor(Date.now() / 1000); // Current time in seconds
+  const secondsAgo = now - numTimestamp;
+
+  if (secondsAgo < 0) return 'Di masa depan'; // Should not happen for "last updated"
+  if (secondsAgo < 10) return 'Baru saja';
+  if (secondsAgo < 60) return `${secondsAgo} detik lalu`;
+  
+  const minutesAgo = Math.floor(secondsAgo / 60);
+  if (minutesAgo < 60) return `${minutesAgo} menit lalu`;
+
+  const hoursAgo = Math.floor(minutesAgo / 60);
+  if (hoursAgo < 24) return `${hoursAgo} jam lalu`;
+
+  const daysAgo = Math.floor(hoursAgo / 24);
+  return `${daysAgo} hari lalu`;
+};
+
+/**
+ * Formats a timestamp into a local time string (e.g., "03:04 PM").
+ * @param timestamp The timestamp in seconds since epoch.
+ * @returns A local time string or 'N/A'.
+ */
+export const formatTime = (timestamp?: number) => {
+  if (timestamp === undefined) return 'N/A';
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+};
+
+
 export const parseGtfsRealtimeData = async (
   tripUpdateBinPath: string,
   alertBinPath: string,

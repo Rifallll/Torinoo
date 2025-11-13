@@ -6,7 +6,7 @@ import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Gauge, ArrowRight,
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { parseGtfsRealtimeData, ParsedVehiclePosition } from '@/utils/gtfsRealtimeParser';
+import { parseGtfsRealtimeData, ParsedVehiclePosition, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
 
 const AllVehiclePositionsPage: React.FC = () => {
   const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]);
@@ -53,7 +53,7 @@ const AllVehiclePositionsPage: React.FC = () => {
     const interval = setInterval(() => {
       setVehiclePositionData(prevPositions =>
         prevPositions.map(vp => {
-          const newTimestamp = vp.timestamp ? vp.timestamp + 15 : Math.floor(Date.now() / 1000); // Increment timestamp
+          const newTimestamp = Math.floor(Date.now() / 1000); // Always use current time for update
 
           // Simulate small random position change
           const newLatitude = (vp.position?.latitude || 0) + (Math.random() - 0.5) * 0.0001; // Small random change
@@ -112,21 +112,6 @@ const AllVehiclePositionsPage: React.FC = () => {
       if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
     }
     return <Info className="h-4 w-4 mr-1" />;
-  };
-
-  const formatTimestamp = (timestamp?: number | string) => {
-    if (timestamp === undefined || timestamp === null) return 'N/A';
-    const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-    if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid';
-    const date = new Date(numTimestamp * 1000);
-    if (isNaN(date.getTime())) return 'Tanggal Tidak Valid';
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  };
-
-  const formatTime = (timestamp?: number) => {
-    if (timestamp === undefined) return 'N/A';
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
@@ -238,7 +223,7 @@ const AllVehiclePositionsPage: React.FC = () => {
                     <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
                   <span className="flex items-center col-span-2">
-                    <Clock className="h-4 w-4 mr-2" /> Update: {formatTimestamp(vp.timestamp)}
+                    <Clock className="h-4 w-4 mr-2" /> Update: {formatRelativeTime(vp.timestamp)}
                   </span>
                 </div>
               </CardContent>
