@@ -3,16 +3,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-// Define interfaces for Transitland API response
+// Define interfaces for Transitland API v2 response
 interface TransitlandRoute {
   onestop_id: string;
-  name: string;
-  vehicle_type: string; // e.g., 'bus', 'tram', 'subway'
-  short_name?: string;
-  long_name?: string;
+  route_short_name?: string; // Changed from short_name
+  route_long_name?: string;  // Changed from long_name
+  route_name?: string;       // New: often a combination or primary name
+  vehicle_type?: string;     // e.g., 'bus', 'tram', 'subway' - might be derived or explicit
   description?: string;
-  operator_name?: string;
-  route_type?: number; // GTFS route_type (e.g., 0 for tram, 3 for bus)
+  operator_name?: string;    // Operator name might be nested or directly on route
+  route_type?: number;       // GTFS route_type (e.g., 0 for tram, 3 for bus)
 }
 
 interface TransitlandRoutesResponse {
@@ -26,18 +26,31 @@ interface TransitlandRoutesResponse {
 
 const fetchTransitlandRoutes = async (city: string): Promise<TransitlandRoute[]> => {
   try {
-    // Menggunakan parameter 'city' seperti yang disarankan pengguna
-    const response = await fetch(`https://api.transit.land/api/v1/routes?city=${city}&per_page=20`);
+    // Operator ID GTT Torino: 'o-st8m-gtt'
+    const operatorId = 'o-st8m-gtt';
+    // Menggunakan domain API Transitland yang baru (dat.transit.land)
+    const apiUrl = `https://dat.transit.land/api/v2/rest/routes?operator_onestop_id=${operatorId}&per_page=5&limit=5`;
+
+    console.log(`Mencoba memuat rute dari: ${apiUrl}`);
+
+    const response = await fetch(apiUrl);
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || `Failed to fetch Transitland routes: ${response.statusText}`);
+      throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
     }
 
     const data: TransitlandRoutesResponse = await response.json();
-    return data.routes;
+    
+    if (data && data.routes && data.routes.length > 0) {
+      console.log("✅ Rute Transportasi GTT Torino (Transitland) berhasil dimuat.");
+      return data.routes;
+    } else {
+      console.warn("⚠️ Data rute ditemukan, tetapi kosong atau tidak ada rute aktif.");
+      return [];
+    }
   } catch (error) {
-    console.error("Error fetching Transitland routes:", error);
+    console.error("❌ Gagal memuat rute:", error);
     toast.error(`Gagal memuat rute transportasi publik: ${error instanceof Error ? error.message : String(error)}`);
     throw error;
   }

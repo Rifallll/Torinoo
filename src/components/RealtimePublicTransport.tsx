@@ -369,9 +369,9 @@ const RealtimePublicTransport: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
                     {getRouteTypeIcon(undefined, route.route_type)}
-                    {route.short_name ? `${route.short_name} - ` : ''}{route.name || route.long_name}
+                    {route.route_short_name ? `${route.route_short_name} - ` : ''}{route.route_long_name || route.route_name || 'N/A'}
                   </h4>
-                  <Badge variant="outline" className="text-xs capitalize">{route.vehicle_type}</Badge>
+                  <Badge variant="outline" className="text-xs capitalize">{route.vehicle_type || 'N/A'}</Badge>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-1">
                   {route.description || `Operator: ${route.operator_name || 'N/A'}`}
