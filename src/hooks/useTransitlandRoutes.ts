@@ -28,8 +28,8 @@ const fetchTransitlandRoutes = async (city: string): Promise<TransitlandRoute[]>
   try {
     // Operator ID GTT Torino: 'o-st8m-gtt'
     const operatorId = 'o-st8m-gtt';
-    // Menggunakan domain API Transitland yang baru (dat.transit.land)
-    const apiUrl = `https://dat.transit.land/api/v2/rest/routes?operator_onestop_id=${operatorId}&per_page=5&limit=5`;
+    // Menggunakan domain API Transitland yang lebih umum untuk akses browser
+    const apiUrl = `https://api.transit.land/api/v2/rest/routes?operator_onestop_id=${operatorId}&per_page=5&limit=5`;
 
     console.log(`Mencoba memuat rute dari: ${apiUrl}`);
 
@@ -51,7 +51,7 @@ const fetchTransitlandRoutes = async (city: string): Promise<TransitlandRoute[]>
     }
   } catch (error) {
     console.error("❌ Gagal memuat rute:", error);
-    toast.error(`Gagal memuat rute transportasi publik: ${error instanceof Error ? error.message : String(error)}`);
+    toast.error(`Gagal memuat rute transportasi publik: ${error instanceof Error ? error.message : String(error)}. Ini mungkin masalah jaringan atau CORS.`);
     throw error;
   }
 };
