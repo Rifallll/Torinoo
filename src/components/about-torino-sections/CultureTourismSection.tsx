@@ -42,17 +42,17 @@ const CultureTourismSection: React.FC<CultureTourismSectionProps> = ({ id }) => 
               <TableRow className="border-b">
                 <TableHead className="w-1/3 py-3 px-4 text-gray-600 dark:text-gray-400">Name</TableHead>
                 <TableHead className="py-3 px-4 text-gray-600 dark:text-gray-400">Description</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {landmarkData.map((item, index) => (
+              <TableRow key={index} className="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <TableCell className="font-medium py-3 px-4 text-gray-700 dark:text-gray-300">{item.name}</TableCell>
+                <TableCell className="py-3 px-4 text-gray-800 dark:text-gray-200">{item.description}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {landmarkData.map((item, index) => (
-                <TableRow key={index} className="border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  <TableCell className="font-medium py-3 px-4 text-gray-700 dark:text-gray-300">{item.name}</TableCell>
-                  <TableCell className="py-3 px-4 text-gray-800 dark:text-gray-200">{item.description}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            ))}
+          </TableBody>
+        </Table>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-2 px-4 pt-4 text-gray-800 dark:text-gray-100">Festivals & Events</h3>
