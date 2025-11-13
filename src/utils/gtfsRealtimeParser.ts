@@ -155,11 +155,10 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
   } catch (error) {
     // Only log/toast critical errors for vehicle_position.
     // For trip_update and alert, suppress console output for parsing errors.
-    if (type === 'vehicle_position') {
+    if (type === 'vehicle_position' || type === 'trip_update' || type === 'alert') { // Re-enabled for trip_update and alert
       console.error(`Error parsing ${type}.bin from ${path}:`, error);
       toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
     }
-    // For 'trip_update' and 'alert', we will now completely suppress console.warn/toast.warning for parsing errors.
     return [];
   }
 };
