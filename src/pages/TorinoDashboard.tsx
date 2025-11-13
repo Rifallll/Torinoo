@@ -187,8 +187,10 @@ const TorinoDashboard = () => {
                       <div key={index} className="border-b last:border-b-0 pb-2 last:pb-0">
                         <p className="font-medium text-gray-800 dark:text-gray-100">{segment.roadName}</p>
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                          <span>Speed: {segment.speed} km/h</span>
-                          <span>Flow: {segment.flow} veh/h</span>
+                          <span>Speed: {segment.speed}</span>
+                          <Badge className={segment.jam ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}>
+                            {segment.jam ? "Congested" : "Clear"}
+                          </Badge>
                         </div>
                       </div>
                     ))
