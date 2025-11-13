@@ -25,7 +25,7 @@ interface TorinoMapComponentProps {
 }
 
 const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifications }) => {
-  const mapRef = useRef<L.Map | null>(null); // Fixed: Initialize useRef with null
+  const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const modificationMarkersRef = useRef<L.LayerGroup | null>(null); // Ref for traffic modification markers
@@ -214,7 +214,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
             style: (feature) => {
               // Custom style for lines/polygons based on properties
               const trafficLevel = feature?.properties?.traffic_level;
-              let color = '#e0e0e0'; // Changed default to very light gray
+              let color = '#9ca3af'; // Changed default to a more visible gray
               let weight = 3;
 
               if (trafficLevel === 'high') {
@@ -251,6 +251,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifica
         }
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
+        toast.error("Gagal memuat data GeoJSON. Pastikan file 'export.geojson' ada di folder public.");
       }
     };
 
