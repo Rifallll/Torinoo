@@ -6,12 +6,13 @@ import { Clock, Bus, TramFront, Info, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { parseGtfsRealtimeData, ParsedTripUpdate } from '@/utils/gtfsRealtimeParser';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const TopDelayedTrips: React.FC = () => {
   const [delayedTrips, setDelayedTrips] = useState<ParsedTripUpdate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchAndProcessData = async () => {
@@ -72,10 +73,12 @@ const TopDelayedTrips: React.FC = () => {
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Clock className="h-5 w-5 mr-2 text-red-600" /> Perjalanan Paling Terlambat
         </CardTitle>
-        <Button asChild variant="link" className="p-0 h-auto">
-          <Link to="/all-trip-updates" className="flex items-center text-indigo-600 hover:text-indigo-700">
-            Lihat Semua <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
+        <Button 
+          variant="link" 
+          className="p-0 h-auto flex items-center text-indigo-600 hover:text-indigo-700"
+          onClick={() => navigate("/all-trip-updates")} // Use navigate here
+        >
+          Lihat Semua <ArrowRight className="ml-1 h-4 w-4" />
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -98,8 +101,12 @@ const TopDelayedTrips: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                 Stop ID: {update.stop_time_update?.[0]?.stop_id || 'N/A'}
               </p>
-              <Button asChild variant="link" className="p-0 h-auto justify-start text-sm mt-1">
-                <Link to={`/all-trip-updates`}>Detail</Link> {/* Link to the general trip updates page for now */}
+              <Button 
+                variant="link" 
+                className="p-0 h-auto justify-start text-sm mt-1"
+                onClick={() => navigate(`/all-trip-updates`)} // Use navigate here
+              >
+                Detail
               </Button>
             </div>
           ))

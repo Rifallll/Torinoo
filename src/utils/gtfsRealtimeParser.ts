@@ -147,35 +147,63 @@ const mockAlerts: ParsedAlert[] = [
   },
 ];
 
+// Mock data for Vehicle Positions (if needed, otherwise return empty array)
+const mockVehiclePositions: ParsedVehiclePosition[] = [
+  {
+    id: 'mock-vp-1',
+    trip: { trip_id: 'T101', route_id: '4', start_time: '08:00:00', start_date: '20231115' },
+    vehicle: { id: 'V101', label: 'Tram 4', license_plate: 'TRM401' },
+    position: { latitude: 45.0703 + 0.001, longitude: 7.6869 + 0.001, bearing: 90, speed: 25 },
+    current_stop_sequence: 2,
+    stop_id: 'S002',
+    current_status: 'IN_TRANSIT_TO',
+    timestamp: Math.floor(Date.now() / 1000),
+    congestion_level: 'RUNNING_SMOOTHLY',
+    occupancy_status: 'FEW_SEATS_AVAILABLE',
+  },
+  {
+    id: 'mock-vp-2',
+    trip: { trip_id: 'B205', route_id: '68', start_time: '09:15:00', start_date: '20231115' },
+    vehicle: { id: 'V205', label: 'Bus 68', license_plate: 'BUS68A' },
+    position: { latitude: 45.0703 - 0.002, longitude: 7.6869 + 0.003, bearing: 270, speed: 15 },
+    current_stop_sequence: 6,
+    stop_id: 'S011',
+    current_status: 'STOPPED_AT_STATION',
+    timestamp: Math.floor(Date.now() / 1000),
+    congestion_level: 'STOP_AND_GO',
+    occupancy_status: 'STANDING_ROOM_ONLY',
+  },
+];
+
+
 const parseSingleBinFile = async (path: string, type: string, FeedMessage: protobuf.Type): Promise<any[]> => {
   try {
     const response = await fetch(path);
     if (!response.ok) {
-      console.warn(`Failed to fetch ${type}.bin from ${path}: ${response.statusText}.`);
-      toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public.`);
-      // Return mock data if fetch fails for trip_update or alert
+      console.warn(`Failed to fetch ${type}.bin from ${path}: ${response.statusText}. Returning mock data.`);
+      toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public. Menggunakan data tiruan.`);
       if (type === 'trip_update') return mockTripUpdates;
       if (type === 'alert') return mockAlerts;
+      if (type === 'vehicle_position') return mockVehiclePositions; // Return mock for vehicle positions too
       return [];
     }
     const buffer = await response.arrayBuffer();
     
-    // Add check for empty buffer
     if (buffer.byteLength === 0) {
-      console.warn(`Fetched ${type}.bin from ${path} but it was empty.`);
-      toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai.`);
-      // Return mock data if file is empty for trip_update or alert
+      console.warn(`Fetched ${type}.bin from ${path} but it was empty. Returning mock data.`);
+      toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai. Menggunakan data tiruan.`);
       if (type === 'trip_update') return mockTripUpdates;
       if (type === 'alert') return mockAlerts;
+      if (type === 'vehicle_position') return mockVehiclePositions; // Return mock for vehicle positions too
       return [];
     }
 
     const message = FeedMessage.decode(new Uint8Array(buffer));
     const payload = FeedMessage.toObject(message, {
-      longs: Number, // Ensure timestamps are numbers
-      enums: String, // Ensure enums are strings
+      longs: Number,
+      enums: String,
       bytes: String,
-      oneofs: true, // Include oneof fields
+      oneofs: true,
     });
 
     const entities: any[] = [];
@@ -187,13 +215,13 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
           const rawVehiclePosition = entity.vehicle;
           const rawTrip = rawVehiclePosition.trip;
 
-          // Remap the non-standard fields from the provided JSON snippet
+          // Corrected remapping based on common GTFS-realtime patterns and your proto
           const remappedTrip: ParsedTripDescriptor = {
               trip_id: rawTrip?.tripId,
-              route_id: rawTrip?.startDate, // Assuming raw `startDate` is the actual route ID (e.g., "10U")
-              start_time: rawTrip?.routeId, // Assuming raw `routeId` is the actual start time (e.g., "08:31:00")
-              start_date: rawTrip?.directionId, // Reverted to use raw `directionId` for start_date
-              // direction_id is not clearly available as a number, leave undefined for now
+              route_id: rawTrip?.routeId, 
+              start_time: rawTrip?.startTime, 
+              start_date: rawTrip?.startDate,
+              direction_id: rawTrip?.directionId, // Assuming directionId is a number
           };
 
           entities.push({
@@ -205,7 +233,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
               occupancy_status: rawVehiclePosition.occupancyStatus,
               current_stop_sequence: rawVehiclePosition.currentStopSequence,
               stop_id: rawVehiclePosition.stopId,
-              current_status: rawVehiclePosition.currentStatus || 'UNKNOWN_STOP_STATUS', // Default if missing
+              current_status: rawVehiclePosition.currentStatus || 'UNKNOWN_STOP_STATUS',
               congestion_level: rawVehiclePosition.congestionLevel,
           } as ParsedVehiclePosition);
         } else if (type === 'alert' && entity.alert) {
@@ -216,10 +244,10 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     return entities;
   } catch (error) {
     console.error(`Error parsing ${type}.bin from ${path}:`, error);
-    toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
-    // Return mock data if parsing fails for trip_update or alert
+    toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar. Menggunakan data tiruan.`);
     if (type === 'trip_update') return mockTripUpdates;
     if (type === 'alert') return mockAlerts;
+    if (type === 'vehicle_position') return mockVehiclePositions; // Return mock for vehicle positions too
     return [];
   }
 };
