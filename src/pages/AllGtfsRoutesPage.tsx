@@ -79,13 +79,13 @@ const AllGtfsRoutesPage: React.FC = () => {
   }, [routes]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
-      <header className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-          <Route className="h-8 w-8 mr-3 text-indigo-600" />
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+      <header className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+          <Route className="h-8 w-8 md:h-10 md:w-10 mr-3 text-indigo-600" />
           Semua Rute Transportasi Publik (GTFS)
         </h1>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" className="px-4 py-2 text-sm md:text-base">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Dashboard
@@ -93,85 +93,93 @@ const AllGtfsRoutesPage: React.FC = () => {
         </Button>
       </header>
 
-      <main className="flex-1">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Cari rute (ID, nama, deskripsi, operator)..."
-              className="pl-9 pr-8 w-full"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-500 hover:bg-transparent"
-                onClick={() => setSearchTerm('')}
-              >
-                <XCircle className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+      <main className="flex-1 max-w-7xl mx-auto w-full">
+        <Card className="mb-6 p-4 bg-white dark:bg-gray-800 shadow-lg rounded-xl">
+          <CardContent className="p-0">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  type="text"
+                  placeholder="Cari rute (ID, nama, deskripsi, operator)..."
+                  className="pl-9 pr-8 w-full h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:bg-transparent"
+                    onClick={() => setSearchTerm('')}
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
 
-          <Select onValueChange={setSelectedRouteType} value={selectedRouteType}>
-            <SelectTrigger className="w-[180px] sm:w-[200px]">
-              <SelectValue placeholder="Filter Tipe Rute" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Tipe</SelectItem>
-              {availableRouteTypes.map(type => (
-                <SelectItem key={type} value={String(type)}>
-                  {getRouteTypeLabel(type)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <Select onValueChange={setSelectedRouteType} value={selectedRouteType}>
+                <SelectTrigger className="w-full sm:w-[200px] h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500">
+                  <SelectValue placeholder="Filter Tipe Rute" />
+                </SelectTrigger>
+                <SelectContent className="dark:bg-gray-700 dark:text-gray-200">
+                  <SelectItem value="all">Semua Tipe</SelectItem>
+                  {availableRouteTypes.map(type => (
+                    <SelectItem key={type} value={String(type)}>
+                      {getRouteTypeLabel(type)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          {(searchTerm || selectedRouteType !== 'all') && (
-            <Button variant="outline" onClick={handleResetFilters} className="flex items-center">
-              <XCircle className="h-4 w-4 mr-2" />
-              Reset Filter
-            </Button>
-          )}
-        </div>
+              {(searchTerm || selectedRouteType !== 'all') && (
+                <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Reset Filter
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {isLoading ? (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-8">Memuat data rute GTFS lokal...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-12 text-lg">Memuat data rute GTFS lokal...</p>
         ) : error ? (
-          <p className="text-red-500 text-center py-8">Gagal memuat rute: {error.message}</p>
+          <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-xl border-red-500">
+            <CardContent className="p-6 text-center text-red-500 text-lg">
+              Gagal memuat rute: {error.message}
+            </CardContent>
+          </Card>
         ) : filteredRoutes.length > 0 ? (
-          <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
+          <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-xl rounded-xl">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px]">ID Rute</TableHead>
-                      <TableHead>Nama Pendek</TableHead>
-                      <TableHead>Nama Panjang</TableHead>
-                      <TableHead>Tipe</TableHead>
-                      <TableHead>Operator</TableHead>
-                      <TableHead>Deskripsi</TableHead>
+                  <TableHeader className="bg-gray-100 dark:bg-gray-700">
+                    <TableRow className="border-b border-gray-200 dark:border-gray-600">
+                      <TableHead className="w-[120px] py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">ID Rute</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Nama Pendek</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Nama Panjang</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Tipe</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Operator</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Deskripsi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredRoutes.map((route) => {
                       const agency = agencies.find(a => a.agency_id === route.agency_id);
                       return (
-                        <TableRow key={route.route_id}>
-                          <TableCell className="font-medium">{route.route_id}</TableCell>
-                          <TableCell>{route.route_short_name || 'N/A'}</TableCell>
-                          <TableCell>{route.route_long_name || 'N/A'}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-xs flex items-center">
+                        <TableRow key={route.route_id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                          <TableCell className="font-medium py-3 px-6 text-gray-800 dark:text-gray-100">{route.route_id}</TableCell>
+                          <TableCell className="py-3 px-6 text-gray-700 dark:text-gray-200">{route.route_short_name || 'N/A'}</TableCell>
+                          <TableCell className="py-3 px-6 text-gray-700 dark:text-gray-200">{route.route_long_name || 'N/A'}</TableCell>
+                          <TableCell className="py-3 px-6">
+                            <Badge variant="outline" className="text-xs flex items-center bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
                               {getRouteTypeIcon(route.route_type)} {getRouteTypeLabel(route.route_type)}
                             </Badge>
                           </TableCell>
-                          <TableCell>{agency?.agency_name || 'N/A'}</TableCell>
-                          <TableCell className="max-w-[200px] truncate">{route.route_desc || 'N/A'}</TableCell>
+                          <TableCell className="py-3 px-6 text-gray-700 dark:text-gray-200">{agency?.agency_name || 'N/A'}</TableCell>
+                          <TableCell className="max-w-[250px] truncate py-3 px-6 text-gray-700 dark:text-gray-200">{route.route_desc || 'N/A'}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -181,7 +189,11 @@ const AllGtfsRoutesPage: React.FC = () => {
             </CardContent>
           </Card>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-8">Tidak ada rute transportasi publik yang tersedia dari data GTFS lokal yang cocok dengan filter Anda.</p>
+          <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-xl">
+            <CardContent className="p-6 text-center text-gray-600 dark:text-gray-400 text-lg">
+              Tidak ada rute transportasi publik yang tersedia dari data GTFS lokal yang cocok dengan filter Anda.
+            </CardContent>
+          </Card>
         )}
       </main>
     </div>
