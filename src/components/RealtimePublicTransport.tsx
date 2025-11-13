@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ListChecks, TrafficCone, Gauge, ArrowRight } from 'lucide-react';
+import { Bus, TramFront, Clock, MapPin, AlertTriangle, CheckCircle2, Info, Car, ListChecks, TrafficCone, Gauge, ArrowRight, Route } from 'lucide-react'; // Added Route icon
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition, formatRelativeTime, formatTime } from '@/utils/gtfsRealtimeParser';
 import { Link } from 'react-router-dom';
+import { useTransitlandRoutes } from '@/hooks/useTransitlandRoutes'; // Import the new hook
 
 const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
@@ -14,6 +15,9 @@ const RealtimePublicTransport: React.FC = () => {
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Use the new hook for Transitland routes
+  const { data: transitlandRoutes, isLoading: isLoadingRoutes, error: routesError } = useTransitlandRoutes("Torino");
 
   const fetchAndParseData = async () => {
     setIsLoading(true);
@@ -138,8 +142,12 @@ const RealtimePublicTransport: React.FC = () => {
   };
 
   const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
-    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />;
-    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />;
+    // Prioritize GTFS route_type if available
+    if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />; // Bus
+    if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram
+    if (routeType === 1) return <Info className="h-4 w-4 mr-1" />; // Subway (using generic info for now)
+    
+    // Fallback to routeId parsing if routeType is not explicit
     if (routeId) {
       if (routeId.includes('B') || routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
       if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
@@ -344,6 +352,42 @@ const RealtimePublicTransport: React.FC = () => {
           </>
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
+        )}
+
+        {/* New section for Transitland Public Transport Routes */}
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center mt-6">
+          <Route className="h-4 w-4 mr-2" /> Rute Transportasi Publik (Transitland)
+        </h3>
+        {isLoadingRoutes ? (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat rute transportasi publik...</p>
+        ) : routesError ? (
+          <p className="text-red-500 text-center py-4">Gagal memuat rute: {routesError.message}</p>
+        ) : transitlandRoutes && transitlandRoutes.length > 0 ? (
+          <div className="space-y-3">
+            {transitlandRoutes.slice(0, 5).map(route => ( // Display first 5 routes
+              <div key={route.onestop_id} className="border-b last:border-b-0 pb-2 last:pb-0">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                    {getRouteTypeIcon(undefined, route.route_type)}
+                    {route.short_name ? `${route.short_name} - ` : ''}{route.name || route.long_name}
+                  </h4>
+                  <Badge variant="outline" className="text-xs capitalize">{route.vehicle_type}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-1">
+                  {route.description || `Operator: ${route.operator_name || 'N/A'}`}
+                </p>
+              </div>
+            ))}
+            {transitlandRoutes.length > 5 && (
+              <div className="text-center mt-4">
+                <Button variant="outline" className="">
+                  <span>Lihat Semua Rute ({transitlandRoutes.length - 5} lainnya)</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada rute transportasi publik yang tersedia dari Transitland.</p>
         )}
       </CardContent>
     </Card>
