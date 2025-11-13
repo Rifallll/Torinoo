@@ -6,9 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 const backgroundImages = [
-  '/11.png', // Menggunakan gambar lokal yang sudah ada
-  '/placeholder-image.jpg', // Menggunakan gambar placeholder baru
-  '/placeholder.svg', // Menggunakan gambar placeholder SVG yang sudah ada
+  '/mole-antonelliana-illustration.png', // Menggunakan gambar ilustrasi Mole Antonelliana yang baru
+  '/placeholder-image.jpg', // Tetap menggunakan gambar placeholder ini
 ];
 
 const HomePage: React.FC = () => {
