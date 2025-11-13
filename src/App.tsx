@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoadingSpinner from './components/LoadingSpinner';
 import { TrafficDataProvider } from './contexts/TrafficDataContext';
+import { SettingsProvider } from './contexts/SettingsContext'; // Import SettingsProvider
 
 // Menggunakan React.lazy untuk memuat komponen secara dinamis
 const HomePage = React.lazy(() => import("./pages/HomePage"));
@@ -29,36 +30,38 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TrafficDataProvider>
-      <>
-        <Toaster />
-        <Sonner />
-        <TooltipProvider>
-          <div>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/torino-dashboard" element={<TorinoDashboard />} />
-                  <Route path="/news" element={<NewsPortal />} />
-                  <Route path="/sensors" element={<SensorsPage />} />
-                  <Route path="/incidents" element={<IncidentsPage />} />
-                  <Route path="/incidents/:id" element={<IncidentDetailPage />} />
-                  <Route path="/reports" element={<ReportsPage />} />
-                  <Route path="/data-analysis" element={<DataAnalysisPage />} />
-                  <Route path="/about-torino" element={<AboutTorinoPage />} />
-                  <Route path="/culture-tourism" element={<CultureTourismPage />} />
-                  <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
-                  <Route path="/weather" element={<WeatherPage />} />
-                  <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
-                  <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} /> {/* New route */}
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </div>
-        </TooltipProvider>
-      </>
+      <SettingsProvider> {/* Wrap with SettingsProvider */}
+        <>
+          <Toaster />
+          <Sonner />
+          <TooltipProvider>
+            <div>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/torino-dashboard" element={<TorinoDashboard />} />
+                    <Route path="/news" element={<NewsPortal />} />
+                    <Route path="/sensors" element={<SensorsPage />} />
+                    <Route path="/incidents" element={<IncidentsPage />} />
+                    <Route path="/incidents/:id" element={<IncidentDetailPage />} />
+                    <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/data-analysis" element={<DataAnalysisPage />} />
+                    <Route path="/about-torino" element={<AboutTorinoPage />} />
+                    <Route path="/culture-tourism" element={<CultureTourismPage />} />
+                    <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
+                    <Route path="/weather" element={<WeatherPage />} />
+                    <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
+                    <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} /> {/* New route */}
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </div>
+          </TooltipProvider>
+        </>
+      </SettingsProvider>
     </TrafficDataProvider>
   </QueryClientProvider>
 );

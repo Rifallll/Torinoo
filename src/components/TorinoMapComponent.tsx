@@ -7,6 +7,7 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
+import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -25,6 +26,8 @@ const TorinoMapComponent: React.FC = () => {
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
+
+  const { isTomTomLayerEnabled } = useSettings(); // Use the setting
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
@@ -92,7 +95,7 @@ const TorinoMapComponent: React.FC = () => {
       }
     };
 
-    // Function to manage TomTom Traffic Flow layer visibility based on map bounds
+    // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
     const updateTomTomTrafficVisibility = () => {
       if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
 
@@ -100,7 +103,7 @@ const TorinoMapComponent: React.FC = () => {
       const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
       const isWithinTorino = currentMapBounds.intersects(torinoBounds);
 
-      if (isWithinTorino) {
+      if (isTomTomLayerEnabled && isWithinTorino) {
         if (!isTomTomLayerActive) {
           tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
           toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
@@ -108,7 +111,7 @@ const TorinoMapComponent: React.FC = () => {
       } else {
         if (isTomTomLayerActive) {
           mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
-          toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino).");
+          toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
         }
       }
     };
@@ -190,6 +193,7 @@ const TorinoMapComponent: React.FC = () => {
         "Subway Stations": subwayStationsLayerGroupRef.current,
       };
 
+      // Only add TomTom layer to control if it was successfully initialized
       if (tomtomTrafficFlowLayerRef.current) {
         overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayerRef.current;
       }
@@ -219,27 +223,13 @@ const TorinoMapComponent: React.FC = () => {
       // Initial check for visibility
       updateGeoJSONVisibility();
       updateSubwayStationsVisibility();
-      updateTomTomTrafficVisibility(); // New: Initial check for TomTom traffic
-
-      // Add subway stations to the map
-      const subwayIcon = L.divIcon({
-        className: 'custom-subway-icon',
-        html: '<div style="background-color:#DC143C; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">M</div>', // Changed color to Crimson
-        iconSize: [30, 30], // Increased size and font
-        iconAnchor: [15, 15], // Adjusted anchor
-        popupAnchor: [0, -15] // Adjusted popup anchor
-      });
-
-      subwayStationsData.forEach(station => {
-        const { latitude, longitude } = convertCoordinates(station.x, station.y);
-        console.log(`Station: ${station.name}, Converted Lat: ${latitude}, Lon: ${longitude}`); // Log converted coordinates
-        if (latitude !== 0 || longitude !== 0) { // Only add if conversion was successful
-          L.marker([latitude, longitude], { icon: subwayIcon })
-            .bindPopup(`<b>${station.name}</b><br>Subway Station`)
-            .addTo(subwayStationsLayerGroupRef.current!);
-        }
-      });
+      // Initial check for TomTom traffic is now handled by the separate useEffect below
     }
+
+    // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
+    useEffect(() => {
+      updateTomTomTrafficVisibility();
+    }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
 
     // Fetch and add GeoJSON data
     const fetchGeoJSON = async () => {

@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { MadeWithDyad } from './made-with-dyad'; // Import MadeWithDyad component
+import TomTomLayerToggle from './TomTomLayerToggle'; // Import the new toggle component
 
 interface TorinoSidebarProps {
   isSidebarOpen: boolean;
@@ -179,6 +180,11 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
           <NavItem key={index} item={item} />
         ))}
       </nav>
+
+      {/* Add the TomTomLayerToggle here */}
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+        <TomTomLayerToggle />
+      </div>
 
       <div className="mt-auto"> {/* Pushes content to the bottom */}
         <MadeWithDyad />
