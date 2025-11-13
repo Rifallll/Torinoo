@@ -25,7 +25,7 @@ interface TorinoMapComponentProps {
 }
 
 const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ trafficModifications }) => {
-  const mapRef = useRef<L.Map | null>(mapRef.current);
+  const mapRef = useRef<L.Map | null>(null); // Fixed: Initialize useRef with null
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const modificationMarkersRef = useRef<L.LayerGroup | null>(null); // Ref for traffic modification markers
