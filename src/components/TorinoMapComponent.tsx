@@ -85,6 +85,9 @@ const TorinoMapComponent: React.FC = () => {
       // Initialize GeoJSON Layer Group
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
+      subwayStationsLayerGroupRef.current.addTo(mapRef.current); // Add subway stations layer to map by default
+      toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+
 
       // Add Geocoder control
       L.Control.geocoder({
