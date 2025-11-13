@@ -26,11 +26,8 @@ interface TransitlandRoutesResponse {
 
 const fetchTransitlandRoutes = async (city: string): Promise<TransitlandRoute[]> => {
   try {
-    // Using a specific operator_id for Torino's GTT (Gruppo Torinese Trasporti)
-    // This might need adjustment if the operator_id changes or if other operators are desired.
-    // A more robust solution would involve first querying for operators in Torino.
-    const operatorOnestopId = "o-spsv-gtt"; // Example Onestop ID for GTT Torino
-    const response = await fetch(`https://api.transit.land/api/v1/routes?operator_onestop_id=${operatorOnestopId}&per_page=20`);
+    // Menggunakan parameter 'city' seperti yang disarankan pengguna
+    const response = await fetch(`https://api.transit.land/api/v1/routes?city=${city}&per_page=20`);
 
     if (!response.ok) {
       const errorData = await response.json();
