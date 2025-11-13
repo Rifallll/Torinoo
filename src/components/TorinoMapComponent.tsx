@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
-import { toast } from 'sonner'; // Import toast for user feedback
-import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
+import { toast } from 'sonner';
+import Papa from 'papaparse'; // Import PapaParse for CSV parsing
+import { convertCoordinates } from '../utils/coordinateConverter';
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -19,39 +20,66 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+interface SubwayStation {
+  name: string;
+  x: number;
+  y: number;
+}
+
 const TorinoMapComponent: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
-  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
-  const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
-  const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
+  const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null);
+
+  const [subwayStations, setSubwayStations] = useState<SubwayStation[]>([]); // State to hold parsed subway station data
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
-  const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
-  const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
+  const minZoomForGeoJSON = 15;
+  const minZoomForSubwayStations = 12;
 
-  // Dummy data for subway stations (using original EPSG:3003 coordinates)
-  const subwayStationsData = [
-    { name: "Fermi", x: 1494000, y: 4990000 },
-    { name: "Paradiso", x: 1495000, y: 4990500 },
-    { name: "Marche", x: 1496000, y: 4991000 },
-    { name: "Racconigi", x: 1497000, y: 4991500 },
-    { name: "Bernini", x: 1498000, y: 4992000 },
-    { name: "Principi d'Acaja", x: 1499000, y: 4992500 },
-    { name: "XVIII Dicembre", x: 1500000, y: 4993000 },
-    { name: "Porta Susa", x: 1500500, y: 4993200 },
-    { name: "Vinzaglio", x: 1501000, y: 4993500 },
-    { name: "Re Umberto", x: 1501500, y: 4993800 },
-    { name: "Porta Nuova", x: 1502000, y: 4994000 },
-    { name: "Marconi", x: 1502500, y: 4994300 },
-    { name: "Nizza", x: 1503000, y: 4994600 },
-    { name: "Dante", x: 1503500, y: 4994900 },
-    { name: "Carducci-Molinette", x: 1504000, y: 4995200 },
-    { name: "Spezia", x: 1504500, y: 4995500 },
-    { name: "Lingotto", x: 1505000, y: 4995800 },
-    { name: "Italia 61 - Regione Piemonte", x: 1505500, y: 4996100 },
-    { name: "Bengasi", x: 1506000, y: 4996400 },
-  ];
+  // Effect to fetch and parse subway station CSV
+  useEffect(() => {
+    const fetchSubwayStations = async () => {
+      try {
+        const response = await fetch('/fermate_linee_metro.csv');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch subway stations CSV: ${response.statusText}`);
+        }
+        const csvText = await response.text();
+
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          dynamicTyping: true, // Automatically convert numbers
+          complete: (results) => {
+            if (results.errors.length > 0) {
+              console.error("CSV parsing errors for subway stations:", results.errors);
+              toast.error(`Gagal mengurai CSV stasiun kereta bawah tanah: ${results.errors[0].message}`);
+              return;
+            }
+            const parsedStations = results.data.map((row: any) => ({
+              name: row.name || 'Unknown Station',
+              x: row.x,
+              y: row.y,
+            })).filter(station => typeof station.x === 'number' && typeof station.y === 'number'); // Filter out invalid entries
+            setSubwayStations(parsedStations);
+            toast.success(`Berhasil memuat ${parsedStations.length} stasiun kereta bawah tanah.`);
+          },
+          error: (error: Error) => {
+            console.error("Error parsing subway stations CSV:", error);
+            toast.error(`Terjadi kesalahan saat mengurai file stasiun kereta bawah tanah: ${error.message}`);
+          }
+        });
+      } catch (error: any) {
+        console.error("Error fetching subway stations CSV:", error);
+        toast.error(`Gagal memuat data stasiun kereta bawah tanah: ${error.message}`);
+      }
+    };
+
+    fetchSubwayStations();
+  }, []); // Run once on mount
 
   useEffect(() => {
     // Function to update GeoJSON layer visibility based on zoom
@@ -90,23 +118,17 @@ const TorinoMapComponent: React.FC = () => {
 
 
     if (!mapRef.current) {
-      // Initialize map with preferCanvas: true for better performance with complex vector data
       mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
 
-      // Add OpenStreetMap tile layer
       const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       });
       osmLayer.addTo(mapRef.current);
 
-      // Initialize GeoJSON Layer Group
       geoJsonLayerGroupRef.current = L.layerGroup();
-      subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
-      // Removed direct addTo(mapRef.current) for subway stations, now controlled by updateSubwayStationsVisibility
+      subwayStationsLayerGroupRef.current = L.layerGroup();
 
-
-      // Add Geocoder control
       L.Control.geocoder({
         defaultMarkGeocode: false,
       })
@@ -122,7 +144,6 @@ const TorinoMapComponent: React.FC = () => {
       })
       .addTo(mapRef.current!);
 
-      // Add Fullscreen control (simple custom button)
       const FullscreenControl = L.Control.extend({
         onAdd: function(map: L.Map) {
           const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -140,7 +161,6 @@ const TorinoMapComponent: React.FC = () => {
       });
       new FullscreenControl({ position: 'topleft' }).addTo(mapRef.current);
 
-      // Add Layer control
       const baseLayers = {
         "OpenStreetMap": osmLayer,
         "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
@@ -148,11 +168,10 @@ const TorinoMapComponent: React.FC = () => {
       };
       const overlayLayers = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
-        "Subway Stations": subwayStationsLayerGroupRef.current // Add subway stations to overlay control
+        "Subway Stations": subwayStationsLayerGroupRef.current
       };
       L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
 
-      // Reset view control
       const ResetViewControl = L.Control.extend({
         onAdd: function(map: L.Map) {
           const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -166,47 +185,49 @@ const TorinoMapComponent: React.FC = () => {
       });
       new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
 
-      // Add event listener for zoom changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
-      mapRef.current.on('zoomend', updateSubwayStationsVisibility); // New: Add listener for subway stations
+      mapRef.current.on('zoomend', updateSubwayStationsVisibility);
 
-      // Initial check for visibility
       updateGeoJSONVisibility();
-      updateSubwayStationsVisibility(); // New: Initial check for subway stations
+      updateSubwayStationsVisibility();
+    }
 
-      // Add subway stations to the map
+    // Add subway stations to the map whenever `subwayStations` state changes
+    if (mapRef.current && subwayStationsLayerGroupRef.current) {
+      subwayStationsLayerGroupRef.current.clearLayers(); // Clear existing markers
+
       const subwayIcon = L.divIcon({
         className: 'custom-subway-icon',
-        html: '<div style="background-color:#DC143C; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">M</div>', // Changed color to Crimson
-        iconSize: [30, 30], // Increased size and font
-        iconAnchor: [15, 15], // Adjusted anchor
-        popupAnchor: [0, -15] // Adjusted popup anchor
+        html: '<div style="background-color:#DC143C; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">M</div>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -15]
       });
 
-      subwayStationsData.forEach(station => {
+      subwayStations.forEach(station => {
         const { latitude, longitude } = convertCoordinates(station.x, station.y);
-        console.log(`Station: ${station.name}, Converted Lat: ${latitude}, Lon: ${longitude}`); // Log converted coordinates
-        if (latitude !== 0 || longitude !== 0) { // Only add if conversion was successful
+        if (latitude !== 0 || longitude !== 0) {
           L.marker([latitude, longitude], { icon: subwayIcon })
             .bindPopup(`<b>${station.name}</b><br>Subway Station`)
             .addTo(subwayStationsLayerGroupRef.current!);
         }
       });
+
+      // Ensure visibility is updated after adding new markers
+      updateSubwayStationsVisibility();
     }
 
     // Fetch and add GeoJSON data
     const fetchGeoJSON = async () => {
       try {
-        const response = await fetch('/export.geojson'); // Path to the GeoJSON file in the public folder
+        const response = await fetch('/export.geojson');
         const data = await response.json();
 
         if (mapRef.current && geoJsonLayerGroupRef.current) {
-          // Clear existing GeoJSON layer from the group
           geoJsonLayerGroupRef.current.clearLayers();
 
           geoJsonLayerRef.current = L.geoJSON(data, {
             onEachFeature: (feature, layer) => {
-              // Bind popup with all properties
               if (feature.properties) {
                 let popupContent = "<table>";
                 for (const key in feature.properties) {
@@ -217,45 +238,43 @@ const TorinoMapComponent: React.FC = () => {
               }
             },
             pointToLayer: (feature, latlng) => {
-              // Custom marker for points based on 'amenity' property
               if (feature.properties && feature.properties.amenity) {
                 const amenity = feature.properties.amenity;
-                let iconColor = '#3b82f6'; // Default blue
+                let iconColor = '#3b82f6';
                 let iconText = '';
                 let iconSize = 24;
 
                 switch (amenity) {
                   case 'hospital':
-                    iconColor = '#ef4444'; // Red
+                    iconColor = '#ef4444';
                     iconText = '+';
                     break;
                   case 'school':
-                    iconColor = '#22c55e'; // Green
+                    iconColor = '#22c55e';
                     iconText = 'S';
                     break;
                   case 'park':
-                    iconColor = '#10b981'; // Teal
+                    iconColor = '#10b981';
                     iconText = 'P';
                     break;
-                  case 'building': // Generic building
-                    iconColor = '#6b7280'; // Gray
+                  case 'building':
+                    iconColor = '#6b7280';
                     iconText = 'B';
                     break;
                   case 'restaurant':
-                    iconColor = '#f97316'; // Orange
+                    iconColor = '#f97316';
                     iconText = 'R';
                     break;
                   case 'cafe':
-                    iconColor = '#a855f7'; // Purple
+                    iconColor = '#a855f7';
                     iconText = 'C';
                     break;
                   case 'shop':
-                    iconColor = '#ec4899'; // Pink
+                    iconColor = '#ec4899';
                     iconText = 'S';
                     break;
-                  // Add more cases as needed for other amenities
                   default:
-                    iconColor = '#3b82f6'; // Default blue
+                    iconColor = '#3b82f6';
                     iconText = '?';
                 }
 
@@ -268,13 +287,11 @@ const TorinoMapComponent: React.FC = () => {
                   })
                 });
               }
-              // For other point features without amenity, use a default Leaflet marker
               return L.marker(latlng);
             },
             style: (feature) => {
-              // Custom style for lines/polygons based on properties
               const trafficLevel = feature?.properties?.traffic_level;
-              let color = '#e0e0e0'; // Changed default to very light gray
+              let color = '#e0e0e0';
               let weight = 3;
 
               if (trafficLevel === 'high') {
@@ -291,20 +308,18 @@ const TorinoMapComponent: React.FC = () => {
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
+                opacity: 0.1
               };
             }
           });
-          geoJsonLayerRef.current.addTo(geoJsonLayerGroupRef.current); // Add to the layer group
+          geoJsonLayerRef.current.addTo(geoJsonLayerGroupRef.current);
 
-          // Update visibility after loading new data
           if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
             if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
               mapRef.current.addLayer(geoJsonLayerGroupRef.current);
             }
           }
 
-          // Optionally, fit map bounds to the GeoJSON layer if it's valid
           if (geoJsonLayerRef.current.getBounds().isValid()) {
             mapRef.current.fitBounds(geoJsonLayerRef.current.getBounds());
           }
@@ -319,12 +334,12 @@ const TorinoMapComponent: React.FC = () => {
     return () => {
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
-        mapRef.current.off('zoomend', updateSubwayStationsVisibility); // Clean up listener
+        mapRef.current.off('zoomend', updateSubwayStationsVisibility);
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, [subwayStations]); // Re-run this effect when subwayStations data changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
