@@ -4,7 +4,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -42,6 +42,7 @@ const navItems: NavItemConfig[] = [
       { label: "Reports", path: "/reports", icon: BarChart2 },
       { label: "All Vehicle Positions", path: "/all-vehicle-positions", icon: Car },
       { label: "All Trip Updates", path: "/all-trip-updates", icon: Clock },
+      { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route }, // New: Link to All GTFS Routes
     ],
   },
   { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },

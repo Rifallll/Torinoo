@@ -23,6 +23,7 @@ const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollabo
 const WeatherPage = React.lazy(() => import("./pages/WeatherPage"));
 const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage"));
 const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage"));
+const AllGtfsRoutesPage = React.lazy(() => import("./pages/AllGtfsRoutesPage")); // New: Import AllGtfsRoutesPage
 const SettingsPage = React.lazy(() => import("./pages/SettingsPage")); // New: Import SettingsPage
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
@@ -54,6 +55,7 @@ const App = () => (
                     <Route path="/weather" element={<WeatherPage />} />
                     <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
                     <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} />
+                    <Route path="/all-gtfs-routes" element={<AllGtfsRoutesPage />} /> {/* New route for AllGtfsRoutesPage */}
                     <Route path="/settings" element={<SettingsPage />} /> {/* New route for SettingsPage */}
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />

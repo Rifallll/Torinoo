@@ -383,8 +383,10 @@ const RealtimePublicTransport: React.FC = () => {
             ))}
             {transitlandRoutes.length > 5 && (
               <div className="text-center mt-4">
-                <Button variant="outline" className="">
-                  <span>Lihat Semua Rute ({transitlandRoutes.length - 5} lainnya)</span>
+                <Button asChild variant="outline" className="">
+                  <Link to="/all-gtfs-routes">
+                    <span>Lihat Semua Rute ({transitlandRoutes.length - 5} lainnya)</span>
+                  </Link>
                 </Button>
               </div>
             )}
