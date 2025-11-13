@@ -7,18 +7,38 @@ import { Badge } from '@/components/ui/badge';
 import { useWeather } from '@/hooks/useWeather';
 
 const WeatherCard: React.FC = () => {
-  const { data, isLoading, error } = useWeather("Torino,it"); // Pass city name to hook
+  const { data, isLoading, error } = useWeather("Torino"); // Pass city name to hook
 
-  const getWeatherIcon = (iconCode: string) => {
-    // OpenWeatherMap icon codes
-    if (iconCode.includes('01')) return <Sun className="h-6 w-6 text-yellow-500" />; // Clear sky
-    if (iconCode.includes('02')) return <CloudSun className="h-6 w-6 text-yellow-500" />; // Few clouds
-    if (iconCode.includes('03') || iconCode.includes('04')) return <Cloud className="h-6 w-6 text-gray-500" />; // Scattered/Broken clouds
-    if (iconCode.includes('09') || iconCode.includes('10')) return <CloudRain className="h-6 w-6 text-blue-500" />; // Shower rain / Rain
-    if (iconCode.includes('11')) return <Zap className="h-6 w-6 text-yellow-400" />; // Thunderstorm
-    if (iconCode.includes('13')) return <Snowflake className="h-6 w-6 text-blue-300" />; // Snow
-    if (iconCode.includes('50')) return <Cloud className="h-6 w-6 text-gray-400" />; // Mist
+  const getWeatherIcon = (weathercode: number) => {
+    // WMO Weather interpretation codes (https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM)
+    if (weathercode === 0) return <Sun className="h-6 w-6 text-yellow-500" />; // Clear sky
+    if (weathercode >= 1 && weathercode <= 3) return <CloudSun className="h-6 w-6 text-yellow-500" />; // Mainly clear, partly cloudy, overcast
+    if (weathercode >= 45 && weathercode <= 48) return <Cloud className="h-6 w-6 text-gray-500" />; // Fog
+    if (weathercode >= 51 && weathercode <= 57) return <CloudRain className="h-6 w-6 text-blue-500" />; // Drizzle
+    if (weathercode >= 61 && weathercode <= 67) return <CloudRain className="h-6 w-6 text-blue-500" />; // Rain
+    if (weathercode >= 71 && weathercode <= 77) return <Snowflake className="h-6 w-6 text-blue-300" />; // Snow
+    if (weathercode >= 80 && weathercode <= 82) return <CloudRain className="h-6 w-6 text-blue-500" />; // Rain showers
+    if (weathercode >= 85 && weathercode <= 86) return <Snowflake className="h-6 w-6 text-blue-300" />; // Snow showers
+    if (weathercode >= 95 && weathercode <= 99) return <Zap className="h-6 w-6 text-yellow-400" />; // Thunderstorm
     return <CloudSun className="h-6 w-6 text-gray-500" />; // Default
+  };
+
+  const getWeatherDescription = (weathercode: number) => {
+    if (weathercode === 0) return "Clear sky";
+    if (weathercode === 1) return "Mainly clear";
+    if (weathercode === 2) return "Partly cloudy";
+    if (weathercode === 3) return "Overcast";
+    if (weathercode >= 45 && weathercode <= 48) return "Fog";
+    if (weathercode >= 51 && weathercode <= 55) return "Drizzle";
+    if (weathercode >= 56 && weathercode <= 57) return "Freezing Drizzle";
+    if (weathercode >= 61 && weathercode <= 65) return "Rain";
+    if (weathercode >= 66 && weathercode <= 67) return "Freezing Rain";
+    if (weathercode >= 71 && weathercode <= 75) return "Snow fall";
+    if (weathercode === 77) return "Snow grains";
+    if (weathercode >= 80 && weathercode <= 82) return "Rain showers";
+    if (weathercode >= 85 && weathercode <= 86) return "Snow showers";
+    if (weathercode >= 95 && weathercode <= 99) return "Thunderstorm";
+    return "N/A";
   };
 
   if (isLoading) {
@@ -48,13 +68,13 @@ const WeatherCard: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
           <p>Gagal memuat data cuaca: {error.message}</p>
-          <p className="text-sm text-gray-500">Harap pastikan kunci API diatur dengan benar dan coba lagi.</p>
+          <p className="text-sm text-gray-500">Pastikan koneksi internet Anda stabil.</p>
         </CardContent>
       </Card>
     );
   }
 
-  if (!data || !data.main || !data.weather || data.weather.length === 0) {
+  if (!data || !data.current) {
     return (
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
@@ -70,18 +90,18 @@ const WeatherCard: React.FC = () => {
     );
   }
 
-  const currentTemp = data.main.temp;
-  const currentHumidity = data.main.humidity;
-  const currentWindSpeed = data.wind.speed;
-  const currentCondition = data.weather[0].description;
-  const currentIconCode = data.weather[0].icon;
+  const currentTemp = data.current.temperature_2m;
+  const currentHumidity = data.current.relativehumidity_2m;
+  const currentWindSpeed = data.current.windspeed_10m;
+  const currentConditionCode = data.current.weathercode;
+  const currentCondition = getWeatherDescription(currentConditionCode);
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-          {getWeatherIcon(currentIconCode)}
-          <span className="ml-2">Cuaca Terkini di {data.name}</span>
+          {getWeatherIcon(currentConditionCode)}
+          <span className="ml-2">Cuaca Terkini di {data.city}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
@@ -89,7 +109,7 @@ const WeatherCard: React.FC = () => {
           <span className="text-4xl font-bold">{Math.round(currentTemp)}°C</span>
           <Badge className="text-base px-3 py-1 capitalize">{currentCondition}</Badge>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{data.name}, {data.sys.country}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{data.city}, {data.country}</p>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="flex items-center">
             <Droplet className="h-4 w-4 mr-1 text-blue-500" />
