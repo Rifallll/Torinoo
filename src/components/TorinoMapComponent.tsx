@@ -28,7 +28,7 @@ const TorinoMapComponent: React.FC = () => {
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
-  const minZoomForSubwayStations = 14; // New: Minimum zoom level for subway stations to appear
+  const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
 
   // Dummy data for subway stations (using original EPSG:3003 coordinates)
   const subwayStationsData = [
@@ -103,8 +103,7 @@ const TorinoMapComponent: React.FC = () => {
       // Initialize GeoJSON Layer Group
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
-      // subwayStationsLayerGroupRef.current.addTo(mapRef.current); // Removed this line, visibility now controlled by updateSubwayStationsVisibility
-      // toast.info("Lapisan halte kereta bawah tanah ditampilkan."); // Removed this toast, now in updateSubwayStationsVisibility
+      // Removed direct addTo(mapRef.current) for subway stations, now controlled by updateSubwayStationsVisibility
 
 
       // Add Geocoder control
@@ -178,8 +177,8 @@ const TorinoMapComponent: React.FC = () => {
       // Add subway stations to the map
       const subwayIcon = L.divIcon({
         className: 'custom-subway-icon',
-        html: '<div style="background-color:#8B0000; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">M</div>', // Increased size and font
-        iconSize: [30, 30], // Increased icon size
+        html: '<div style="background-color:#DC143C; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">M</div>', // Changed color to Crimson
+        iconSize: [30, 30], // Increased size and font
         iconAnchor: [15, 15], // Adjusted anchor
         popupAnchor: [0, -15] // Adjusted popup anchor
       });
