@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge } from 'lucide-react';
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge, TrafficCone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,10 +17,11 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
-import RealtimePublicTransport from '@/components/RealtimePublicTransport'; // Import the new component
+import RealtimePublicTransport from '@/components/RealtimePublicTransport';
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
-import QuickActionsCard from '@/components/QuickActionsCard'; // Import the new QuickActionsCard
+import QuickActionsCard from '@/components/QuickActionsCard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import useTorinoTrafficData from '@/hooks/useTorinoTrafficData'; // Import the new hook
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,6 +33,9 @@ const TorinoDashboard = () => {
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
+
+  // Use the new hook for Torino traffic data
+  const { data: torinoTrafficData, isLoading: isLoadingTorinoTraffic, error: torinoTrafficError } = useTorinoTrafficData();
 
   // Dummy data for quick actions and statistics
   const dummyStats = {
@@ -164,6 +168,35 @@ const TorinoDashboard = () => {
             <div className="space-y-6">
               <WeatherCard />
               <RealtimePublicTransport />
+
+              {/* New Card for Real-time Torino Traffic Segments */}
+              <Card className="bg-white dark:bg-gray-800 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+                    <TrafficCone className="h-5 w-5 mr-2 text-orange-600" />
+                    Real-time Torino Traffic Segments
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {isLoadingTorinoTraffic ? (
+                    <p className="text-gray-600 dark:text-gray-400 text-center py-4">Loading traffic data...</p>
+                  ) : torinoTrafficError ? (
+                    <p className="text-red-500 text-center py-4">{torinoTrafficError}</p>
+                  ) : torinoTrafficData.length > 0 ? (
+                    torinoTrafficData.map((segment, index) => (
+                      <div key={index} className="border-b last:border-b-0 pb-2 last:pb-0">
+                        <p className="font-medium text-gray-800 dark:text-gray-100">{segment.roadName}</p>
+                        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                          <span>Speed: {segment.speed} km/h</span>
+                          <span>Flow: {segment.flow} veh/h</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-600 dark:text-gray-400 text-center py-4">No real-time traffic data available.</p>
+                  )}
+                </CardContent>
+              </Card>
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
