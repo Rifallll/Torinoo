@@ -37,7 +37,7 @@ const TorinoMapComponent: React.FC = () => {
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15;
-  const minZoomForSubwayStations = 12;
+  const minZoomForSubwayStations = 0; // Changed to 0 to always show subway stations
 
   // Effect to fetch and parse subway station CSV
   useEffect(() => {
@@ -103,7 +103,7 @@ const TorinoMapComponent: React.FC = () => {
     const updateSubwayStationsVisibility = () => {
       if (!mapRef.current || !subwayStationsLayerGroupRef.current) return;
 
-      if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
+      if (mapRef.current.getZoom() >= minZoomForSubwayStations) { // Now minZoomForSubwayStations is 0
         if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
           subwayStationsLayerGroupRef.current.addTo(mapRef.current);
           toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
