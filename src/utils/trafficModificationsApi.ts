@@ -64,7 +64,7 @@ const mockTrafficModifications: TrafficModification[] = [
     id: "661425",
     title: "PEDONALIZZAZIONE DI VIA ROMA",
     shortDescription: "Fino a venerdì 8 november, per lavori del Comune di Torino, sono previste chiusure in: - piazza CLN tra via Giolitti e via Rossi - piazza CLN tra via Rossi e via Amendola - piazza CLN tra via Alfieri e via Frola - via Roma tra piazza CLN e via Cavour - via Roma da piazza San Carlo a via Monte di Pietà - via Viotti da via Bertola a via Monte di Pietà - via Bertola da via XX Settembre a via Viott - via Frola tra via XX Settembre e via piazza CLN - via Principe Amedeo da via Duse a via Roma - piazza Carlo Felice tra piazza Lagrange e piazza Paleocapa",
-    fullDescription: "Fino a venerdì 8 november, per lavori del Comune di Torino, sono previste chiusure in: - piazza CLN tra via Giolitti e via Rossi - piazza CLN tra via Rossi e via Amendola - piazza CLN tra via Alfieri e via Frola - via Roma tra piazza CLN dan via Cavour - via Roma da piazza San Carlo a via Monte di Pietà - via Viotti da via Bertola a via Monte di Pietà - via Bertola da via XX Settembre a via Viott - via Frola tra via XX Settembre e via piazza CLN - via Principe Amedeo da via Duse a via Roma - piazza Carlo Felice tra piazza Lagrange e piazza Paleocapa. Fino a sabato 31 Januari 2026 è, inoltre, prevista la chiusura di via Roma tra via Cavour e via Buozzi. I dettagli sul Comunicato Stampa del Comune di Torino",
+    fullDescription: "Fino a venerdì 8 november, per lavori del Comune di Torino, sono previste chiusure in: - piazza CLN tra via Giolitti e via Rossi - piazza CLN tra via Rossi dan via Amendola - piazza CLN tra via Alfieri e via Frola - via Roma tra piazza CLN dan via Cavour - via Roma da piazza San Carlo a via Monte di Pietà - via Viotti da via Bertola a via Monte di Pietà - via Bertola da via XX Settembre e via Viott - via Frola tra via XX Settembre e via piazza CLN - via Principe Amedeo da via Duse a via Roma - piazza Carlo Felice tra piazza Lagrange e piazza Paleocapa. Fino a sabato 31 Januari 2026 è, inoltre, prevista la chiusura di via Roma tra via Cavour e via Buozzi. I dettagli sul Comunicato Stampa del Comune di Torino",
     latitude: 45.0665,
     longitude: 7.6817,
     status: "red",
@@ -76,7 +76,6 @@ export const fetchTrafficModifications = async (): Promise<TrafficModification[]
     setTimeout(() => {
       // Simulate potential changes in data over time if needed, e.g., by adding a new item
       // For now, it returns the same mock data.
-      toast.info("Simulating fetch of traffic modifications data...");
       resolve(mockTrafficModifications);
     }, 1000); // Simulate network delay
   });
