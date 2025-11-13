@@ -7,21 +7,22 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { parseGtfsRealtimeData, ParsedTripUpdate, ParsedAlert, ParsedVehiclePosition, formatRelativeTime, formatTime } from '@/utils/gtfsRealtimeParser';
 import { Link } from 'react-router-dom';
-import { useTransitlandRoutes } from '@/hooks/useTransitlandRoutes'; // Import the new hook
+import { useGtfsData } from '@/hooks/useGtfsData'; // Import the new hook for local GTFS data
 
 const RealtimePublicTransport: React.FC = () => {
   const [tripUpdates, setTripUpdates] = useState<ParsedTripUpdate[]>([]);
   const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]);
   const [alerts, setAlerts] = useState<ParsedAlert[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoadingRealtime, setIsLoadingRealtime] = useState(true);
+  const [errorRealtime, setErrorRealtime] = useState<string | null>(null);
 
-  // Use the new hook for Transitland routes
-  const { data: transitlandRoutes, isLoading: isLoadingRoutes, error: routesError } = useTransitlandRoutes("Torino");
+  // Use the new hook for local GTFS routes
+  const { data: gtfsData, isLoading: isLoadingGtfs, error: gtfsError } = useGtfsData();
+  const transitlandRoutes = gtfsData?.routes || []; // Use local GTFS routes
 
-  const fetchAndParseData = async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchAndParseRealtimeData = async () => {
+    setIsLoadingRealtime(true);
+    setErrorRealtime(null);
     try {
       const data = await parseGtfsRealtimeData('/trip_update.bin', '/alerts.bin', '/vehicle_position.bin');
       setTripUpdates(data.tripUpdates);
@@ -32,14 +33,14 @@ const RealtimePublicTransport: React.FC = () => {
       console.log("[RealtimePublicTransport] Fetched Alerts:", data.alerts);
     } catch (err) {
       console.error("Failed to fetch or parse GTFS-realtime data:", err);
-      setError("Gagal memuat atau mengurai data transportasi publik.");
+      setErrorRealtime("Gagal memuat atau mengurai data transportasi publik real-time.");
     } finally {
-      setIsLoading(false);
+      setIsLoadingRealtime(false);
     }
   };
 
   useEffect(() => {
-    fetchAndParseData();
+    fetchAndParseRealtimeData();
 
     const occupancyStatuses = [
       'EMPTY',
@@ -252,10 +253,10 @@ const RealtimePublicTransport: React.FC = () => {
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Car className="h-4 w-4 mr-2" /> Posisi Kendaraan
         </h3>
-        {isLoading ? (
+        {isLoadingRealtime ? (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat posisi kendaraan...</p>
-        ) : error ? (
-          <p className="text-red-500 text-center py-4">{error}</p>
+        ) : errorRealtime ? (
+          <p className="text-red-500 text-center py-4">{errorRealtime}</p>
         ) : vehiclePositions.length > 0 ? (
           <>
             {displayedVehiclePositions.map(vp => (
@@ -304,10 +305,10 @@ const RealtimePublicTransport: React.FC = () => {
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Clock className="h-4 w-4 mr-2" /> Pembaruan Perjalanan
         </h3>
-        {isLoading ? (
+        {isLoadingRealtime ? (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat pembaruan perjalanan...</p>
-        ) : error ? (
-          <p className="text-red-500 text-center py-4">{error}</p>
+        ) : errorRealtime ? (
+          <p className="text-red-500 text-center py-4">{errorRealtime}</p>
         ) : tripUpdates.length > 0 ? (
           <>
             {displayedTripUpdates.map(update => (
@@ -354,27 +355,29 @@ const RealtimePublicTransport: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada pembaruan perjalanan yang tersedia.</p>
         )}
 
-        {/* New section for Transitland Public Transport Routes */}
+        {/* New section for Local GTFS Public Transport Routes */}
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center mt-6">
-          <Route className="h-4 w-4 mr-2" /> Rute Transportasi Publik (Transitland)
+          <Route className="h-4 w-4 mr-2" /> Rute Transportasi Publik (Lokal GTFS)
         </h3>
-        {isLoadingRoutes ? (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat rute transportasi publik...</p>
-        ) : routesError ? (
-          <p className="text-red-500 text-center py-4">Gagal memuat rute: {routesError.message}</p>
+        {isLoadingGtfs ? (
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat rute transportasi publik lokal...</p>
+        ) : gtfsError ? (
+          <p className="text-red-500 text-center py-4">Gagal memuat rute lokal: {gtfsError.message}</p>
         ) : transitlandRoutes && transitlandRoutes.length > 0 ? (
           <div className="space-y-3">
             {transitlandRoutes.slice(0, 5).map(route => ( // Display first 5 routes
-              <div key={route.onestop_id} className="border-b last:border-b-0 pb-2 last:pb-0">
+              <div key={route.route_id} className="border-b last:border-b-0 pb-2 last:pb-0">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
-                    {getRouteTypeIcon(undefined, route.route_type)}
-                    {route.route_short_name ? `${route.route_short_name} - ` : ''}{route.route_long_name || route.route_name || 'N/A'}
+                    {getRouteTypeIcon(route.route_id, route.route_type)}
+                    {route.route_short_name ? `${route.route_short_name} - ` : ''}{route.route_long_name || route.route_short_name || 'N/A'}
                   </h4>
-                  <Badge variant="outline" className="text-xs capitalize">{route.vehicle_type || 'N/A'}</Badge>
+                  <Badge variant="outline" className="text-xs capitalize">
+                    {route.route_type === 0 ? 'Tram' : route.route_type === 1 ? 'Subway' : route.route_type === 3 ? 'Bus' : 'Lainnya'}
+                  </Badge>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-1">
-                  {route.description || `Operator: ${route.operator_name || 'N/A'}`}
+                  {route.route_desc || `Operator: ${gtfsData?.agencies.find(a => a.agency_id === route.agency_id)?.agency_name || 'N/A'}`}
                 </p>
               </div>
             ))}
@@ -387,7 +390,7 @@ const RealtimePublicTransport: React.FC = () => {
             )}
           </div>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada rute transportasi publik yang tersedia dari Transitland.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada rute transportasi publik yang tersedia dari data GTFS lokal.</p>
         )}
       </CardContent>
     </Card>
