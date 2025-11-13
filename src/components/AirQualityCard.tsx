@@ -83,9 +83,8 @@ const AirQualityCard: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
           <p>Tidak ada data kualitas udara yang dapat dimuat saat ini.</p>
-        </p>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
     );
   }
 
