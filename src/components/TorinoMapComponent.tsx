@@ -105,6 +105,22 @@ const TorinoMapComponent: React.FC = () => {
       subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
       // Removed direct addTo(mapRef.current) for subway stations, now controlled by updateSubwayStationsVisibility
 
+      // Get TomTom API Key from environment variables
+      const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+      let tomtomTrafficFlowLayer: L.TileLayer | null = null;
+
+      if (tomtomApiKey) {
+        tomtomTrafficFlowLayer = L.tileLayer(
+          `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
+          {
+            attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
+            maxZoom: 19,
+            opacity: 0.7, // Make it slightly transparent to see base map
+          }
+        );
+      } else {
+        toast.warning("Kunci API TomTom tidak ditemukan. Lapisan lalu lintas TomTom tidak akan tersedia.");
+      }
 
       // Add Geocoder control
       L.Control.geocoder({
@@ -146,10 +162,15 @@ const TorinoMapComponent: React.FC = () => {
         "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
         "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
       };
-      const overlayLayers = {
+      const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
         "Subway Stations": subwayStationsLayerGroupRef.current // Add subway stations to overlay control
       };
+
+      if (tomtomTrafficFlowLayer) {
+        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayer;
+      }
+
       L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
 
       // Reset view control
