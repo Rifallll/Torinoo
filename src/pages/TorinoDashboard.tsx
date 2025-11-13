@@ -28,6 +28,11 @@ const TorinoDashboard = () => {
   const [isTrafficAnalysisModalOpen, setIsTrafficAnalysisModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
+  // State for filters
+  const [timeFilter, setTimeFilter] = useState<string>('all');
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
+  const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
+
   // Dummy data for quick actions and statistics
   const dummyStats = {
     totalIncidents: 124,
@@ -139,11 +144,18 @@ const TorinoDashboard = () => {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Torino Traffic Map</CardTitle>
                   <div className="flex space-x-2">
-                    <FilterDropdowns />
+                    <FilterDropdowns
+                      timeFilter={timeFilter}
+                      setTimeFilter={setTimeFilter}
+                      vehicleTypeFilter={vehicleTypeFilter}
+                      setVehicleTypeFilter={setVehicleTypeFilter}
+                      roadConditionFilter={roadConditionFilter}
+                      setRoadConditionFilter={setRoadConditionFilter}
+                    />
                   </div>
                 </CardHeader>
                 <CardContent className="h-[500px] p-0">
-                  <TorinoMapComponent />
+                  <TorinoMapComponent selectedVehicleType={vehicleTypeFilter} />
                 </CardContent>
               </Card>
               <TrafficSpeedDistributionChart />

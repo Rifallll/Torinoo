@@ -6,11 +6,23 @@ import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import { toast } from 'sonner';
 
-const FilterDropdowns: React.FC = () => {
-  const [timeFilter, setTimeFilter] = useState<string>('all');
-  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
-  const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
+interface FilterDropdownsProps {
+  timeFilter: string;
+  setTimeFilter: (filter: string) => void;
+  vehicleTypeFilter: string;
+  setVehicleTypeFilter: (filter: string) => void;
+  roadConditionFilter: string;
+  setRoadConditionFilter: (filter: string) => void;
+}
 
+const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
+  timeFilter,
+  setTimeFilter,
+  vehicleTypeFilter,
+  setVehicleTypeFilter,
+  roadConditionFilter,
+  setRoadConditionFilter,
+}) => {
   const applyFilter = (filterName: string, value: string) => {
     let message = `Filter '${filterName}' applied: ${value}`;
     toast.info(message);
@@ -49,6 +61,8 @@ const FilterDropdowns: React.FC = () => {
           <DropdownMenuItem onClick={() => { setVehicleTypeFilter('motorcycle'); applyFilter('Vehicle Type', 'Motorcycle'); }}>Motorcycle</DropdownMenuItem>
           <DropdownMenuItem onClick={() => { setVehicleTypeFilter('bus'); applyFilter('Vehicle Type', 'Bus'); }}>Bus</DropdownMenuItem>
           <DropdownMenuItem onClick={() => { setVehicleTypeFilter('truck'); applyFilter('Vehicle Type', 'Truck'); }}>Truck</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('tram'); applyFilter('Vehicle Type', 'Tram'); }}>Tram</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => { setVehicleTypeFilter('subway'); applyFilter('Vehicle Type', 'Subway'); }}>Subway</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
