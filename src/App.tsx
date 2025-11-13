@@ -21,11 +21,10 @@ const AboutTorinoPage = React.lazy(() => import("./pages/AboutTorinoPage"));
 const CultureTourismPage = React.lazy(() => import("./pages/CultureTourismPage"));
 const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollaborationPage"));
 const WeatherPage = React.lazy(() => import("./pages/WeatherPage"));
-const AirQualityPage = React.lazy(() => import("./pages/AirQualityPage")); // New: Import AirQualityPage
 const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage"));
 const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage"));
-const AllGtfsRoutesPage = React.lazy(() => import("./pages/AllGtfsRoutesPage"));
-const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
+const AllGtfsRoutesPage = React.lazy(() => import("./pages/AllGtfsRoutesPage")); // New: Import AllGtfsRoutesPage
+const SettingsPage = React.lazy(() => import("./pages/SettingsPage")); // New: Import SettingsPage
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -54,11 +53,10 @@ const App = () => (
                     <Route path="/culture-tourism" element={<CultureTourismPage />} />
                     <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
                     <Route path="/weather" element={<WeatherPage />} />
-                    <Route path="/air-quality" element={<AirQualityPage />} /> {/* New route for AirQualityPage */}
                     <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
                     <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} />
-                    <Route path="/all-gtfs-routes" element={<AllGtfsRoutesPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/all-gtfs-routes" element={<AllGtfsRoutesPage />} /> {/* New route for AllGtfsRoutesPage */}
+                    <Route path="/settings" element={<SettingsPage />} /> {/* New route for SettingsPage */}
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

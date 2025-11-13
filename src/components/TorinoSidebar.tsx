@@ -4,11 +4,12 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route, Leaf
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { MadeWithDyad } from './made-with-dyad';
+import { MadeWithDyad } from './made-with-dyad'; // Import MadeWithDyad component
+// import TomTomLayerToggle from './TomTomLayerToggle'; // Removed: Toggle is now on SettingsPage
 
 interface TorinoSidebarProps {
   isSidebarOpen: boolean;
@@ -41,12 +42,11 @@ const navItems: NavItemConfig[] = [
       { label: "Reports", path: "/reports", icon: BarChart2 },
       { label: "All Vehicle Positions", path: "/all-vehicle-positions", icon: Car },
       { label: "All Trip Updates", path: "/all-trip-updates", icon: Clock },
-      { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route },
+      { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route }, // New: All GTFS Routes
     ],
   },
   { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
   { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun },
-  { label: "Torino Air Quality", path: "/air-quality", icon: Leaf }, // New: Air Quality Page
   { label: "News Portal", path: "/news", icon: Newspaper },
   {
     label: "City Info",
@@ -63,7 +63,7 @@ const navItems: NavItemConfig[] = [
     icon: User,
     isCategory: true,
     subItems: [
-      { label: "Settings", path: "/settings", icon: Settings },
+      { label: "Settings", path: "/settings", icon: Settings }, // Changed to direct link to SettingsPage
       { label: "Log out", path: "#logout", icon: LogOut, onClick: () => toast.info("Logout function not yet implemented.") },
     ],
   },
@@ -180,6 +180,11 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
           <NavItem key={index} item={item} />
         ))}
       </nav>
+
+      {/* Removed: TomTomLayerToggle is now on SettingsPage */}
+      {/* <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+        <TomTomLayerToggle />
+      </div> */}
 
       <div className="mt-auto">
         <MadeWithDyad />
