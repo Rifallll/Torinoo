@@ -37,7 +37,6 @@ import {
   Lightbulb,
   Quote,
   Image as ImageIcon,
-  Camera, // Import Camera icon
 } from "lucide-react";
 
 // Define searchable items
@@ -56,7 +55,6 @@ const searchableItems = [
       { label: "Culture, Cuisine & Tourism", value: "culture cuisine tourism", path: "/culture-tourism", icon: Palette },
       { label: "Contact & Collaboration", value: "contact collaboration", path: "/contact-collaboration", icon: Mail },
       { label: "Torino Weather Forecast", value: "torino weather forecast", path: "/weather", icon: CloudSun },
-      { label: "Traffic Camera Feeds", value: "traffic camera feeds", path: "/torino-dashboard#traffic-camera-feeds", icon: Camera }, // New entry
     ],
   },
   {

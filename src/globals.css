@@ -99,24 +99,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* Custom CSS for subway station icon */
-.custom-subway-icon {
-  background-color: transparent !important; /* Ensure no default background */
-  border: none !important; /* Remove any default border */
-}
-
-.custom-subway-icon div {
-  /* These styles are already inline, but adding here for reference/override */
-  background-color: #DC143C; /* Crimson red */
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: add a subtle shadow */
-}

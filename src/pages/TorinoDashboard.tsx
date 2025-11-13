@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge, Camera } from 'lucide-react';
+import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,10 +17,8 @@ import ExportModal from '@/components/modals/ExportModal';
 import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
-import RealtimePublicTransport from '@/components/RealtimePublicTransport';
+import RealtimePublicTransport from '@/components/RealtimePublicTransport'; // Import the new component
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
-import TopDelayedTrips from '@/components/TopDelayedTrips';
-import TrafficCameraFeed from '@/components/TrafficCameraFeed'; // Import the new component
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const TorinoDashboard = () => {
@@ -152,8 +150,9 @@ const TorinoDashboard = () => {
 
             <div className="space-y-6">
               <WeatherCard />
-              <RealtimePublicTransport />
-              <TopDelayedTrips />
+              <RealtimePublicTransport /> {/* Replaced ActiveIncidentsSummary with this */}
+              {/* Removed SensorStatusOverviewCard */}
+              {/* Removed TrafficCongestionCard */}
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
@@ -280,11 +279,6 @@ const TorinoDashboard = () => {
           {/* New section for Recent News */}
           <div className="mt-6">
             <RecentNewsSection />
-          </div>
-
-          {/* New section for Traffic Camera Feeds */}
-          <div className="mt-6">
-            <TrafficCameraFeed />
           </div>
         </main>
       </div>

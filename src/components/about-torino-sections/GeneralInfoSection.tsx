@@ -19,7 +19,7 @@ const generalInfo = [
   { label: "Postal Codes", value: "10100–10156" },
   { label: "Vehicle Code", value: "TO" },
   { label: "Official Language", value: "Italian" },
-  { label: "City Nicknames", value: "“La Città dell’Automobile” (The Automotive City), “La Capitale Sabauda” (The Savoy Capital)”" },
+  { label: "City Nicknames", value: "“La Città dell’Automobile” (The Automotive City), “La Capitale Sabauda” (The Savoy Capital)" },
 ];
 
 interface GeneralInfoSectionProps {
