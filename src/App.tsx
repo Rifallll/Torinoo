@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster"; // Ini untuk shadcn/ui toast (useToast)
+import { Toaster as SonnerToaster } from "sonner"; // Ini untuk sonner toast
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -21,7 +21,7 @@ const CultureTourismPage = React.lazy(() => import("./pages/CultureTourismPage")
 const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollaborationPage"));
 const WeatherPage = React.lazy(() => import("./pages/WeatherPage"));
 const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage"));
-const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage")); // New: Import AllTripUpdatesPage
+const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -30,8 +30,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TrafficDataProvider>
       <>
-        <Toaster />
-        <Sonner />
+        <Toaster /> {/* Toaster untuk shadcn/ui useToast */}
+        <SonnerToaster /> {/* Toaster untuk sonner */}
         <TooltipProvider>
           <div>
             <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -50,7 +50,7 @@ const App = () => (
                   <Route path="/contact-collaboration" element={<ContactCollaborationPage />} />
                   <Route path="/weather" element={<WeatherPage />} />
                   <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
-                  <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} /> {/* New route */}
+                  <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
