@@ -169,7 +169,7 @@ const mockVehiclePositions: ParsedVehiclePosition[] = [
     current_stop_sequence: 6,
     stop_id: 'S011',
     current_status: 'STOPPED_AT_STATION',
-    timestamp: Math.floor(Date.now() / 1000),
+        timestamp: Math.floor(Date.now() / 1000),
     congestion_level: 'STOP_AND_GO',
     occupancy_status: 'STANDING_ROOM_ONLY',
   },
@@ -184,17 +184,18 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public. Menggunakan data tiruan.`);
       if (type === 'trip_update') return mockTripUpdates;
       if (type === 'alert') return mockAlerts;
-      if (type === 'vehicle_position') return mockVehiclePositions; // Return mock for vehicle positions too
+      if (type === 'vehicle_position') return mockVehiclePositions;
       return [];
     }
     const buffer = await response.arrayBuffer();
     
+    // Explicitly check for empty buffer before decoding
     if (buffer.byteLength === 0) {
       console.warn(`Fetched ${type}.bin from ${path} but it was empty. Returning mock data.`);
       toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai. Menggunakan data tiruan.`);
       if (type === 'trip_update') return mockTripUpdates;
       if (type === 'alert') return mockAlerts;
-      if (type === 'vehicle_position') return mockVehiclePositions; // Return mock for vehicle positions too
+      if (type === 'vehicle_position') return mockVehiclePositions;
       return [];
     }
 
@@ -247,7 +248,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar. Menggunakan data tiruan.`);
     if (type === 'trip_update') return mockTripUpdates;
     if (type === 'alert') return mockAlerts;
-    if (type === 'vehicle_position') return mockVehiclePositions; // Return mock for vehicle positions too
+    if (type === 'vehicle_position') return mockVehiclePositions;
     return [];
   }
 };
