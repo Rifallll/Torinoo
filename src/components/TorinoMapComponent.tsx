@@ -24,11 +24,15 @@ const TorinoMapComponent: React.FC = () => {
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
+  const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
   const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
+
+  // Define approximate bounding box for Torino (South-West, North-East)
+  const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
 
   // Dummy data for subway stations (using original EPSG:3003 coordinates)
   const subwayStationsData = [
@@ -88,6 +92,27 @@ const TorinoMapComponent: React.FC = () => {
       }
     };
 
+    // Function to manage TomTom Traffic Flow layer visibility based on map bounds
+    const updateTomTomTrafficVisibility = () => {
+      if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
+
+      const currentMapBounds = mapRef.current.getBounds();
+      const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
+      const isWithinTorino = currentMapBounds.intersects(torinoBounds);
+
+      if (isWithinTorino) {
+        if (!isTomTomLayerActive) {
+          tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
+          toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
+        }
+      } else {
+        if (isTomTomLayerActive) {
+          mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
+          toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino).");
+        }
+      }
+    };
+
 
     if (!mapRef.current) {
       // Initialize map with preferCanvas: true for better performance with complex vector data
@@ -100,17 +125,15 @@ const TorinoMapComponent: React.FC = () => {
       });
       osmLayer.addTo(mapRef.current);
 
-      // Initialize GeoJSON Layer Group
+      // Initialize Layer Groups
       geoJsonLayerGroupRef.current = L.layerGroup();
-      subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
-      // Removed direct addTo(mapRef.current) for subway stations, now controlled by updateSubwayStationsVisibility
+      subwayStationsLayerGroupRef.current = L.layerGroup();
 
       // Get TomTom API Key from environment variables
       const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
-      let tomtomTrafficFlowLayer: L.TileLayer | null = null;
-
+      
       if (tomtomApiKey) {
-        tomtomTrafficFlowLayer = L.tileLayer(
+        tomtomTrafficFlowLayerRef.current = L.tileLayer(
           `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
           {
             attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
@@ -164,11 +187,11 @@ const TorinoMapComponent: React.FC = () => {
       };
       const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
-        "Subway Stations": subwayStationsLayerGroupRef.current // Add subway stations to overlay control
+        "Subway Stations": subwayStationsLayerGroupRef.current,
       };
 
-      if (tomtomTrafficFlowLayer) {
-        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayer;
+      if (tomtomTrafficFlowLayerRef.current) {
+        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayerRef.current;
       }
 
       L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
@@ -187,13 +210,16 @@ const TorinoMapComponent: React.FC = () => {
       });
       new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
 
-      // Add event listener for zoom changes
+      // Add event listeners for zoom and move changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
-      mapRef.current.on('zoomend', updateSubwayStationsVisibility); // New: Add listener for subway stations
+      mapRef.current.on('zoomend', updateSubwayStationsVisibility);
+      mapRef.current.on('moveend', updateTomTomTrafficVisibility); // New: Add listener for TomTom traffic
+      mapRef.current.on('zoomend', updateTomTomTrafficVisibility); // New: Add listener for TomTom traffic
 
       // Initial check for visibility
       updateGeoJSONVisibility();
-      updateSubwayStationsVisibility(); // New: Initial check for subway stations
+      updateSubwayStationsVisibility();
+      updateTomTomTrafficVisibility(); // New: Initial check for TomTom traffic
 
       // Add subway stations to the map
       const subwayIcon = L.divIcon({
@@ -340,7 +366,9 @@ const TorinoMapComponent: React.FC = () => {
     return () => {
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
-        mapRef.current.off('zoomend', updateSubwayStationsVisibility); // Clean up listener
+        mapRef.current.off('zoomend', updateSubwayStationsVisibility);
+        mapRef.current.off('moveend', updateTomTomTrafficVisibility); // Clean up listener
+        mapRef.current.off('zoomend', updateTomTomTrafficVisibility); // Clean up listener
         mapRef.current.remove();
         mapRef.current = null;
       }
