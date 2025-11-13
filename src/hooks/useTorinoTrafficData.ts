@@ -38,11 +38,11 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
 
     const lat = 45.0686;
     const lon = 7.6891;
-    const radius = 500; 
-    const zoom = 14; // Zoom level is required for /traffic/flow
+    // Removed radius parameter to simplify the request
+    const zoom = 14; 
 
-    // Corrected URL to use /traffic/flow endpoint
-    const apiUrl = `https://api.geoapify.com/v1/traffic/flow?lat=${lat}&lon=${lon}&radius=${radius}&zoom=${zoom}&apiKey=${GEOAPIFY_API_KEY}`;
+    // Corrected URL to use /traffic/flow endpoint without radius
+    const apiUrl = `https://api.geoapify.com/v1/traffic/flow?lat=${lat}&lon=${lon}&zoom=${zoom}&apiKey=${GEOAPIFY_API_KEY}`;
 
     console.log(`Attempting to fetch real-time traffic flow around Torino using Geoapify...`);
 
@@ -73,8 +73,8 @@ const useTorinoTrafficData = (): UseTorinoTrafficDataResult => {
           });
         });
       } else {
-        console.log("⚠️ No traffic flow data found within 500m radius.");
-        toast.warning("Tidak ada data aliran lalu lintas yang ditemukan dalam radius 500m dari Geoapify.");
+        console.log("⚠️ No traffic flow data found within the specified area.");
+        toast.warning("Tidak ada data aliran lalu lintas yang ditemukan dalam area yang ditentukan dari Geoapify.");
       }
       setData(parsedResults);
       toast.success("Real-time Torino traffic data loaded from Geoapify!");
