@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
+import { convertCoordinates } from '@/utils/coordinateConverter'; // Import the coordinate converter
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -22,10 +23,34 @@ const TorinoMapComponent: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
+  const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
+
+  // Dummy data for subway stations (using original EPSG:3003 coordinates)
+  const subwayStationsData = [
+    { name: "Fermi", x: 1494000, y: 4990000 },
+    { name: "Paradiso", x: 1495000, y: 4990500 },
+    { name: "Marche", x: 1496000, y: 4991000 },
+    { name: "Racconigi", x: 1497000, y: 4991500 },
+    { name: "Bernini", x: 1498000, y: 4992000 },
+    { name: "Principi d'Acaja", x: 1499000, y: 4992500 },
+    { name: "XVIII Dicembre", x: 1500000, y: 4993000 },
+    { name: "Porta Susa", x: 1500500, y: 4993200 },
+    { name: "Vinzaglio", x: 1501000, y: 4993500 },
+    { name: "Re Umberto", x: 1501500, y: 4993800 },
+    { name: "Porta Nuova", x: 1502000, y: 4994000 },
+    { name: "Marconi", x: 1502500, y: 4994300 },
+    { name: "Nizza", x: 1503000, y: 4994600 },
+    { name: "Dante", x: 1503500, y: 4994900 },
+    { name: "Carducci-Molinette", x: 1504000, y: 4995200 },
+    { name: "Spezia", x: 1504500, y: 4995500 },
+    { name: "Lingotto", x: 1505000, y: 4995800 },
+    { name: "Italia 61 - Regione Piemonte", x: 1505500, y: 4996100 },
+    { name: "Bengasi", x: 1506000, y: 4996400 },
+  ];
 
   useEffect(() => {
     // Function to update GeoJSON layer visibility based on zoom
@@ -59,6 +84,7 @@ const TorinoMapComponent: React.FC = () => {
 
       // Initialize GeoJSON Layer Group
       geoJsonLayerGroupRef.current = L.layerGroup();
+      subwayStationsLayerGroupRef.current = L.layerGroup(); // Initialize subway stations layer group
 
       // Add Geocoder control
       L.Control.geocoder({
@@ -101,7 +127,8 @@ const TorinoMapComponent: React.FC = () => {
         "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
       };
       const overlayLayers = {
-        "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current // Add the layer group here
+        "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
+        "Subway Stations": subwayStationsLayerGroupRef.current // Add subway stations to overlay control
       };
       L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
 
@@ -124,6 +151,24 @@ const TorinoMapComponent: React.FC = () => {
 
       // Initial check for visibility
       updateGeoJSONVisibility();
+
+      // Add subway stations to the map
+      const subwayIcon = L.divIcon({
+        className: 'custom-subway-icon',
+        html: '<div style="background-color:#8B0000; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:bold;">M</div>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
+      });
+
+      subwayStationsData.forEach(station => {
+        const { latitude, longitude } = convertCoordinates(station.x, station.y);
+        if (latitude !== 0 || longitude !== 0) { // Only add if conversion was successful
+          L.marker([latitude, longitude], { icon: subwayIcon })
+            .bindPopup(`<b>${station.name}</b><br>Subway Station`)
+            .addTo(subwayStationsLayerGroupRef.current!);
+        }
+      });
     }
 
     // Fetch and add GeoJSON data
