@@ -245,7 +245,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     return entities;
   } catch (error) {
     console.error(`Error parsing ${type}.bin from ${path}:`, error);
-    toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar. Menggunakan data tiruan.`);
+    toast.error(`Gagal mengurai data ${type}.bin: File mungkin rusak atau tidak dalam format Protobuf yang benar. Menggunakan data tiruan.`);
     // Always return mock data on any parsing error to prevent app from crashing
     if (type === 'trip_update') return mockTripUpdates;
     if (type === 'alert') return mockAlerts;
