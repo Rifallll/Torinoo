@@ -79,7 +79,7 @@ const navItems: NavItemConfig[] = [
     isCategory: true,
     subItems: [
       { label: "Settings", path: "/settings", icon: Settings },
-      { label: "Log out", path: "#logout", icon: LogOut, onClick: () => toast.info("Logout function not yet implemented.") },
+      // { label: "Log out", path: "#logout", icon: LogOut, onClick: () => toast.info("Logout function not yet implemented.") }, // Removed
     ],
   },
 ];
