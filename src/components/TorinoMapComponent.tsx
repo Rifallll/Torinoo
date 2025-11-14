@@ -282,7 +282,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
           {
             attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
             maxZoom: 19,
-            opacity: 0.7, // Make it slightly transparent to see base map
+            opacity: 1.0, // Mengubah opasitas menjadi 1.0
           }
         );
       } else {
