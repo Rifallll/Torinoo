@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-// Menghapus import fetchWeatherApi dari 'openmeteo'
 
 // Mendefinisikan ulang antarmuka agar sesuai dengan respons JSON langsung dari Open-Meteo API
 interface OpenMeteoCurrentData {

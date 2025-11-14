@@ -175,7 +175,7 @@ const DetailedWeatherPage: React.FC = () => {
     precipitation: data.daily.precipitation_sum[index],
     windSpeedMax: data.daily.windspeed_10m_max[index],
     uvIndexMax: data.daily.uv_index_max[index],
-    humidityMean: data.daily.relativehumidity_2m_mean[index],
+    // humidityMean: data.daily.relativehumidity_2m_mean[index], // Dihapus
   }));
 
   return (
