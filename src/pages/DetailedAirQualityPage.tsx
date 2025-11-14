@@ -122,7 +122,7 @@ const DetailedAirQualityPage: React.FC = () => {
     );
   }
 
-  if (!data || data.aqi === undefined) { // FIX 14: This check is now robust
+  if (!data || data.aqi === undefined) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
         <header className="flex items-center justify-between mb-6">
@@ -154,9 +154,10 @@ const DetailedAirQualityPage: React.FC = () => {
     );
   }
 
-  const aqi = data!.aqi; // FIX 15: Use non-null assertion
-  const dominantPollutant = data!.dominant_pollutant?.toUpperCase() || 'N/A'; // FIX 16: Use non-null assertion
+  const aqi = data!.aqi;
+  const dominantPollutant = data!.dominant_pollutant?.toUpperCase() || 'N/A';
   const aqiDescription = getAqiDescription(aqi);
+  const healthRecommendation = getHealthRecommendation(aqi); // FIX: Define healthRecommendation
 
   // Dummy data for historical trend (replace with actual API data if available)
   const historicalData = [
@@ -191,7 +192,7 @@ const DetailedAirQualityPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Leaf className="h-5 w-5 mr-2 text-green-600" />
-              Kualitas Udara Terkini di {data!.city.name} {/* FIX 17: Use non-null assertion and .name */}
+              Kualitas Udara Terkini di {data!.city.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
@@ -205,7 +206,7 @@ const DetailedAirQualityPage: React.FC = () => {
               <p className="text-base">{healthRecommendation}</p>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data!.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })} {/* FIX 18: Use non-null assertion */}
+              *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data!.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })}
             </p>
           </CardContent>
         </Card>
@@ -219,10 +220,10 @@ const DetailedAirQualityPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(data!.iaqi || {}).map(([pollutant, valueObj]) => ( {/* FIX 19: Use non-null assertion */}
+            {Object.entries(data!.iaqi || {}).map(([pollutant, valueObj]) => (
               <div key={pollutant} className="flex items-center justify-between p-3 border rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                 <span className="font-medium text-gray-800 dark:text-gray-100">{pollutant.toUpperCase()}:</span>
-                <Badge variant="secondary" className="text-base">{getPollutantValue(data!.iaqi, pollutant)}</Badge> {/* FIX 20: Use non-null assertion */}
+                <Badge variant="secondary" className="text-base">{getPollutantValue(data!.iaqi, pollutant)}</Badge>
               </div>
             ))}
           </CardContent>
