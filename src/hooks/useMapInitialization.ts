@@ -38,7 +38,8 @@ export const useMapInitialization = ({ mapContainerId, center, zoom }: MapInitia
 
     const map = L.map(mapContainerId, { preferCanvas: true }).setView(center, zoom);
     mapRef.current = map;
-    
+    setMapInstance(map); // Set mapInstance immediately here
+
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -55,12 +56,6 @@ export const useMapInitialization = ({ mapContainerId, center, zoom }: MapInitia
       subwayStationsLayerGroup,
       gtfsRoutesLayerGroup,
     };
-
-    // Set mapInstance ONLY after the map is fully loaded and its internal structures are ready
-    map.whenReady(() => {
-      setMapInstance(map);
-      // Now, all layer groups are already on the map.
-    });
 
     return () => {
       if (mapRef.current) {

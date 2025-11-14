@@ -26,27 +26,6 @@ export const useGeoJsonLayer = ({
     if (!map || !geoJsonLayerGroup) return;
 
     const setupGeoJsonLayer = async () => {
-      // Explicitly check if the map is loaded
-      // @ts-ignore - _loaded is an internal Leaflet property
-      if (!map._loaded) {
-        console.warn("Map not fully loaded for GeoJSON layer, deferring creation.");
-        setTimeout(setupGeoJsonLayer, 100); // Retry after a short delay
-        return;
-      }
-
-      // Defensive check: Ensure map panes are ready before adding markers
-      // This specifically targets the "appendChild" error on _initIcon
-      // @ts-ignore - _panes is an internal Leaflet property
-      if (!map._panes || !map._panes.markerPane) {
-        console.warn("Map panes not ready for GeoJSON markers, deferring creation.");
-        // Clear layers to prevent partial rendering if this happens mid-update
-        geoJsonLayerGroup.clearLayers();
-        // Re-schedule this function call to run after a short delay
-        // This gives Leaflet's internal DOM setup more time.
-        setTimeout(setupGeoJsonLayer, 50); 
-        return;
-      }
-
       // The layer group is now assumed to be already on the map from useMapInitialization.
       // No need for geoJsonLayerGroup.addTo(map) here.
 

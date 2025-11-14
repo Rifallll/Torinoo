@@ -28,24 +28,6 @@ export const useSubwayStationsLayer = ({
     if (!map || !subwayStationsLayerGroup) return;
 
     const setupSubwayStationsLayer = () => {
-      // Explicitly check if the map is loaded
-      // @ts-ignore - _loaded is an internal Leaflet property
-      if (!map._loaded) {
-        console.warn("Map not fully loaded for Subway Stations layer, deferring creation.");
-        setTimeout(setupSubwayStationsLayer, 100); // Retry after a short delay
-        return;
-      }
-
-      // Defensive check: Ensure map panes are ready before adding markers
-      // @ts-ignore - _panes is an internal Leaflet property
-      if (!map._panes || !map._panes.markerPane) {
-        console.warn("Map panes not ready for Subway markers, deferring creation.");
-        subwayStationsLayerGroup.clearLayers();
-        // Re-schedule this function call to run after a short delay
-        setTimeout(setupSubwayStationsLayer, 50);
-        return;
-      }
-
       // The layer group is now assumed to be already on the map from useMapInitialization.
       // No need for subwayStationsLayerGroup.addTo(map) here.
 

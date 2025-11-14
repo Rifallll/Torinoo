@@ -27,14 +27,6 @@ export const useGtfsRoutesLayer = ({
     }
 
     const setupGtfsRoutesLayer = () => {
-      // Explicitly check if the map is loaded
-      // @ts-ignore - _loaded is an internal Leaflet property
-      if (!map._loaded) {
-        console.warn("Map not fully loaded for GTFS Routes layer, deferring creation.");
-        setTimeout(setupGtfsRoutesLayer, 100); // Retry after a short delay
-        return;
-      }
-
       // The layer group is now assumed to be already on the map from useMapInitialization.
       // No need for gtfsRoutesLayerGroup.addTo(map) here.
 
