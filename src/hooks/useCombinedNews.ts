@@ -49,11 +49,13 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
   }
 
   const params = new URLSearchParams({
-    q: query,
+    q: query, // Menggunakan query pengguna
     language: language,
     sortBy: 'publishedAt',
     pageSize: '100',
     apiKey: apiKey,
+    // Menambahkan domain spesifik untuk mempersempit cakupan pencarian
+    domains: 'repubblica.it,corriere.it,lastampa.it,ansa.it,ilsole24ore.com',
   });
 
   const url = `https://newsapi.org/v2/everything?${params.toString()}`;
@@ -63,7 +65,8 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     if (!response.ok) {
       const errorData = await response.json();
       console.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`);
-      toast.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`);
+      // Menyederhanakan pesan error untuk pengguna
+      toast.error(`Gagal mengambil berita dari NewsAPI. Coba lagi nanti.`);
       return [];
     }
 
@@ -71,7 +74,7 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     return result.articles;
   } catch (error) {
     console.error("Error fetching from NewsAPI:", error);
-    toast.error(`Terjadi kesalahan saat mengambil berita dari NewsAPI: ${error instanceof Error ? error.message : String(error)}`);
+    toast.error(`Terjadi kesalahan saat mengambil berita dari NewsAPI. Coba lagi nanti.`);
     return [];
   }
 };
@@ -84,7 +87,7 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
   }
 
   const params = new URLSearchParams({
-    q: query,
+    q: query, // Menggunakan query pengguna
     lang: language,
     max: '100',
     token: apiKey,
@@ -97,7 +100,8 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
     if (!response.ok) {
       const errorData = await response.json();
       console.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`);
-      toast.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`);
+      // Menyederhanakan pesan error untuk pengguna
+      toast.error(`Gagal mengambil berita dari GNews.io. Coba lagi nanti.`);
       return [];
     }
 
@@ -117,7 +121,7 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
     }));
   } catch (error) {
     console.error("Error fetching from GNews.io:", error);
-    toast.error(`Terjadi kesalahan saat mengambil berita dari GNews.io: ${error instanceof Error ? error.message : String(error)}`);
+    toast.error(`Terjadi kesalahan saat mengambil berita dari GNews.io. Coba lagi nanti.`);
     return [];
   }
 };
