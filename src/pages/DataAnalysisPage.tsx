@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import ProjectPlanningSection from '@/components/ProjectPlanningSection';
+import TrafficChangesInsights from '@/components/TrafficChangesInsights'; // Import the new component
 import { useTrafficData } from '@/contexts/TrafficDataContext'; // Import the new hook
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 
@@ -310,6 +311,14 @@ const DataAnalysisPage = () => {
             <Target className="h-6 w-6 mr-2 text-indigo-600" /> Ikhtisar Perencanaan Proyek
           </h2>
           <ProjectPlanningSection id="project-planning-overview" />
+        </div>
+
+        {/* New section for Traffic Changes Insights */}
+        <div className="lg:col-span-2 mt-6">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+            <AlertTriangle className="h-6 w-6 mr-2 text-red-600" /> Wawasan & Prediksi Perubahan Lalu Lintas
+          </h2>
+          <TrafficChangesInsights id="traffic-changes-insights" />
         </div>
       </main>
     </div>
