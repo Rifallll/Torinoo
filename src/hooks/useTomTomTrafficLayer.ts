@@ -18,8 +18,9 @@ export const useTomTomTrafficLayer = ({
   torinoBounds,
 }: UseTomTomTrafficLayerProps) => {
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null);
+  const isLayerAddedToMapRef = useRef(false); // Track if the layer has been added to the map at least once
 
-  // Effect 1: Initialize or destroy TomTom layer based on API key and map presence
+  // Effect 1: Initialize TomTom layer and add it to map once
   useEffect(() => {
     if (!map) return;
 
@@ -29,64 +30,74 @@ export const useTomTomTrafficLayer = ({
         {
           attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
           maxZoom: 19,
-          opacity: 0.7,
+          opacity: 0, // Start with 0 opacity (hidden)
         }
       );
+      // Add the layer to the map immediately, but keep it hidden
+      tomtomTrafficFlowLayerRef.current.addTo(map);
+      isLayerAddedToMapRef.current = true;
+      console.log("TomTom Traffic Flow layer initialized and added to map (hidden).");
     } else if (!tomtomApiKey && tomtomTrafficFlowLayerRef.current) {
+      // If API key is removed, clean up the layer
       if (map.hasLayer(tomtomTrafficFlowLayerRef.current)) {
         map.removeLayer(tomtomTrafficFlowLayerRef.current);
       }
       tomtomTrafficFlowLayerRef.current = null;
+      isLayerAddedToMapRef.current = false;
       toast.warning("Kunci API TomTom tidak ditemukan. Lapisan lalu lintas TomTom tidak akan tersedia.");
     }
-  }, [map, tomtomApiKey]);
 
-  // Effect 2: Manage TomTom Traffic Flow layer visibility based on map bounds and toggle state
+    // Cleanup for this effect: remove layer if component unmounts or API key changes to null
+    return () => {
+      if (map && tomtomTrafficFlowLayerRef.current && isLayerAddedToMapRef.current) {
+        map.removeLayer(tomtomTrafficFlowLayerRef.current);
+        tomtomTrafficFlowLayerRef.current = null;
+        isLayerAddedToMapRef.current = false;
+      }
+    };
+  }, [map, tomtomApiKey]); // Only re-run if map or API key changes
+
+  // Effect 2: Manage TomTom Traffic Flow layer visibility (opacity)
   useEffect(() => {
-    if (!map) return;
+    if (!map || !tomtomTrafficFlowLayerRef.current || !isLayerAddedToMapRef.current) {
+      return;
+    }
 
     const currentLayer = tomtomTrafficFlowLayerRef.current;
 
     const updateTomTomTrafficVisibility = () => {
-      // Crucial check: Ensure the layer instance exists AND map is fully loaded
       // @ts-ignore - _loaded is an internal Leaflet property, but useful here
       if (!map || !currentLayer || !map._loaded) {
         return;
       }
 
       const currentMapBounds = map.getBounds();
-      const isTomTomLayerActive = map.hasLayer(currentLayer);
       const isWithinTorino = L.latLngBounds(torinoBounds).intersects(currentMapBounds);
 
       if (isTomTomLayerEnabled && isWithinTorino) {
-        if (!isTomTomLayerActive) {
-          currentLayer.addTo(map);
-          toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
-        }
+        currentLayer.setOpacity(0.7); // Make visible
+        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
       } else {
-        if (isTomTomLayerActive) {
-          map.removeLayer(currentLayer);
-          toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
-        }
+        currentLayer.setOpacity(0); // Hide
+        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
       }
     };
 
     // Attach listeners
     map.on('moveend', updateTomTomTrafficVisibility);
     map.on('zoomend', updateTomTomTrafficVisibility);
-    // Only run initial visibility check AFTER the map has fully loaded
-    map.on('load', updateTomTomTrafficVisibility);
+    map.on('load', updateTomTomTrafficVisibility); // Initial check after map loads
+
+    // Initial visibility update when the component mounts or dependencies change
+    updateTomTomTrafficVisibility();
 
     return () => {
-      // Detach listeners and clean up layer if it exists during unmount/re-run
+      // Detach listeners
       map.off('moveend', updateTomTomTrafficVisibility);
       map.off('zoomend', updateTomTomTrafficVisibility);
-      map.off('load', updateTomTomTrafficVisibility); // Clean up load listener
-      if (currentLayer && map.hasLayer(currentLayer)) {
-        map.removeLayer(currentLayer);
-      }
+      map.off('load', updateTomTomTrafficVisibility);
     };
-  }, [map, isTomTomLayerEnabled, tomtomApiKey, torinoBounds]); // tomtomApiKey is a dependency because currentLayer depends on it.
+  }, [map, isTomTomLayerEnabled, torinoBounds]); // tomtomApiKey is NOT a dependency here, as layer creation is in Effect 1
 
   return tomtomTrafficFlowLayerRef.current;
 };
