@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CloudSun, Thermometer, Wind, Droplet, CloudRain, Sun, Cloud, Snowflake, Zap } from 'lucide-react';
+import { CloudSun, Thermometer, Wind, Droplet, CloudRain, Sun, Cloud, Snowflake, Zap, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWeather } from '@/hooks/useWeather';
 import { useSettings } from '@/contexts/SettingsContext'; // New: Import useSettings
+import { Link } from 'react-router-dom'; // Import Link
 
 const WeatherCard: React.FC = () => {
   const { isWeatherFeatureEnabled } = useSettings(); // New: Get weather feature status
@@ -118,11 +119,14 @@ const WeatherCard: React.FC = () => {
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           {getWeatherIcon(currentConditionCode)}
           <span className="ml-2">Cuaca Terkini di {data.city}</span>
         </CardTitle>
+        <Link to="/detailed-weather" className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center">
+          Lihat Detail <ArrowRight className="ml-1 h-4 w-4" />
+        </Link>
       </CardHeader>
       <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
         <div className="flex items-center justify-between">

@@ -4,7 +4,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route, Leaf
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -42,11 +42,20 @@ const navItems: NavItemConfig[] = [
       { label: "Reports", path: "/reports", icon: BarChart2 },
       { label: "All Vehicle Positions", path: "/all-vehicle-positions", icon: Car },
       { label: "All Trip Updates", path: "/all-trip-updates", icon: Clock },
-      { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route }, // New: All GTFS Routes
+      { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route },
     ],
   },
   { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
-  { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun },
+  {
+    label: "Environment",
+    icon: CloudSun,
+    isCategory: true,
+    subItems: [
+      { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun },
+      { label: "Detailed Weather Forecast", path: "/detailed-weather", icon: CloudSun }, // New
+      { label: "Detailed Air Quality", path: "/detailed-air-quality", icon: Leaf }, // New
+    ],
+  },
   { label: "News Portal", path: "/news", icon: Newspaper },
   {
     label: "City Info",
@@ -63,7 +72,7 @@ const navItems: NavItemConfig[] = [
     icon: User,
     isCategory: true,
     subItems: [
-      { label: "Settings", path: "/settings", icon: Settings }, // Changed to direct link to SettingsPage
+      { label: "Settings", path: "/settings", icon: Settings },
       { label: "Log out", path: "#logout", icon: LogOut, onClick: () => toast.info("Logout function not yet implemented.") },
     ],
   },
