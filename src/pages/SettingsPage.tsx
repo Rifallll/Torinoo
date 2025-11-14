@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Settings, Leaf } from 'lucide-react'; // Import Leaf icon
+import { ArrowLeft, Settings, Leaf, Bike } from 'lucide-react'; // Import Leaf and Bike icons
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TomTomLayerToggle from '@/components/TomTomLayerToggle';
 import WeatherFeatureToggle from '@/components/WeatherFeatureToggle';
-import AirQualityFeatureToggle from '@/components/AirQualityFeatureToggle'; // New: Import AirQualityFeatureToggle
+import AirQualityFeatureToggle from '@/components/AirQualityFeatureToggle';
+import TorinoPathsLayerToggle from '@/components/TorinoPathsLayerToggle'; // New: Import TorinoPathsLayerToggle
 
 const SettingsPage: React.FC = () => {
   return (
@@ -37,6 +38,10 @@ const SettingsPage: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Enable or disable the real-time TomTom traffic layer on the map. Disabling it can save API usage.
             </p>
+            <TorinoPathsLayerToggle /> {/* New: Add the Torino paths layer toggle here */}
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Enable or disable the Torino bicycle and pedestrian paths layer on the map.
+            </p>
           </CardContent>
         </Card>
 
@@ -51,7 +56,7 @@ const SettingsPage: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Enable or disable the weather forecast feature across the application. Disabling it can save API usage.
             </p>
-            <AirQualityFeatureToggle /> {/* New: Add the air quality feature toggle here */}
+            <AirQualityFeatureToggle />
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Enable or disable the air quality feature across the application. Disabling it can save API usage.
             </p>

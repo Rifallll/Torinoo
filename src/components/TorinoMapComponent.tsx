@@ -9,7 +9,7 @@ import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
 import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
 import { TrafficChange } from './TrafficChangesInsights'; // Import TrafficChange interface
-import { TrafficCone } from 'lucide-react'; // Import TrafficCone icon
+import { TrafficCone, Bike } from 'lucide-react'; // Import TrafficCone and Bike icons
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -33,16 +33,18 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
-  const trafficChangesLayerGroupRef = useRef<L.LayerGroup | null>(null); // New: Ref for traffic changes layer group
+  const trafficChangesLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for traffic changes layer group
+  const torinoPathsLayerGroupRef = useRef<L.LayerGroup | null>(null); // New: Ref for Torino paths layer group
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
 
-  const { isTomTomLayerEnabled } = useSettings(); // Use the setting
+  const { isTomTomLayerEnabled, isTorinoPathsLayerEnabled } = useSettings(); // Use the settings
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
   const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
   const minZoomForTrafficChanges = 11; // New: Minimum zoom level for traffic changes to appear
+  const minZoomForTorinoPaths = 12; // New: Minimum zoom level for Torino paths to appear
 
   // Define approximate bounding box for Torino (South-West, North-East)
   const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
@@ -235,6 +237,27 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     }
   };
 
+  // New: Function to update Torino Paths layer visibility based on zoom AND toggle state
+  const updateTorinoPathsVisibility = () => {
+    if (!mapRef.current || !torinoPathsLayerGroupRef.current) return;
+
+    const isTorinoPathsLayerActive = mapRef.current.hasLayer(torinoPathsLayerGroupRef.current);
+
+    if (isTorinoPathsLayerEnabled && mapRef.current.getZoom() >= minZoomForTorinoPaths) {
+      if (!isTorinoPathsLayerActive) {
+        torinoPathsLayerGroupRef.current.addTo(mapRef.current);
+        // TODO: Remove or make less frequent for production
+        toast.info("Torino paths layer enabled.");
+      }
+    } else {
+      if (isTorinoPathsLayerActive) {
+        mapRef.current.removeLayer(torinoPathsLayerGroupRef.current);
+        // TODO: Remove or make less frequent for production
+        toast.info("Torino paths layer disabled (zoom out or toggled off).");
+      }
+    }
+  };
+
   // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
   const updateTomTomTrafficVisibility = () => {
     if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
@@ -285,6 +308,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup();
       trafficChangesLayerGroupRef.current = L.layerGroup(); // New: Initialize traffic changes layer group
+      torinoPathsLayerGroupRef.current = L.layerGroup(); // New: Initialize Torino paths layer group
 
       // Add subway stations to their layer group
       subwayStationsData.forEach(station => {
@@ -365,7 +389,8 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
         "Subway Stations": subwayStationsLayerGroupRef.current,
-        "Traffic Changes": trafficChangesLayerGroupRef.current, // New: Add traffic changes layer to control
+        "Traffic Changes": trafficChangesLayerGroupRef.current, // Add traffic changes layer to control
+        "Torino Paths": torinoPathsLayerGroupRef.current, // New: Add Torino paths layer to control
       };
 
       // Only add TomTom layer to control if it was successfully initialized
@@ -392,14 +417,16 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       // Add event listeners for zoom and move changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
       mapRef.current.on('zoomend', updateSubwayStationsVisibility);
-      mapRef.current.on('zoomend', updateTrafficChangesVisibility); // New: Add listener for traffic changes
+      mapRef.current.on('zoomend', updateTrafficChangesVisibility);
+      mapRef.current.on('zoomend', updateTorinoPathsVisibility); // New: Add listener for Torino paths
       mapRef.current.on('moveend', updateTomTomTrafficVisibility);
       mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
 
       // Initial check for visibility
       updateGeoJSONVisibility();
       updateSubwayStationsVisibility();
-      updateTrafficChangesVisibility(); // New: Initial check for traffic changes visibility
+      updateTrafficChangesVisibility();
+      updateTorinoPathsVisibility(); // New: Initial check for Torino paths visibility
     }
 
     // Fetch and add GeoJSON data
@@ -496,7 +523,8 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
         mapRef.current.off('zoomend', updateSubwayStationsVisibility);
-        mapRef.current.off('zoomend', updateTrafficChangesVisibility); // New: Remove listener
+        mapRef.current.off('zoomend', updateTrafficChangesVisibility);
+        mapRef.current.off('zoomend', updateTorinoPathsVisibility); // New: Remove listener
         mapRef.current.off('moveend', updateTomTomTrafficVisibility);
         mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
         mapRef.current.remove();
@@ -510,6 +538,12 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     console.log("TomTom layer enabled state changed:", isTomTomLayerEnabled);
     updateTomTomTrafficVisibility();
   }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
+
+  // This useEffect specifically handles the Torino Paths layer based on `isTorinoPathsLayerEnabled`
+  useEffect(() => {
+    console.log("Torino Paths layer enabled state changed:", isTorinoPathsLayerEnabled);
+    updateTorinoPathsVisibility();
+  }, [isTorinoPathsLayerEnabled]); // Re-run when the toggle state changes
 
   // New useEffect to handle traffic changes data
   useEffect(() => {
@@ -552,6 +586,93 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
 
     updateTrafficChangesVisibility(); // Update visibility after adding new markers
   }, [trafficChanges]); // Re-run when trafficChanges data changes
+
+  // New useEffect to load and display Torino paths GeoJSON
+  useEffect(() => {
+    const fetchTorinoPathsGeoJSON = async () => {
+      try {
+        const response = await fetch('/torino-paths.geojson');
+        if (!response.ok) {
+          throw new Error(`Failed to load Torino paths GeoJSON: ${response.statusText}`);
+        }
+        const data = await response.json();
+
+        if (mapRef.current && torinoPathsLayerGroupRef.current) {
+          torinoPathsLayerGroupRef.current.clearLayers(); // Clear existing layers
+
+          L.geoJSON(data, {
+            onEachFeature: (feature, layer) => {
+              if (feature.properties) {
+                let popupContent = `<b>${feature.properties.name}</b><br/>`;
+                if (feature.properties.description) {
+                  popupContent += `${feature.properties.description}<br/>`;
+                }
+                if (feature.properties.type) {
+                  popupContent += `Type: ${feature.properties.type.replace(/_/g, ' ').split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`;
+                }
+                layer.bindPopup(popupContent);
+              }
+            },
+            pointToLayer: (feature, latlng) => {
+              // Custom icon for pedestrian areas (points)
+              if (feature.properties?.type === 'pedestrian_area') {
+                return L.marker(latlng, {
+                  icon: L.divIcon({
+                    className: 'pedestrian-area-marker',
+                    html: `<div style="background-color:${feature.properties.color || '#22c55e'}; width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:bold; opacity:0.8;">P</div>`,
+                    iconSize: [25, 25],
+                    iconAnchor: [12, 12]
+                  })
+                });
+              }
+              return L.marker(latlng); // Default marker for other points if any
+            },
+            style: (feature) => {
+              // Custom style for line features (paths)
+              const type = feature?.properties?.type;
+              let color = feature?.properties?.color || '#6b7280'; // Default gray
+              let weight = 3;
+              let dashArray: string | undefined = undefined;
+
+              switch (type) {
+                case 'bicycle_path':
+                  color = '#ef4444'; // Red
+                  weight = 3;
+                  break;
+                case 'mixed_path':
+                  color = '#6366f1'; // Blue
+                  weight = 4;
+                  dashArray = '5, 5'; // Dashed for mixed
+                  break;
+                case 'bicycle_pedestrian_path':
+                  color = '#f97316'; // Orange
+                  weight = 3;
+                  break;
+                case 'pedestrian_area':
+                  color = '#22c55e'; // Green (for polygons if any)
+                  weight = 2;
+                  break;
+              }
+
+              return {
+                color: color,
+                weight: weight,
+                opacity: 0.7,
+                dashArray: dashArray
+              };
+            }
+          }).addTo(torinoPathsLayerGroupRef.current);
+
+          updateTorinoPathsVisibility(); // Update visibility after loading new data
+        }
+      } catch (error) {
+        console.error("Error loading Torino paths GeoJSON data:", error);
+        toast.error(`Failed to load Torino paths data: ${error instanceof Error ? error.message : String(error)}. Ensure 'torino-paths.geojson' file is in the 'public' folder.`);
+      }
+    };
+
+    fetchTorinoPathsGeoJSON();
+  }, []); // Empty dependency array means this runs once on mount
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 });
