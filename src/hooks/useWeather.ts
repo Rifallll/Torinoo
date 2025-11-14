@@ -26,7 +26,7 @@ interface OpenMeteoDailyData {
   precipitation_sum: number[];
   windspeed_10m_max: number[];
   uv_index_max: number[];
-  relativehumidity_2m_mean: number[];
+  // relativehumidity_2m_mean: number[]; // Dihapus karena bukan parameter daily yang valid
 }
 
 // Antarmuka untuk respons API mentah
@@ -67,7 +67,7 @@ interface OpenMeteoParsedData {
     precipitation_sum: number[];
     windspeed_10m_max: number[];
     uv_index_max: number[];
-    relativehumidity_2m_mean: number[];
+    // relativehumidity_2m_mean: number[]; // Dihapus
   };
   city: string;
   country: string;
@@ -82,7 +82,7 @@ const fetchOpenMeteoWeather = async (city: string): Promise<OpenMeteoParsedData>
     longitude: longitude.toString(),
     hourly: "temperature_2m,rain",
     current: "temperature_2m,weathercode,windspeed_10m,relativehumidity_2m",
-    daily: "weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,uv_index_max,relativehumidity_2m_mean",
+    daily: "weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,uv_index_max", // 'relativehumidity_2m_mean' dihapus
     past_days: "0",
     forecast_days: "7",
     timezone: "Europe/Rome", // Secara eksplisit meminta zona waktu untuk konversi waktu yang benar
@@ -118,7 +118,7 @@ const fetchOpenMeteoWeather = async (city: string): Promise<OpenMeteoParsedData>
       precipitation_sum: apiResponse.daily.precipitation_sum,
       windspeed_10m_max: apiResponse.daily.windspeed_10m_max,
       uv_index_max: apiResponse.daily.uv_index_max,
-      relativehumidity_2m_mean: apiResponse.daily.relativehumidity_2m_mean,
+      // relativehumidity_2m_mean: apiResponse.daily.relativehumidity_2m_mean, // Dihapus
     },
     city: "Torino", // Hardcode untuk saat ini
     country: "IT", // Hardcode untuk saat ini
