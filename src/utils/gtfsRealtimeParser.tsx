@@ -2,7 +2,7 @@
 
 import * as protobuf from 'protobufjs';
 import { toast } from 'sonner';
-import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock, AlertTriangle } from 'lucide-react'; // Import AlertTriangle
+import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock, AlertTriangle, TrainFront, CableCar, Ferry, Cable } from 'lucide-react'; // Import AlertTriangle, TrainFront, CableCar, Ferry, Cable
 import React from 'react'; // Import React for JSX icons
 
 // Define interfaces for the parsed data based on the .proto schema
@@ -331,8 +331,28 @@ export const getDelayBadgeClass = (delaySeconds: number | undefined) => {
 };
 
 export const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
-  // Always return a generic AlertTriangle icon for alerts
-  return (<AlertTriangle className="h-4 w-4 mr-1" />);
+  if (routeType !== undefined) {
+    switch (routeType) {
+      case 0: return <TramFront className="h-4 w-4 mr-1" />; // Tram
+      case 1: return <TrainFront className="h-4 w-4 mr-1" />; // Subway
+      case 2: return <TrainFront className="h-4 w-4 mr-1" />; // Rail
+      case 3: return <Bus className="h-4 w-4 mr-1" />; // Bus
+      case 4: return <Ferry className="h-4 w-4 mr-1" />; // Ferry
+      case 5: return <CableCar className="h-4 w-4 mr-1" />; // Cable Car
+      case 6: return <Cable className="h-4 w-4 mr-1" />; // Gondola
+      case 7: return <CableCar className="h-4 w-4 mr-1" />; // Funicular
+      default: return <Info className="h-4 w-4 mr-1" />; // Default for unknown types
+    }
+  }
+
+  // Fallback to routeId heuristics if routeType is not available or is generic
+  if (routeId) {
+    if (routeId.includes('B') || routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
+    if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
+    if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
+  }
+  
+  return <Info className="h-4 w-4 mr-1" />; // Default if no match
 };
 
 export const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
