@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Upload } from 'lucide-react';
 import Papa from 'papaparse';
 import { toast } from 'sonner';
-import { useTrafficData } from '@/contexts/TrafficDataContext'; // Import the new hook
+import { useTrafficData, TrafficDataRow } from '@/contexts/TrafficDataContext'; // Import TrafficDataRow
 
 interface UploadCSVModalProps {
   isOpen: boolean;
@@ -34,6 +34,7 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
       Papa.parse(selectedFile, {
         header: true,
         skipEmptyLines: true,
+        dynamicTyping: true, // Automatically convert numbers, booleans, etc.
         complete: (results) => {
           if (results.errors.length > 0) {
             console.error("CSV parsing errors:", results.errors);
@@ -42,7 +43,8 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
             return;
           }
           
-          const parsedData = results.data as { [key: string]: string | number }[];
+          // Type assertion here, assuming the CSV structure matches TrafficDataRow
+          const parsedData = results.data as TrafficDataRow[]; 
           uploadData(parsedData); // Pass parsed data to context
           toast.success(`File '${selectedFile.name}' berhasil diunggah dan analisis dimulai.`);
           onClose();
