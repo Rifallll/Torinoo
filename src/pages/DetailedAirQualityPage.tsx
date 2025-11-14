@@ -155,8 +155,8 @@ const DetailedAirQualityPage: React.FC = () => {
     );
   }
 
-  const aqi = data!.aqi;
-  const dominantPollutant = data!.dominant_pollutant?.toUpperCase() || 'N/A';
+  const aqi = data.aqi;
+  const dominantPollutant = data.dominant_pollutant?.toUpperCase() || 'N/A';
   const aqiDescription = getAqiDescription(aqi);
   const healthRecommendation = getHealthRecommendation(aqi); // Define healthRecommendation here
 
@@ -193,7 +193,7 @@ const DetailedAirQualityPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Leaf className="h-5 w-5 mr-2 text-green-600" />
-              Kualitas Udara Terkini di {data!.city.name}
+              Kualitas Udara Terkini di {data.city.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
@@ -207,7 +207,7 @@ const DetailedAirQualityPage: React.FC = () => {
               <p className="text-base">{healthRecommendation}</p>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data!.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })}
+              *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })}
             </p>
           </CardContent>
         </Card>
@@ -221,11 +221,11 @@ const DetailedAirQualityPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(data!.iaqi || {}).map(([pollutant, valueObj]) => {
+            {Object.entries(data.iaqi || {}).map(([pollutant, valueObj]) => {
               return (
                 <div key={pollutant} className="flex items-center justify-between p-3 border rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                   <span className="font-medium text-gray-800 dark:text-gray-100">{pollutant.toUpperCase()}:</span>
-                  <Badge variant="secondary" className="text-base">{getPollutantValue(data!.iaqi, pollutant)}</Badge>
+                  <Badge variant="secondary" className="text-base">{getPollutantValue(data.iaqi, pollutant)}</Badge>
                 </div>
               );
             })}

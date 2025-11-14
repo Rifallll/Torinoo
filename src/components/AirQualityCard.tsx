@@ -100,8 +100,8 @@ const AirQualityCard: React.FC = () => {
     );
   }
 
-  const aqi = data!.aqi; // FIX 4: Use non-null assertion
-  const dominantPollutant = data!.dominant_pollutant?.toUpperCase() || 'N/A'; // FIX 5: Use non-null assertion
+  const aqi = data.aqi; // FIX 4: Use non-null assertion
+  const dominantPollutant = data.dominant_pollutant?.toUpperCase() || 'N/A'; // FIX 5: Use non-null assertion
   const aqiDescription = getAqiDescription(aqi);
 
   return (
@@ -109,7 +109,7 @@ const AirQualityCard: React.FC = () => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Leaf className="h-5 w-5 mr-2 text-green-600" />
-          <span className="ml-2">Kualitas Udara di {data!.city.name}</span> {/* FIX 6: Use non-null assertion and .name */}
+          <span className="ml-2">Kualitas Udara di {data.city.name}</span> {/* FIX 6: Use non-null assertion and .name */}
         </CardTitle>
         <Link to="/detailed-air-quality" className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center">
           Lihat Detail <ArrowRight className="ml-1 h-4 w-4" />
@@ -127,32 +127,32 @@ const AirQualityCard: React.FC = () => {
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
             <div className="flex items-center justify-between">
               <span>PM2.5:</span>
-              <Badge variant="secondary">{getPollutantValue(data!.iaqi, 'pm25')}</Badge> {/* FIX 7: Use non-null assertion */}
+              <Badge variant="secondary">{getPollutantValue(data.iaqi, 'pm25')}</Badge> {/* FIX 7: Use non-null assertion */}
             </div>
             <div className="flex items-center justify-between">
               <span>PM10:</span>
-              <Badge variant="secondary">{getPollutantValue(data!.iaqi, 'pm10')}</Badge> {/* FIX 8: Use non-null assertion */}
+              <Badge variant="secondary">{getPollutantValue(data.iaqi, 'pm10')}</Badge> {/* FIX 8: Use non-null assertion */}
             </div>
             <div className="flex items-center justify-between">
               <span>O3:</span>
-              <Badge variant="secondary">{getPollutantValue(data!.iaqi, 'o3')}</Badge> {/* FIX 9: Use non-null assertion */}
+              <Badge variant="secondary">{getPollutantValue(data.iaqi, 'o3')}</Badge> {/* FIX 9: Use non-null assertion */}
             </div>
             <div className="flex items-center justify-between">
               <span>NO2:</span>
-              <Badge variant="secondary">{getPollutantValue(data!.iaqi, 'no2')}</Badge> {/* FIX 10: Use non-null assertion */}
+              <Badge variant="secondary">{getPollutantValue(data.iaqi, 'no2')}</Badge> {/* FIX 10: Use non-null assertion */}
             </div>
             <div className="flex items-center justify-between">
               <span>SO2:</span>
-              <Badge variant="secondary">{getPollutantValue(data!.iaqi, 'so2')}</Badge> {/* FIX 11: Use non-null assertion */}
+              <Badge variant="secondary">{getPollutantValue(data.iaqi, 'so2')}</Badge> {/* FIX 11: Use non-null assertion */}
             </div>
             <div className="flex items-center justify-between">
               <span>CO:</span>
-              <Badge variant="secondary">{getPollutantValue(data!.iaqi, 'co')}</Badge> {/* FIX 12: Use non-null assertion */}
+              <Badge variant="secondary">{getPollutantValue(data.iaqi, 'co')}</Badge> {/* FIX 12: Use non-null assertion */}
             </div>
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-4">
-          *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data!.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })} {/* FIX 13: Use non-null assertion */}
+          *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })} {/* FIX 13: Use non-null assertion */}
         </p>
       </CardContent>
     </Card>
