@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-import { renderToString } from 'react-dom/server';
+// import { renderToString } from 'react-dom/server'; // No longer needed
 import { convertCoordinates } from '../utils/coordinateConverter';
 
 // Import new modular hooks
@@ -166,11 +166,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       }
     }
 
-    const borderRadius = iconShape === 'circle' ? '50%' : '5px';
+    // SUPER SIMPLIFIED HTML FOR DEBUGGING
+    const htmlString = `<div style="background-color:${iconColor}; color:white; width:${iconSize}px; height:${iconSize}px; border-radius:${iconShape === 'circle' ? '50%' : '5px'}; display:flex; align-items:center; justify-content:center; font-size:${iconSize / 2}px;">${iconText}</div>`;
+    console.log("Generated custom icon HTML:", htmlString); // Log the HTML string
 
     return L.divIcon({
       className: 'custom-poi-marker',
-      html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:${borderRadius}; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize / 2}px; font-weight:bold; opacity:0.1;">${iconText}</div>`,
+      html: htmlString,
       iconSize: [iconSize, iconSize],
       iconAnchor: [iconSize / 2, iconSize / 2]
     });

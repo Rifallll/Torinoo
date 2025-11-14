@@ -3,11 +3,10 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
-// Removed: import { renderToString } from 'react-dom/server';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-// Removed: import React from 'react';
+// Removed: import React from 'react'; // No longer needed
 
 interface PublicTransportVehiclesLayerProps {
   map: L.Map | null;
@@ -41,12 +40,9 @@ export const usePublicTransportVehiclesLayer = ({
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
           
-          // Simplified vehicle icon HTML for the marker
-          const vehicleIconHtml = `
-            <div class="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style="width: 30px; height: 30px; font-size: 14px; font-weight: bold;">
-              ${routeId.charAt(0)}
-            </div>
-          `;
+          // SUPER SIMPLIFIED vehicle icon HTML for debugging
+          const vehicleIconHtml = `<div style="background-color:indigo; color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">${routeId.charAt(0)}</div>`;
+          console.log("Generated vehicle icon HTML:", vehicleIconHtml); // Log the HTML string
 
           const vehicleIcon = L.divIcon({
             className: 'custom-vehicle-marker',
