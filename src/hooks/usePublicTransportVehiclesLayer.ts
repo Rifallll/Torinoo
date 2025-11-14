@@ -42,13 +42,16 @@ export const usePublicTransportVehiclesLayer = ({
           const latlng: L.LatLngExpression = [vp.position.latitude, vp.position.longitude];
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
-          const vehicleTypeIcon = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined));
+          const vehicleTypeIconElement = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined));
 
-          const vehicleIconHtml = renderToString(
+          // Define the JSX element for the icon
+          const iconElement = (
             <div className="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style={{ width: '30px', height: '30px' }}>
-              {vehicleTypeIcon}
+              {vehicleTypeIconElement}
             </div>
           );
+          // Render it to a string
+          const vehicleIconHtml = renderToString(iconElement);
 
           const vehicleIcon = L.divIcon({
             className: 'custom-vehicle-marker',
@@ -57,10 +60,14 @@ export const usePublicTransportVehiclesLayer = ({
             iconAnchor: [15, 15],
           });
 
+          // Define the JSX element for the popup route icon
+          const popupRouteIconElement = getRouteTypeIcon(routeId);
+          const popupRouteIconHtml = renderToString(popupRouteIconElement);
+
           const popupContent = `
             <div class="font-sans text-sm">
               <h3 class="font-bold text-base mb-1 flex items-center">
-                ${renderToString(vehicleTypeIcon)} Jalur ${routeId}
+                ${popupRouteIconHtml} Jalur ${routeId}
               </h3>
               <p><strong>Kendaraan:</strong> ${vehicleLabel}</p>
               <p><strong>Status:</strong> ${getVehicleStatus(vp.current_status, vp.occupancy_status)}</p>
@@ -82,7 +89,7 @@ export const usePublicTransportVehiclesLayer = ({
         }
       });
 
-      for (const id in currentMarkers) {
+      for (const id of Object.keys(currentMarkers)) { // Fixed: Use Object.keys for safer iteration
         if (!newVehicleIds.has(id)) {
           layerGroup.removeLayer(currentMarkers[id]);
           delete currentMarkers[id];
@@ -94,7 +101,7 @@ export const usePublicTransportVehiclesLayer = ({
         toast.info("Lapisan kendaraan transportasi publik diaktifkan.");
       }
     } else {
-      for (const id in currentMarkers) {
+      for (const id of Object.keys(currentMarkers)) { // Fixed: Use Object.keys for safer iteration
         layerGroup.removeLayer(currentMarkers[id]);
         delete currentMarkers[id];
       }
@@ -115,7 +122,7 @@ export const usePublicTransportVehiclesLayer = ({
     return () => {
       map.off('zoomend', updateVisibilityAndMarkers);
       map.off('moveend', updateVisibilityAndMarkers);
-      for (const id in vehicleMarkersRef.current) {
+      for (const id of Object.keys(vehicleMarkersRef.current)) { // Fixed: Use Object.keys for safer iteration
         layerGroup.removeLayer(vehicleMarkersRef.current[id]);
       }
       vehicleMarkersRef.current = {};
