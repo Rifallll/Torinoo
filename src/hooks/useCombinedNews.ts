@@ -156,23 +156,37 @@ const fetchCombinedNews = async (query: string, language: string): Promise<NewsA
     if (deduplicatedArticles.has(key)) {
       const existingArticle = deduplicatedArticles.get(key)!;
       
-      // Compare articles and keep the one with more complete data or is newer
-      const existingHasImage = !!existingArticle.urlToImage;
-      const newHasImage = !!article.urlToImage;
-      const existingHasDescription = !!existingArticle.description;
-      const newHasDescription = !!article.description;
+      // Determine which article is "better"
+      let shouldReplace = false;
 
-      // Prioritize article with image, then description, then newer published date
-      if (
-        (newHasImage && !existingHasImage) || // New has image, existing doesn't
-        (!newHasImage && existingHasImage) || // Existing has image, new doesn't (keep existing)
-        (newHasImage === existingHasImage && newHasDescription && !existingHasDescription) || // Same image status, new has description, existing doesn't
-        (newHasImage === existingHasImage && !newHasDescription && existingHasDescription) || // Same image status, existing has description, new doesn't (keep existing)
-        (newHasImage === existingHasImage && newHasDescription === existingHasDescription && new Date(article.publishedAt) > new Date(existingArticle.publishedAt))
-      ) {
-        // If new article is "better" (more info or newer), replace existing
+      const newHasImage = !!article.urlToImage;
+      const existingHasImage = !!existingArticle.urlToImage;
+      const newHasDescription = !!article.description;
+      const existingHasDescription = !!existingArticle.description;
+      const newPublishedAt = new Date(article.publishedAt).getTime();
+      const existingPublishedAt = new Date(existingArticle.publishedAt).getTime();
+
+      // Prioritize article with an image
+      if (newHasImage && !existingHasImage) {
+        shouldReplace = true;
+      } else if (!newHasImage && existingHasImage) {
+        shouldReplace = false; // Keep existing
+      } 
+      // If both/neither have image, then prioritize article with a description
+      else if (newHasDescription && !existingHasDescription) {
+        shouldReplace = true;
+      } else if (!newHasDescription && existingHasDescription) {
+        shouldReplace = false; // Keep existing
+      }
+      // If both/neither have image/description, then prioritize newer article
+      else if (newPublishedAt > existingPublishedAt) {
+        shouldReplace = true;
+      }
+
+      if (shouldReplace) {
         deduplicatedArticles.set(key, article);
       }
+      // If shouldReplace is false, we implicitly keep the existing article.
     } else {
       deduplicatedArticles.set(key, article);
     }
