@@ -26,9 +26,6 @@ export const useGeoJsonLayer = ({
     if (!map || !geoJsonLayerGroup) return;
 
     const setupGeoJsonLayer = async () => {
-      // The layer group is now assumed to be already on the map from useMapInitialization.
-      // No need for geoJsonLayerGroup.addTo(map) here.
-
       try {
         const response = await fetch('/export.geojson');
         if (!response.ok) {

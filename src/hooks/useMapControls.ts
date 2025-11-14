@@ -33,31 +33,17 @@ export const useMapControls = ({
   const fullscreenControlRef = useRef<L.Control | null>(null);
   const layerControlRef = useRef<L.Control.Layers | null>(null);
   const resetViewControlRef = useRef<L.Control | null>(null);
-  const controlsAddedRef = useRef<boolean>(false); // Tracks if static controls are added
 
   // Effect 1: Add static controls (geocoder, fullscreen, layer control, reset view)
   // This effect now also handles the initial addition of the TomTom layer to the map and layer control.
   useEffect(() => {
     if (!map || !layerGroups) {
-      controlsAddedRef.current = false;
-      return;
-    }
-
-    // Only add static controls once per map instance
-    if (controlsAddedRef.current) {
       return;
     }
 
     const addStaticControls = () => {
-      // @ts-ignore - _controlCorners is an internal Leaflet property
-      if (!map._controlCorners) {
-        console.warn("Leaflet map._controlCorners is not defined, delaying static control addition.");
-        return;
-      }
-
-      // Prevent re-adding if already present (e.g., if map.whenReady fires multiple times)
+      // Only add controls if they haven't been added yet
       if (geocoderRef.current && map.hasControl(geocoderRef.current)) {
-        controlsAddedRef.current = true;
         return;
       }
 
@@ -138,11 +124,9 @@ export const useMapControls = ({
       });
       const resetViewControl = new ResetViewControl({ position: 'topleft' }).addTo(map);
       resetViewControlRef.current = resetViewControl;
-
-      controlsAddedRef.current = true;
     };
 
-    map.whenReady(addStaticControls);
+    map.whenReady(addStaticControls); // Add controls when map is ready
 
     // Cleanup for static controls
     return () => {
@@ -160,9 +144,8 @@ export const useMapControls = ({
       fullscreenControlRef.current = null;
       layerControlRef.current = null;
       resetViewControlRef.current = null;
-      controlsAddedRef.current = false;
     };
-  }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]); // tomtomTrafficFlowLayer is now a dependency here
+  }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]);
 
   // Effect 2: Manage TomTom Traffic Flow layer visibility (opacity)
   // This effect now ONLY controls opacity and does not add/remove the layer from the map.

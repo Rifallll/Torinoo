@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useRef } from 'react'; // Import useRef
 import L from 'leaflet'; // Import L for LatLngBoundsExpression
 
 // Import custom hooks and utilities
@@ -20,6 +20,8 @@ interface TorinoMapComponentProps {
 }
 
 const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter, gtfsRouteTypeFilter }) => {
+  const mapContainerRef = useRef<HTMLDivElement>(null); // Create a ref for the map container
+
   const torinoCenter: L.LatLngExpression = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15;
@@ -57,7 +59,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
 
   // 1. Initialize the map and get layer groups
   const { map, layerGroups } = useMapInitialization({
-    mapContainerId: 'torino-map',
+    mapContainerRef, // Pass the ref here
     center: torinoCenter,
     zoom: defaultZoom,
   });
@@ -105,7 +107,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     minZoomForGtfsRoutes,
   });
 
-  return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
+  return <div id="torino-map" ref={mapContainerRef} className="h-full w-full rounded-md relative z-10"></div>;
 };
 
 export default TorinoMapComponent;
