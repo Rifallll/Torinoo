@@ -23,6 +23,8 @@ import VehiclePositionsCard from '@/components/VehiclePositionsCard'; // New com
 import GtfsRoutesCard from '@/components/GtfsRoutesCard'; // New component
 // import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart'; // Removed
 import QuickActionsCard from '@/components/QuickActionsCard';
+import { mockTrafficChanges } from '@/components/TrafficChangesInsights'; // New: Import mockTrafficChanges
+
 // import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Removed chart imports
 
 const TorinoDashboard = () => {
@@ -116,6 +118,7 @@ const TorinoDashboard = () => {
                   <TorinoMapComponent 
                     selectedVehicleType={vehicleTypeFilter} 
                     roadConditionFilter={roadConditionFilter} 
+                    trafficChanges={mockTrafficChanges} // New: Pass traffic changes data
                   />
                 </CardContent>
               </Card>

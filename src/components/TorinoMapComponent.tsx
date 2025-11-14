@@ -8,6 +8,7 @@ import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
 import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
+import { TrafficChange } from './TrafficChangesInsights'; // Import TrafficChange interface
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -23,13 +24,15 @@ L.Icon.Default.mergeOptions({
 interface TorinoMapComponentProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
+  trafficChanges: TrafficChange[]; // New prop for traffic changes
 }
 
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ selectedVehicleType, roadConditionFilter }) => {
+const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ selectedVehicleType, roadConditionFilter, trafficChanges }) => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
+  const trafficChangesLayerGroupRef = useRef<L.LayerGroup | null>(null); // New: Ref for traffic changes layer group
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
 
   const { isTomTomLayerEnabled } = useSettings(); // Use the setting
@@ -38,6 +41,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
   const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
+  const minZoomForTrafficChanges = 11; // New: Minimum zoom level for traffic changes to appear
 
   // Define approximate bounding box for Torino (South-West, North-East)
   const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
@@ -211,6 +215,25 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     }
   };
 
+  // New: Function to update Traffic Changes layer visibility based on zoom
+  const updateTrafficChangesVisibility = () => {
+    if (!mapRef.current || !trafficChangesLayerGroupRef.current) return;
+
+    if (mapRef.current.getZoom() >= minZoomForTrafficChanges) {
+      if (!mapRef.current.hasLayer(trafficChangesLayerGroupRef.current)) {
+        trafficChangesLayerGroupRef.current.addTo(mapRef.current);
+        // TODO: Remove or make less frequent for production
+        toast.info("Lapisan perubahan lalu lintas ditampilkan.");
+      }
+    } else {
+      if (mapRef.current.hasLayer(trafficChangesLayerGroupRef.current)) {
+        mapRef.current.removeLayer(trafficChangesLayerGroupRef.current);
+        // TODO: Remove or make less frequent for production
+        toast.info("Lapisan perubahan lalu lintas disembunyikan.");
+      }
+    }
+  };
+
   // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
   const updateTomTomTrafficVisibility = () => {
     if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
@@ -260,6 +283,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       // Initialize Layer Groups
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup();
+      trafficChangesLayerGroupRef.current = L.layerGroup(); // New: Initialize traffic changes layer group
 
       // Add subway stations to their layer group
       subwayStationsData.forEach(station => {
@@ -340,6 +364,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
         "Subway Stations": subwayStationsLayerGroupRef.current,
+        "Traffic Changes": trafficChangesLayerGroupRef.current, // New: Add traffic changes layer to control
       };
 
       // Only add TomTom layer to control if it was successfully initialized
@@ -366,12 +391,14 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       // Add event listeners for zoom and move changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
       mapRef.current.on('zoomend', updateSubwayStationsVisibility);
+      mapRef.current.on('zoomend', updateTrafficChangesVisibility); // New: Add listener for traffic changes
       mapRef.current.on('moveend', updateTomTomTrafficVisibility);
       mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
 
       // Initial check for visibility
       updateGeoJSONVisibility();
       updateSubwayStationsVisibility();
+      updateTrafficChangesVisibility(); // New: Initial check for traffic changes visibility
     }
 
     // Fetch and add GeoJSON data
@@ -468,6 +495,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
         mapRef.current.off('zoomend', updateSubwayStationsVisibility);
+        mapRef.current.off('zoomend', updateTrafficChangesVisibility); // New: Remove listener
         mapRef.current.off('moveend', updateTomTomTrafficVisibility);
         mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
         mapRef.current.remove();
@@ -481,6 +509,41 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     console.log("TomTom layer enabled state changed:", isTomTomLayerEnabled);
     updateTomTomTrafficVisibility();
   }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
+
+  // New useEffect to handle traffic changes data
+  useEffect(() => {
+    if (!mapRef.current || !trafficChangesLayerGroupRef.current) return;
+
+    trafficChangesLayerGroupRef.current.clearLayers(); // Clear existing markers
+
+    trafficChanges.forEach(change => {
+      const iconHtml = `
+        <div style="background-color:#eab308; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold; opacity:0.8;">
+          ${change.type === 'closure' ? 'X' : change.type === 'roadwork' ? '🚧' : change.type === 'reduction' ? '⬇️' : 'ℹ️'}
+        </div>
+      `;
+      const customIcon = L.divIcon({
+        className: 'traffic-change-marker',
+        html: iconHtml,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+
+      const popupContent = `
+        <b>${change.title}</b><br/>
+        ${change.description}<br/>
+        ${change.startDate ? `Mulai: ${change.startDate}<br/>` : ''}
+        ${change.endDate ? `Berakhir: ${change.endDate}<br/>` : ''}
+        ${change.responsibleEntity ? `Oleh: ${change.responsibleEntity}` : ''}
+      `;
+
+      L.marker([change.latitude, change.longitude], { icon: customIcon })
+        .bindPopup(popupContent)
+        .addTo(trafficChangesLayerGroupRef.current);
+    });
+
+    updateTrafficChangesVisibility(); // Update visibility after adding new markers
+  }, [trafficChanges]); // Re-run when trafficChanges data changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 });

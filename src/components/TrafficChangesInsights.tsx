@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, CalendarDays, AlertTriangle, Lightbulb, TrendingUp, Clock, Users } from 'lucide-react';
 
 // Interface untuk data perubahan lalu lintas yang diekstrak dari HTML
-interface TrafficChange {
+export interface TrafficChange { // Export interface
   id: string;
   title: string;
   description: string;
@@ -19,7 +19,7 @@ interface TrafficChange {
 }
 
 // Data dummy yang diekstrak secara manual dari HTML yang Anda berikan
-const mockTrafficChanges: TrafficChange[] = [
+export const mockTrafficChanges: TrafficChange[] = [ // Export the data
   {
     id: '668853',
     title: 'CHIUSURA IN CORSO MORTARA',
@@ -44,7 +44,7 @@ const mockTrafficChanges: TrafficChange[] = [
   {
     id: '668781',
     title: 'LAVORI IN PIAZZA SOFIA',
-    description: 'Fino a venerdì 14 novembre, per lavori SMAT, sono previste riduzioni di carreggiata in piazza Sofia all\'intersezione con strada Settimo.',
+    description: 'Fino a venerdì 14 november, per lavori SMAT, sono previste riduzioni di carreggiata in piazza Sofia all\'intersezione con strada Settimo.',
     latitude: 45.0951,
     longitude: 7.71709,
     endDate: '2025-11-14',
@@ -54,7 +54,7 @@ const mockTrafficChanges: TrafficChange[] = [
   {
     id: '668498',
     title: 'LAVORI SU CONTROVIALI DI CORSO TASSONI',
-    description: 'Da lunedì 17 novembre a mercoledì 17 dicembre, per lavori del comune di Torino, sono previsti lavori con chiusure di carreggiata sui controviali est e ovest di corso Tassoni tra piazza Bernini e corso Regina Margherita.',
+    description: 'Da lunedì 17 november a mercoledì 17 dicembre, per lavori del comune di Torino, sono previsti lavori con chiusure di carreggiata sui controviali est e ovest di corso Tassoni tra piazza Bernini e corso Regina Margherita.',
     latitude: 45.0814,
     longitude: 7.65617,
     startDate: '2025-11-17',
@@ -66,7 +66,7 @@ const mockTrafficChanges: TrafficChange[] = [
     id: '668465',
     title: 'LAVORI AL PARCO DEL VALENTINO',
     description: 'Per lavori all\'interno del parco del Valentino sono previste chiusure viabili. Baca tutto...',
-    fullDescription: 'Per lavori all\'interno del parco del Valentino sono previste chiusure viabili. Da lunedì 10 novembre 2025 a domenica 1 marzo 2026 adalah penutupan diviale Turr antara viale Boiardo dan via Millio. Hingga Minggu 1 Maret 2026 adalah penutupan di: - viale Stefano Turr antara viale Boiardo dan viale Marinai d\'Italia - viale Boiardo antara via Turr dan viale Marinai d\'Italia - viale Marinai d\'Italia antara viale Boiardo dan viale Turr - viale Millio antara viale Turr dan pintu masuk ke Borgo Medievale',
+    fullDescription: 'Per lavori all\'interno del parco del Valentino sono previste chiusure viabili. Da lunedì 10 november 2025 a domenica 1 marzo 2026 adalah penutupan diviale Turr antara viale Boiardo dan via Millio. Hingga Minggu 1 Maret 2026 adalah penutupan di: - viale Stefano Turr antara viale Boiardo dan viale Marinai d\'Italia - viale Boiardo antara via Turr dan viale Marinai d\'Italia - viale Marinai d\'Italia antara viale Boiardo dan viale Turr - viale Millio antara viale Turr dan pintu masuk ke Borgo Medievale',
     latitude: 45.0501,
     longitude: 7.68233,
     startDate: '2025-11-10',
