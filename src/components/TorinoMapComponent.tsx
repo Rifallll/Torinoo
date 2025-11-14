@@ -7,7 +7,11 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
-import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
+import { useSettings } from '@/contexts/SettingsContext';
+import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData'; // Import the GTFS Realtime hook
+import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
+import { renderToString } from 'react-dom/server'; // To render React components to string for Leaflet popups
+import { BusFront, TramFront } from 'lucide-react'; // Icons for vehicles
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -31,13 +35,17 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
+  const publicTransportVehiclesLayerGroupRef = useRef<L.LayerGroup | null>(null); // New: Ref for public transport vehicles layer group
+  const vehicleMarkersRef = useRef<{ [key: string]: L.Marker }>({}); // New: To keep track of individual vehicle markers
 
-  const { isTomTomLayerEnabled } = useSettings(); // Use the setting
+  const { isTomTomLayerEnabled, isPublicTransportLayerEnabled } = useSettings(); // Use the settings
+  const { data: gtfsRealtimeData } = useGtfsRealtimeData(); // Fetch real-time GTFS data
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
   const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
+  const minZoomForPublicTransport = 12; // New: Minimum zoom level for public transport vehicles to appear
 
   // Define approximate bounding box for Torino (South-West, North-East)
   const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
@@ -239,6 +247,26 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     }
   };
 
+  // New: Function to manage Public Transport Vehicles layer visibility based on zoom AND toggle state
+  const updatePublicTransportVisibility = () => {
+    if (!mapRef.current || !publicTransportVehiclesLayerGroupRef.current) return;
+
+    const isPublicTransportLayerActive = mapRef.current.hasLayer(publicTransportVehiclesLayerGroupRef.current);
+    const isWithinTorino = mapRef.current.getBounds().intersects(torinoBounds);
+
+    if (isPublicTransportLayerEnabled && isWithinTorino && mapRef.current.getZoom() >= minZoomForPublicTransport) {
+      if (!isPublicTransportLayerActive) {
+        publicTransportVehiclesLayerGroupRef.current.addTo(mapRef.current);
+        toast.info("Lapisan kendaraan transportasi publik diaktifkan.");
+      }
+    } else {
+      if (isPublicTransportLayerActive) {
+        publicTransportVehiclesLayerGroupRef.current.removeLayer(mapRef.current);
+        toast.info("Lapisan kendaraan transportasi publik dinonaktifkan.");
+      }
+    }
+  };
+
   useEffect(() => {
     if (!mapRef.current) {
       // Initialize map with preferCanvas: true for better performance with complex vector data
@@ -254,6 +282,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       // Initialize Layer Groups
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup();
+      publicTransportVehiclesLayerGroupRef.current = L.layerGroup(); // New: Initialize layer group for public transport
 
       // Add subway stations to their layer group
       subwayStationsData.forEach(station => {
@@ -333,6 +362,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
         "Subway Stations": subwayStationsLayerGroupRef.current,
+        "Public Transport Vehicles": publicTransportVehiclesLayerGroupRef.current, // New: Add to overlay layers
       };
 
       // Only add TomTom layer to control if it was successfully initialized
@@ -361,10 +391,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       mapRef.current.on('zoomend', updateSubwayStationsVisibility);
       mapRef.current.on('moveend', updateTomTomTrafficVisibility);
       mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
+      mapRef.current.on('zoomend', updatePublicTransportVisibility); // New
+      mapRef.current.on('moveend', updatePublicTransportVisibility); // New
 
       // Initial check for visibility
       updateGeoJSONVisibility();
       updateSubwayStationsVisibility();
+      updatePublicTransportVisibility(); // New
     }
 
     // Fetch and add GeoJSON data
@@ -463,6 +496,8 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
         mapRef.current.off('zoomend', updateSubwayStationsVisibility);
         mapRef.current.off('moveend', updateTomTomTrafficVisibility);
         mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
+        mapRef.current.off('zoomend', updatePublicTransportVisibility); // New
+        mapRef.current.off('moveend', updatePublicTransportVisibility); // New
         mapRef.current.remove();
         mapRef.current = null;
       }
@@ -474,6 +509,86 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     console.log("TomTom layer enabled state changed:", isTomTomLayerEnabled);
     updateTomTomTrafficVisibility();
   }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
+
+  // New: This useEffect handles the Public Transport Vehicles layer based on `isPublicTransportLayerEnabled` and `gtfsRealtimeData`
+  useEffect(() => {
+    if (!mapRef.current || !publicTransportVehiclesLayerGroupRef.current || !gtfsRealtimeData) return;
+
+    const currentMarkers = vehicleMarkersRef.current;
+    const newVehicleIds = new Set<string>();
+
+    if (isPublicTransportLayerEnabled && mapRef.current.getZoom() >= minZoomForPublicTransport) {
+      gtfsRealtimeData.vehiclePositions.forEach(vp => {
+        if (vp.position?.latitude && vp.position?.longitude) {
+          newVehicleIds.add(vp.id);
+          const latlng: L.LatLngExpression = [vp.position.latitude, vp.position.longitude];
+          const routeId = vp.trip?.route_id || 'N/A';
+          const vehicleLabel = vp.vehicle?.label || vp.id;
+          const vehicleTypeIcon = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined)); // Heuristic for icon
+
+          // Create a custom div icon for the vehicle
+          const vehicleIcon = L.divIcon({
+            className: 'custom-vehicle-marker',
+            html: renderToString(
+              <div className="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style={{ width: '30px', height: '30px' }}>
+                {vehicleTypeIcon}
+              </div>
+            ),
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+          });
+
+          // Create popup content
+          const popupContent = `
+            <div class="font-sans text-sm">
+              <h3 class="font-bold text-base mb-1 flex items-center">
+                ${renderToString(getRouteTypeIcon(routeId))} Jalur ${routeId}
+              </h3>
+              <p><strong>Kendaraan:</strong> ${vehicleLabel}</p>
+              <p><strong>Status:</strong> ${getVehicleStatus(vp.current_status, vp.occupancy_status)}</p>
+              <p><strong>Kecepatan:</strong> ${vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}</p>
+              <p><strong>Kemacetan:</strong> <span class="${getCongestionBadgeClass(vp.congestion_level).replace('hover:bg-gray-100', '')} px-2 py-0.5 rounded-full text-xs">${formatCongestionLevel(vp.congestion_level)}</span></p>
+              <p><strong>Terakhir Diperbarui:</strong> ${formatRelativeTime(vp.timestamp)}</p>
+            </div>
+          `;
+
+          if (currentMarkers[vp.id]) {
+            // Update existing marker position and popup
+            currentMarkers[vp.id].setLatLng(latlng);
+            currentMarkers[vp.id].setPopupContent(popupContent);
+          } else {
+            // Create new marker
+            const marker = L.marker(latlng, { icon: vehicleIcon })
+              .bindPopup(popupContent);
+            marker.addTo(publicTransportVehiclesLayerGroupRef.current);
+            currentMarkers[vp.id] = marker;
+          }
+        }
+      });
+
+      // Remove markers for vehicles that are no longer in the data
+      for (const id in currentMarkers) {
+        if (!newVehicleIds.has(id)) {
+          publicTransportVehiclesLayerGroupRef.current.removeLayer(currentMarkers[id]);
+          delete currentMarkers[id];
+        }
+      }
+
+      // Ensure the layer group is added to the map if enabled
+      if (!mapRef.current.hasLayer(publicTransportVehiclesLayerGroupRef.current)) {
+        publicTransportVehiclesLayerGroupRef.current.addTo(mapRef.current);
+      }
+    } else {
+      // If the layer is disabled or zoom level is too low, clear all markers and remove the layer group
+      for (const id in currentMarkers) {
+        publicTransportVehiclesLayerGroupRef.current.removeLayer(currentMarkers[id]);
+        delete currentMarkers[id];
+      }
+      if (mapRef.current.hasLayer(publicTransportVehiclesLayerGroupRef.current)) {
+        mapRef.current.removeLayer(publicTransportVehiclesLayerGroupRef.current);
+      }
+    }
+  }, [isPublicTransportLayerEnabled, gtfsRealtimeData, minZoomForPublicTransport]); // Re-run when toggle or data changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };

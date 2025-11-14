@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TomTomLayerToggle from '@/components/TomTomLayerToggle';
 import WeatherFeatureToggle from '@/components/WeatherFeatureToggle';
 import AirQualityFeatureToggle from '@/components/AirQualityFeatureToggle'; // New: Import AirQualityFeatureToggle
+import PublicTransportLayerToggle from '@/components/PublicTransportLayerToggle'; // New: Import PublicTransportLayerToggle
 
 const SettingsPage: React.FC = () => {
   return (
@@ -36,6 +37,10 @@ const SettingsPage: React.FC = () => {
             <TomTomLayerToggle />
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Aktifkan atau nonaktifkan lapisan lalu lintas real-time dari TomTom di peta. Menonaktifkan dapat menghemat penggunaan API.
+            </p>
+            <PublicTransportLayerToggle /> {/* New: Add the public transport layer toggle here */}
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Aktifkan atau nonaktifkan lapisan posisi kendaraan transportasi publik real-time di peta.
             </p>
           </CardContent>
         </Card>

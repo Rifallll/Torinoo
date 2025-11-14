@@ -8,8 +8,10 @@ interface SettingsContextType {
   toggleTomTomLayer: () => void;
   isWeatherFeatureEnabled: boolean;
   toggleWeatherFeature: () => void;
-  isAirQualityFeatureEnabled: boolean; // New: State for air quality feature
-  toggleAirQualityFeature: () => void; // New: Toggle function for air quality feature
+  isAirQualityFeatureEnabled: boolean;
+  toggleAirQualityFeature: () => void;
+  isPublicTransportLayerEnabled: boolean; // New: State for public transport layer
+  togglePublicTransportLayer: () => void; // New: Toggle function for public transport layer
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -40,6 +42,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     return true;
   });
 
+  const [isPublicTransportLayerEnabled, setIsPublicTransportLayerEnabled] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('isPublicTransportLayerEnabled');
+      return saved ? JSON.parse(saved) : true; // Default to true
+    }
+    return true;
+  });
+
   // Persist state to localStorage whenever it changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -58,6 +68,12 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       localStorage.setItem('isAirQualityFeatureEnabled', JSON.stringify(isAirQualityFeatureEnabled));
     }
   }, [isAirQualityFeatureEnabled]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isPublicTransportLayerEnabled', JSON.stringify(isPublicTransportLayerEnabled));
+    }
+  }, [isPublicTransportLayerEnabled]);
 
   const toggleTomTomLayer = useCallback(() => {
     setIsTomTomLayerEnabled(prev => {
@@ -83,6 +99,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
   }, []);
 
+  const togglePublicTransportLayer = useCallback(() => {
+    setIsPublicTransportLayerEnabled(prev => {
+      const newState = !prev;
+      toast.info(`Lapisan transportasi publik ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`);
+      return newState;
+    });
+  }, []);
+
   return (
     <SettingsContext.Provider value={{ 
       isTomTomLayerEnabled, 
@@ -90,7 +114,9 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       isWeatherFeatureEnabled, 
       toggleWeatherFeature,
       isAirQualityFeatureEnabled,
-      toggleAirQualityFeature
+      toggleAirQualityFeature,
+      isPublicTransportLayerEnabled, // New
+      togglePublicTransportLayer // New
     }}>
       {children}
     </SettingsContext.Provider>
