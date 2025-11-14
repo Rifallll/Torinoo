@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Route, Bus, TramFront, Info, Search, XCircle } from 'lucide-react';
+import { ArrowLeft, Route, Bus, TramFront, Info, Search, XCircle, TrainFront, CableCar, Ferry, Cable } from 'lucide-react'; // Added more specific icons
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,10 +36,14 @@ const AllGtfsRoutesPage: React.FC = () => {
   const getRouteTypeIcon = (routeType: number) => {
     switch (routeType) {
       case 0: return <TramFront className="h-4 w-4 mr-1" />;
-      case 1: return <Info className="h-4 w-4 mr-1" />; // Using Info for Subway
+      case 1: return <TrainFront className="h-4 w-4 mr-1" />; // Subway
+      case 2: return <TrainFront className="h-4 w-4 mr-1" />; // Rail
       case 3: return <Bus className="h-4 w-4 mr-1" />;
-      case 7: return <Info className="h-4 w-4 mr-1" />; // Using Info for Funicular
-      default: return <Info className="h-4 w-4 mr-1" />;
+      case 4: return <Ferry className="h-4 w-4 mr-1" />;
+      case 5: return <CableCar className="h-4 w-4 mr-1" />; // Cable Car
+      case 6: return <Cable className="h-4 w-4 mr-1" />; // Gondola (using Cable as a generic icon)
+      case 7: return <CableCar className="h-4 w-4 mr-1" />; // Funicular (using CableCar as a generic icon)
+      default: return <Info className="h-4 w-4 mr-1" />; // Default for unknown types
     }
   };
 
