@@ -31,7 +31,7 @@ export const usePublicTransportVehiclesLayer = ({
 
     const currentMarkers = vehicleMarkersRef.current;
     const newVehicleIds = new Set<string>();
-    const isLayerCurrentlyOnMap = map.hasLayer(layerGroup); // Define here for broader scope
+    const isLayerCurrentlyOnMap = map.hasLayer(layerGroup);
 
     if (isPublicTransportLayerEnabled && map.getZoom() >= minZoom && map.getBounds().intersects(bounds)) {
       gtfsRealtimeData.vehiclePositions.forEach(vp => {
@@ -40,16 +40,16 @@ export const usePublicTransportVehiclesLayer = ({
           const latlng: L.LatLngExpression = [vp.position.latitude, vp.position.longitude];
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
-          const vehicleTypeIconElement = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined));
+          
+          // Render the inner icon element (JSX) to a string
+          const innerVehicleTypeIconHtml = renderToString(getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined)));
 
-          // Define the JSX element for the icon
-          const iconElement = (
-            <div className="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style={{ width: '30px', height: '30px' }}>
-              {vehicleTypeIconElement}
+          // Construct the outer div HTML string for the marker icon
+          const vehicleIconHtml = `
+            <div class="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style="width: 30px; height: 30px;">
+              ${innerVehicleTypeIconHtml}
             </div>
-          );
-          // Render it to a string
-          const vehicleIconHtml = renderToString(iconElement);
+          `;
 
           const vehicleIcon = L.divIcon({
             className: 'custom-vehicle-marker',
@@ -58,9 +58,8 @@ export const usePublicTransportVehiclesLayer = ({
             iconAnchor: [15, 15],
           });
 
-          // Define the JSX element for the popup route icon
-          const popupRouteIconElement = getRouteTypeIcon(routeId);
-          const popupRouteIconHtml = renderToString(popupRouteIconElement);
+          // Render the popup route icon element (JSX) to a string
+          const popupRouteIconHtml = renderToString(getRouteTypeIcon(routeId));
 
           const popupContent = `
             <div class="font-sans text-sm">
