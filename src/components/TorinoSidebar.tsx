@@ -42,6 +42,7 @@ const navItems: NavItemConfig[] = [
       // { label: "Reports", path: "/reports", icon: BarChart2 }, // Removed: Uses dummy data
       { label: "All Vehicle Positions", path: "/all-vehicle-positions", icon: Car },
       { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route },
+      { label: "Traffic Changes & Roadworks", path: "/traffic-changes", icon: TrafficCone }, // New: Traffic Changes page
     ],
   },
   {

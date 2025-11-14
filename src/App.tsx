@@ -28,6 +28,7 @@ const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePosit
 const AllGtfsRoutesPage = React.lazy(() => import("./pages/AllGtfsRoutesPage"));
 const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
 const DetailedAirQualityPage = React.lazy(() => import("./pages/DetailedAirQualityPage")); // New: Import DetailedAirQualityPage
+const TrafficChangesPage = React.lazy(() => import("./pages/TrafficChangesPage")); // New: Import TrafficChangesPage
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
                       <Route path="/all-gtfs-routes" element={<AllGtfsRoutesPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
                       <Route path="/detailed-air-quality" element={<DetailedAirQualityPage />} /> {/* New route */}
+                      <Route path="/traffic-changes" element={<TrafficChangesPage />} /> {/* New route */}
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

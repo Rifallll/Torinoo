@@ -41,6 +41,7 @@ import {
   Route as RouteIcon, // Renamed to avoid conflict with React Router's Route
   Clock, // For All Trip Updates
   Leaf, // For Air Quality
+  TrafficCone, // New: Import TrafficCone for Traffic Changes
 } from "lucide-react";
 
 // Define searchable items
@@ -64,6 +65,7 @@ const searchableItems = [
       // { label: "All Trip Updates", value: "all trip updates", path: "/all-trip-updates", icon: Clock }, // Removed
       { label: "All GTFS Routes", value: "all gtfs routes", path: "/all-gtfs-routes", icon: RouteIcon },
       { label: "Detailed Air Quality", value: "detailed air quality", path: "/detailed-air-quality", icon: Leaf }, // New
+      { label: "Traffic Changes & Roadworks", value: "traffic changes roadworks", path: "/traffic-changes", icon: TrafficCone }, // New
       { label: "Settings", value: "settings", path: "/settings", icon: Settings },
     ],
   },
