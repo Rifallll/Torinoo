@@ -7,6 +7,7 @@ import { renderToString } from 'react-dom/server';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
+import React from 'react'; // Import React for JSX rendering
 
 interface PublicTransportLayerProps {
   map: L.Map | null;
@@ -130,7 +131,7 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
         map.removeLayer(publicTransportVehiclesLayerGroupRef.current);
       }
     }
-  }, [map, gtfsRealtimeData, isPublicTransportLayerEnabled, minZoomForPublicTransport]);
+  }, [map, gtfsRealtimeData, isPublicTransportLayerEnabled, minZoomForPublicTransport, torinoBounds]); // Added torinoBounds to dependencies
 
   return publicTransportVehiclesLayerGroupRef.current;
 };
