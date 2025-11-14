@@ -7,7 +7,8 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
-import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
+import { useSettings } from '@/contexts/SettingsContext';
+import { useGtfsData } from '@/hooks/useGtfsData'; // Import useGtfsData hook
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -23,21 +24,25 @@ L.Icon.Default.mergeOptions({
 interface TorinoMapComponentProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
+  gtfsRouteTypeFilter: string; // New prop for GTFS route type filter
 }
 
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter }) => {
+const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter, gtfsRouteTypeFilter }) => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
+  const gtfsRoutesLayerGroupRef = useRef<L.LayerGroup | null>(null); // New: Ref for GTFS routes layer group
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
 
-  const { isTomTomLayerEnabled } = useSettings(); // Use the setting
+  const { isTomTomLayerEnabled } = useSettings();
+  const { data: gtfsData, isLoading: isLoadingGtfs, error: gtfsError } = useGtfsData(); // Fetch GTFS data
 
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
-  const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
-  const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
+  const minZoomForGeoJSON = 15;
+  const minZoomForSubwayStations = 12;
+  const minZoomForGtfsRoutes = 12; // New: Minimum zoom level for GTFS routes to appear
 
   // Define approximate bounding box for Torino (South-West, North-East)
   const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
@@ -207,6 +212,23 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     }
   };
 
+  // New: Function to update GTFS Routes layer visibility based on zoom
+  const updateGtfsRoutesVisibility = () => {
+    if (!mapRef.current || !gtfsRoutesLayerGroupRef.current) return;
+
+    if (mapRef.current.getZoom() >= minZoomForGtfsRoutes) {
+      if (!mapRef.current.hasLayer(gtfsRoutesLayerGroupRef.current)) {
+        gtfsRoutesLayerGroupRef.current.addTo(mapRef.current);
+        toast.info("Lapisan rute transportasi publik ditampilkan.");
+      }
+    } else {
+      if (mapRef.current.hasLayer(gtfsRoutesLayerGroupRef.current)) {
+        mapRef.current.removeLayer(gtfsRoutesLayerGroupRef.current);
+        toast.info("Lapisan rute transportasi publik disembunyikan (perkecil untuk performa).");
+      }
+    }
+  };
+
   // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
   const updateTomTomTrafficVisibility = () => {
     if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
@@ -243,6 +265,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       // Initialize Layer Groups
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup();
+      gtfsRoutesLayerGroupRef.current = L.layerGroup(); // New: Initialize GTFS routes layer group
 
       // Add subway stations to their layer group
       subwayStationsData.forEach(station => {
@@ -320,6 +343,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
         "Subway Stations": subwayStationsLayerGroupRef.current,
+        "GTFS Public Routes": gtfsRoutesLayerGroupRef.current, // New: Add GTFS routes to layer control
       };
 
       // Only add TomTom layer to control if it was successfully initialized
@@ -346,12 +370,14 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       // Add event listeners for zoom and move changes
       mapRef.current.on('zoomend', updateGeoJSONVisibility);
       mapRef.current.on('zoomend', updateSubwayStationsVisibility);
+      mapRef.current.on('zoomend', updateGtfsRoutesVisibility); // New: Add listener for GTFS routes
       mapRef.current.on('moveend', updateTomTomTrafficVisibility);
       mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
 
       // Initial check for visibility
       updateGeoJSONVisibility();
       updateSubwayStationsVisibility();
+      updateGtfsRoutesVisibility(); // New: Initial check for GTFS routes
     }
 
     // Fetch and add GeoJSON data
@@ -448,6 +474,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       if (mapRef.current) {
         mapRef.current.off('zoomend', updateGeoJSONVisibility);
         mapRef.current.off('zoomend', updateSubwayStationsVisibility);
+        mapRef.current.off('zoomend', updateGtfsRoutesVisibility);
         mapRef.current.off('moveend', updateTomTomTrafficVisibility);
         mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
         mapRef.current.remove();
@@ -460,6 +487,77 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   useEffect(() => {
     updateTomTomTrafficVisibility();
   }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
+
+  // New: useEffect to handle GTFS routes display and filtering
+  useEffect(() => {
+    if (!mapRef.current || !gtfsRoutesLayerGroupRef.current || isLoadingGtfs || gtfsError || !gtfsData) {
+      return;
+    }
+
+    gtfsRoutesLayerGroupRef.current.clearLayers(); // Clear existing routes
+
+    const { routes, shapes, agencies } = gtfsData;
+
+    // Create a map for efficient shape lookup
+    const shapesByShapeId = new Map<string, L.LatLng[]>();
+    shapes.forEach(shapePoint => {
+      if (!shapesByShapeId.has(shapePoint.shape_id)) {
+        shapesByShapeId.set(shapePoint.shape_id, []);
+      }
+      shapesByShapeId.get(shapePoint.shape_id)?.push(L.latLng(shapePoint.shape_pt_lat, shapePoint.shape_pt_lon));
+    });
+
+    const filteredRoutes = routes.filter(route => {
+      const matchesType = gtfsRouteTypeFilter === 'all' || String(route.route_type) === gtfsRouteTypeFilter;
+      return matchesType;
+    });
+
+    filteredRoutes.forEach(route => {
+      if (route.shape_id && shapesByShapeId.has(route.shape_id)) {
+        const routeShape = shapesByShapeId.get(route.shape_id);
+        if (routeShape && routeShape.length > 1) {
+          let lineColor = '#3388ff'; // Default blue
+          let lineWeight = 3;
+
+          switch (route.route_type) {
+            case 0: // Tram
+              lineColor = '#a855f7'; // Purple
+              lineWeight = 4;
+              break;
+            case 1: // Subway
+              lineColor = '#6b7280'; // Gray
+              lineWeight = 5;
+              break;
+            case 3: // Bus
+              lineColor = '#22c55e'; // Green
+              lineWeight = 3;
+              break;
+            // Add more cases for other route_types if needed
+          }
+
+          const polyline = L.polyline(routeShape, {
+            color: lineColor,
+            weight: lineWeight,
+            opacity: 0.7,
+          });
+
+          const agency = agencies.find(a => a.agency_id === route.agency_id);
+          const popupContent = `
+            <b>${route.route_short_name || route.route_long_name || 'N/A'}</b><br/>
+            Tipe: ${route.route_type === 0 ? 'Tram' : route.route_type === 1 ? 'Subway' : route.route_type === 3 ? 'Bus' : 'Lainnya'}<br/>
+            Nama Panjang: ${route.route_long_name || 'N/A'}<br/>
+            Operator: ${agency?.agency_name || 'N/A'}<br/>
+            Deskripsi: ${route.route_desc || 'N/A'}
+          `;
+          polyline.bindPopup(popupContent);
+
+          polyline.addTo(gtfsRoutesLayerGroupRef.current!);
+        }
+      }
+    });
+
+    updateGtfsRoutesVisibility(); // Update visibility after drawing routes
+  }, [gtfsData, gtfsRouteTypeFilter, isLoadingGtfs, gtfsError]); // Re-run when GTFS data or filter changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };

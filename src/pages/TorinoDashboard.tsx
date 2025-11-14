@@ -32,6 +32,7 @@ const TorinoDashboard = () => {
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
+  const [gtfsRouteTypeFilter, setGtfsRouteTypeFilter] = useState<string>('all'); // New state for GTFS route type filter
 
   // Dummy data for quick actions and statistics
   const dummyStats = {
@@ -151,6 +152,8 @@ const TorinoDashboard = () => {
                       setVehicleTypeFilter={setVehicleTypeFilter}
                       roadConditionFilter={roadConditionFilter}
                       setRoadConditionFilter={setRoadConditionFilter}
+                      gtfsRouteTypeFilter={gtfsRouteTypeFilter} // Pass new prop
+                      setGtfsRouteTypeFilter={setGtfsRouteTypeFilter} // Pass new prop
                     />
                   </div>
                 </CardHeader>
@@ -158,6 +161,7 @@ const TorinoDashboard = () => {
                   <TorinoMapComponent 
                     selectedVehicleType={vehicleTypeFilter} 
                     roadConditionFilter={roadConditionFilter} 
+                    gtfsRouteTypeFilter={gtfsRouteTypeFilter} // Pass new prop
                   />
                 </CardContent>
               </Card>
