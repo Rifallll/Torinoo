@@ -148,6 +148,7 @@ export const useMapControls = ({
   }, [map, layerGroups, torinoCenter, defaultZoom]);
 
   // Effect 2: Manage TomTom Traffic Flow layer addition/removal to map and layer control
+  // This effect now explicitly depends on layerControlRef.current
   useEffect(() => {
     if (!map || !layerControlRef.current || !tomtomTrafficFlowLayer) {
       return;
@@ -157,12 +158,15 @@ export const useMapControls = ({
     const currentTomTomLayer = tomtomTrafficFlowLayer;
 
     const addTomTomLayerToMapAndControl = () => {
+      // Ensure the layer is added to the map first
       if (!map.hasLayer(currentTomTomLayer)) {
         currentTomTomLayer.addTo(map);
       }
       // Only add to control if it's not already there
-      // Leaflet's addOverlay handles duplicates, but this is a safeguard
-      if (!Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer)) {
+      // This check is crucial to prevent re-adding and potential Leaflet errors
+      // @ts-ignore - _layers is an internal property, but necessary for this check
+      const isTomTomInControl = Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer);
+      if (!isTomTomInControl) {
         currentLayerControl.addOverlay(currentTomTomLayer, "TomTom Traffic Flow");
       }
     };
@@ -172,7 +176,9 @@ export const useMapControls = ({
         map.removeLayer(currentTomTomLayer);
       }
       // Remove from control if it's there
-      if (Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer)) {
+      // @ts-ignore
+      const isTomTomInControl = Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer);
+      if (isTomTomInControl) {
         currentLayerControl.removeLayer(currentTomTomLayer);
       }
     };
@@ -184,7 +190,7 @@ export const useMapControls = ({
     return () => {
       removeTomTomLayerFromMapAndControl();
     };
-  }, [map, layerControlRef.current, tomtomTrafficFlowLayer]); // Dependencies for this effect
+  }, [map, layerControlRef.current, tomtomTrafficFlowLayer]); // Explicitly depend on layerControlRef.current
 
   // Effect 3: Manage TomTom Traffic Flow layer visibility (opacity)
   useEffect(() => {
