@@ -52,11 +52,11 @@ const WeatherCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="ml-2">Fitur Cuaca Dinonaktifkan</span>
+            <span className="ml-2">Weather Feature Disabled</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Fitur prakiraan cuaca saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data cuaca.</p>
+          <p>The weather forecast feature is currently disabled. Enable it in Settings to view weather data.</p>
         </CardContent>
       </Card>
     );
@@ -68,11 +68,11 @@ const WeatherCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-5 w-5 mr-2 text-indigo-600 animate-pulse" />
-            <span className="ml-2">Memuat Cuaca...</span>
+            <span className="ml-2">Loading Weather...</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Mengambil data cuaca terkini untuk Torino.</p>
+          <p>Fetching current weather data for Torino.</p>
         </CardContent>
       </Card>
     );
@@ -84,12 +84,12 @@ const WeatherCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-red-500 flex items-center">
             <Thermometer className="h-5 w-5 mr-2" />
-            <span className="ml-2">Kesalahan Cuaca</span>
+            <span className="ml-2">Weather Error</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Gagal memuat data cuaca: {error.message}</p>
-          <p className="text-sm text-gray-500">Pastikan koneksi internet Anda stabil.</p>
+          <p>Failed to load weather data: {error.message}</p>
+          <p className="text-sm text-gray-500">Please ensure your internet connection is stable.</p>
         </CardContent>
       </Card>
     );
@@ -101,11 +101,11 @@ const WeatherCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-5 w-5 mr-2 text-indigo-600" />
-            <span className="ml-2">Data Cuaca Tidak Tersedia</span>
+            <span className="ml-2">Weather Data Not Available</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Tidak ada data cuaca yang dapat dimuat saat ini.</p>
+          <p>No weather data could be loaded at this time.</p>
         </CardContent>
       </Card>
     );
@@ -122,10 +122,10 @@ const WeatherCard: React.FC = React.memo(() => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           {getWeatherIcon(currentConditionCode)}
-          <span className="ml-2">Cuaca Terkini di {data.city}</span>
+          <span className="ml-2">Current Weather in {data.city}</span>
         </CardTitle>
         <Link to="/detailed-weather" className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center">
-          Lihat Detail <ArrowRight className="ml-1 h-4 w-4" />
+          View Details <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </CardHeader>
       <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
@@ -137,11 +137,11 @@ const WeatherCard: React.FC = React.memo(() => {
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="flex items-center">
             <Droplet className="h-4 w-4 mr-1 text-blue-500" />
-            <span>Kelembaban: {currentHumidity}%</span>
+            <span>Humidity: {currentHumidity}%</span>
           </div>
           <div className="flex items-center">
             <Wind className="h-4 w-4 mr-1 text-gray-500" />
-            <span>Angin: {currentWindSpeed.toFixed(1)} m/s</span>
+            <span>Wind: {currentWindSpeed.toFixed(1)} m/s</span>
           </div>
         </div>
       </CardContent>

@@ -62,7 +62,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const toggleTomTomLayer = useCallback(() => {
     setIsTomTomLayerEnabled(prev => {
       const newState = !prev;
-      toast.info(`Lapisan lalu lintas TomTom ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`);
+      toast.info(`TomTom traffic layer ${newState ? 'enabled' : 'disabled'}.`);
       return newState;
     });
   }, []);
@@ -70,7 +70,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const toggleWeatherFeature = useCallback(() => {
     setIsWeatherFeatureEnabled(prev => {
       const newState = !prev;
-      toast.info(`Fitur cuaca ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`);
+      toast.info(`Weather feature ${newState ? 'enabled' : 'disabled'}.`);
       return newState;
     });
   }, []);
@@ -78,7 +78,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const toggleAirQualityFeature = useCallback(() => {
     setIsAirQualityFeatureEnabled(prev => {
       const newState = !prev;
-      toast.info(`Fitur kualitas udara ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`);
+      toast.info(`Air quality feature ${newState ? 'enabled' : 'disabled'}.`);
       return newState;
     });
   }, []);

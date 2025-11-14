@@ -18,15 +18,15 @@ const DataAnalysisPage = () => {
   const getStatusMessage = () => {
     switch (analysisStatus) {
       case 'idle':
-        return "Menunggu unggahan data CSV untuk memulai analisis.";
+        return "Awaiting CSV data upload to start analysis.";
       case 'processing':
-        return "Aplikasi sedang memproses data lalu lintas yang diunggah (simulasi).";
+        return "Application is processing the uploaded traffic data (simulation).";
       case 'completed':
-        return "Analisis data lalu lintas selesai! Data siap disinkronkan.";
+        return "Traffic data analysis complete! Data is ready to be synchronized.";
       case 'error':
-        return "Terjadi kesalahan selama analisis data.";
+        return "An error occurred during data analysis.";
       default:
-        return "Status tidak diketahui.";
+        return "Unknown status.";
     }
   };
 
@@ -35,12 +35,12 @@ const DataAnalysisPage = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center">
           <BarChart2 className="h-8 w-8 mr-3 text-indigo-600" />
-          Analisis & Sinkronisasi Data
+          Data Analysis & Synchronization
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -48,7 +48,7 @@ const DataAnalysisPage = () => {
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="flex flex-col">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Status Analisis Data</CardTitle>
+            <CardTitle className="text-xl font-semibold">Data Analysis Status</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between">
             <div className="space-y-4">
@@ -57,32 +57,32 @@ const DataAnalysisPage = () => {
               </p>
               {analysisStatus !== 'idle' && (
                 <div className="space-y-2">
-                  <Label htmlFor="analysis-progress">Progres:</Label>
+                  <Label htmlFor="analysis-progress">Progress:</Label>
                   <Progress value={analysisProgress} id="analysis-progress" className="w-full" />
-                  <p className="text-sm text-gray-500 text-right">{analysisProgress}% Selesai</p>
+                  <p className="text-sm text-gray-500 text-right">{analysisProgress}% Complete</p>
                 </div>
               )}
               {uploadedData && (
                 <p className="text-sm text-gray-600 flex items-center">
                   <FileText className="h-4 w-4 mr-2" />
-                  Data diunggah: {uploadedData.length} baris.
+                  Data uploaded: {uploadedData.length} rows.
                 </p>
               )}
               <p className="text-sm text-gray-600">
-                Analisis mencakup pola kemacetan, kecepatan rata-rata, dan prediksi aliran.
+                Analysis includes congestion patterns, average speeds, and flow predictions.
               </p>
             </div>
             <div className="mt-6 flex justify-end space-x-2">
               {analysisStatus === 'completed' && (
                 <Button variant="outline" onClick={resetAnalysis} className="flex items-center">
                   <RefreshCcw className="h-4 w-4 mr-2" />
-                  Reset Analisis
+                  Reset Analysis
                 </Button>
               )}
               {analysisStatus === 'idle' && uploadedData && (
                 <Button variant="secondary" onClick={startAnalysis} className="flex items-center">
                   <BarChart2 className="h-4 w-4 mr-2" />
-                  Mulai Analisis Ulang
+                  Start Re-analysis
                 </Button>
               )}
             </div>
@@ -91,21 +91,21 @@ const DataAnalysisPage = () => {
 
         <Card className="flex flex-col">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Sinkronisasi Data</CardTitle>
+            <CardTitle className="text-xl font-semibold">Data Synchronization</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between">
             <div className="space-y-4">
               <p className="text-gray-700">
-                Setelah analisis selesai, Anda dapat menyinkronkan data terbaru ke dashboard untuk visualisasi.
+                Once the analysis is complete, you can synchronize the latest data to the dashboard for visualization.
               </p>
               <p className="text-sm text-gray-600">
-                Data yang disinkronkan akan memperbarui peta lalu lintas, prediksi, dan laporan.
+                Synchronized data will update traffic maps, predictions, and reports.
               </p>
             </div>
             <div className="mt-6 flex justify-end">
               <Button className="flex items-center" disabled={analysisStatus !== 'completed'}>
                 <Database className="h-4 w-4 mr-2" />
-                Sinkronkan Data Sekarang
+                Synchronize Data Now
               </Button>
             </div>
           </CardContent>
@@ -116,27 +116,27 @@ const DataAnalysisPage = () => {
             <Card className="lg:col-span-2 flex flex-col">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold flex items-center">
-                  <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" /> Hasil Analisis Data Lalu Lintas
+                  <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" /> Traffic Data Analysis Results
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
                 <div className="space-y-2">
-                  <p><strong>Total Catatan:</strong> {analysisResults.totalRecords}</p>
-                  <p><strong>Detektor Unik:</strong> {analysisResults.uniqueDetectors}</p>
-                  <p><strong>Kecepatan Rata-rata:</strong> {analysisResults.averageSpeed}</p>
-                  <p><strong>Aliran Rata-rata:</strong> {analysisResults.averageFlow}</p>
-                  <p><strong>Okupansi Rata-rata:</strong> {analysisResults.averageOccupancy}</p>
+                  <p><strong>Total Records:</strong> {analysisResults.totalRecords}</p>
+                  <p><strong>Unique Detectors:</strong> {analysisResults.uniqueDetectors}</p>
+                  <p><strong>Average Speed:</strong> {analysisResults.averageSpeed}</p>
+                  <p><strong>Average Flow:</strong> {analysisResults.averageFlow}</p>
+                  <p><strong>Average Occupancy:</strong> {analysisResults.averageOccupancy}</p>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-lg mb-2">Wawasan Tambahan (Simulasi):</h3>
+                  <h3 className="font-semibold text-lg mb-2">Additional Insights (Simulated):</h3>
                   <ul className="list-disc list-inside pl-4">
-                    <li>Puncak kemacetan terdeteksi pada jam 07:00-09:00 dan 17:00-19:00.</li>
-                    <li>Via Roma dan Piazza Castello menunjukkan tingkat kemacetan tertinggi.</li>
-                    <li>Rekomendasi: Optimalkan lampu lalu lintas di persimpangan utama.</li>
+                    <li>Peak congestion detected at 07:00-09:00 and 17:00-19:00.</li>
+                    <li>Via Roma and Piazza Castello show the highest congestion levels.</li>
+                    <li>Recommendation: Optimize traffic lights at major intersections.</li>
                   </ul>
                 </div>
                 <p className="lg:col-span-2 text-sm text-gray-500 mt-4">
-                  *Ini adalah hasil analisis simulasi. Sistem backend Python yang sebenarnya akan memberikan wawasan yang lebih mendalam.
+                  *These are simulated analysis results. The actual Python backend system will provide more in-depth insights.
                 </p>
               </CardContent>
             </Card>
@@ -146,7 +146,7 @@ const DataAnalysisPage = () => {
               <Card className="lg:col-span-2 flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold flex items-center">
-                    <Gauge className="h-5 w-5 mr-2 text-blue-600" /> Tren Kecepatan Rata-rata Harian
+                    <Gauge className="h-5 w-5 mr-2 text-blue-600" /> Daily Average Speed Trend
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
@@ -154,14 +154,14 @@ const DataAnalysisPage = () => {
                     <LineChart data={analysisResults.dailySpeedAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
                       <XAxis dataKey="day" className="text-sm text-gray-600 dark:text-gray-400" />
-                      <YAxis label={{ value: 'Kecepatan (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Speed (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
                       <Tooltip
                         contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
                         labelStyle={{ color: 'hsl(var(--foreground))' }}
                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                      <Line type="monotone" dataKey="averageSpeed" stroke="#8884d8" activeDot={{ r: 8 }} name="Kecepatan Rata-rata" />
+                      <Line type="monotone" dataKey="averageSpeed" stroke="#8884d8" activeDot={{ r: 8 }} name="Average Speed" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -173,7 +173,7 @@ const DataAnalysisPage = () => {
               <Card className="lg:col-span-2 flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold flex items-center">
-                    <Cloud className="h-5 w-5 mr-2 text-green-600" /> Tren Aliran Lalu Lintas Harian
+                    <Cloud className="h-5 w-5 mr-2 text-green-600" /> Daily Traffic Flow Trend
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
@@ -181,14 +181,14 @@ const DataAnalysisPage = () => {
                     <LineChart data={analysisResults.dailyFlowAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
                       <XAxis dataKey="day" className="text-sm text-gray-600 dark:text-gray-400" />
-                      <YAxis label={{ value: 'Aliran', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Flow', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
                       <Tooltip
                         contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
                         labelStyle={{ color: 'hsl(var(--foreground))' }}
                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                      <Line type="monotone" dataKey="averageFlow" stroke="#82ca9d" activeDot={{ r: 8 }} name="Aliran Rata-rata" />
+                      <Line type="monotone" dataKey="averageFlow" stroke="#82ca9d" activeDot={{ r: 8 }} name="Average Flow" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -200,7 +200,7 @@ const DataAnalysisPage = () => {
               <Card className="lg:col-span-2 flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold flex items-center">
-                    <Gauge className="h-5 w-5 mr-2 text-purple-600" /> Tren Kecepatan Rata-rata Per Jam
+                    <Gauge className="h-5 w-5 mr-2 text-purple-600" /> Hourly Average Speed Trend
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
@@ -208,14 +208,14 @@ const DataAnalysisPage = () => {
                     <LineChart data={analysisResults.hourlySpeedAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
                       <XAxis dataKey="hour" className="text-sm text-gray-600 dark:text-gray-400" />
-                      <YAxis label={{ value: 'Kecepatan (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Speed (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
                       <Tooltip
                         contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
                         labelStyle={{ color: 'hsl(var(--foreground))' }}
                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                      <Line type="monotone" dataKey="averageSpeed" stroke="#a855f7" activeDot={{ r: 8 }} name="Kecepatan Rata-rata" />
+                      <Line type="monotone" dataKey="averageSpeed" stroke="#a855f7" activeDot={{ r: 8 }} name="Average Speed" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -227,7 +227,7 @@ const DataAnalysisPage = () => {
               <Card className="lg:col-span-2 flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold flex items-center">
-                    <Cloud className="h-5 w-5 mr-2 text-orange-600" /> Tren Aliran Lalu Lintas Per Jam
+                    <Cloud className="h-5 w-5 mr-2 text-orange-600" /> Hourly Traffic Flow Trend
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
@@ -235,14 +235,14 @@ const DataAnalysisPage = () => {
                     <LineChart data={analysisResults.hourlyFlowAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
                       <XAxis dataKey="hour" className="text-sm text-gray-600 dark:text-gray-400" />
-                      <YAxis label={{ value: 'Aliran', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Flow', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
                       <Tooltip
                         contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
                         labelStyle={{ color: 'hsl(var(--foreground))' }}
                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                      <Line type="monotone" dataKey="averageFlow" stroke="#f97316" activeDot={{ r: 8 }} name="Aliran Rata-rata" />
+                      <Line type="monotone" dataKey="averageFlow" stroke="#f97316" activeDot={{ r: 8 }} name="Average Flow" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -254,61 +254,61 @@ const DataAnalysisPage = () => {
         <Card className="lg:col-span-2 flex flex-col">
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
-              <BarChart2 className="h-5 w-5 mr-2 text-indigo-600" /> Metrik Analisis Lalu Lintas Utama
+              <BarChart2 className="h-5 w-5 mr-2 text-indigo-600" /> Key Traffic Analysis Metrics
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
             <div className="space-y-2">
-              <h3 className="font-semibold text-lg mb-2">Jenis Analisis Umum:</h3>
+              <h3 className="font-semibold text-lg mb-2">Common Analysis Types:</h3>
               <ul className="space-y-2">
                 <li className="flex items-center">
                   <TrafficCone className="h-5 w-5 mr-2 text-red-500" />
-                  <span>Analisis Kemacetan: Mengidentifikasi dan mengukur hambatan lalu lintas.</span>
+                  <span>Congestion Analysis: Identifying and measuring traffic bottlenecks.</span>
                 </li>
                 <li className="flex items-center">
                   <Gauge className="h-5 w-5 mr-2 text-blue-500" />
-                  <span>Analisis Kecepatan Rata-rata: Melacak kecepatan di berbagai segmen jalan.</span>
+                  <span>Average Speed Analysis: Tracking speeds across different road segments.</span>
                 </li>
                 <li className="flex items-center">
                   <AlertCircle className="h-5 w-5 mr-2 text-yellow-500" />
-                  <span>Analisis Dampak Insiden: Menilai bagaimana insiden memengaruhi aliran lalu lintas.</span>
+                  <span>Incident Impact Analysis: Assessing how incidents affect traffic flow.</span>
                 </li>
                 <li className="flex items-center">
                   <Clock className="h-5 w-5 mr-2 text-green-500" />
-                  <span>Keandalan Waktu Tempuh: Mengukur konsistensi waktu tempuh.</span>
+                  <span>Travel Time Reliability: Measuring the consistency of travel times.</span>
                 </li>
               </ul>
             </div>
             <div className="space-y-2">
-              <h3 className="font-semibold text-lg mb-2">Analisis Lanjutan:</h3>
+              <h3 className="font-semibold text-lg mb-2">Advanced Analysis:</h3>
               <ul className="space-y-2">
                 <li className="flex items-center">
                   <Map className="h-5 w-5 mr-2 text-purple-500" />
-                  <span>Analisis Asal-Tujuan: Memahami sumber dan tujuan lalu lintas.</span>
+                  <span>Origin-Destination Analysis: Understanding traffic sources and destinations.</span>
                 </li>
                 <li className="flex items-center">
                   <Car className="h-5 w-5 mr-2 text-orange-500" />
-                  <span>Klasifikasi Kendaraan: Mengkategorikan kendaraan (mobil, truk, sepeda motor).</span>
+                  <span>Vehicle Classification: Categorizing vehicles (cars, trucks, motorcycles).</span>
                 </li>
                 <li className="flex items-center">
                   <ParkingSquare className="h-5 w-5 mr-2 text-teal-500" />
-                  <span>Analisis Pola Parkir: Mengoptimalkan ketersediaan dan penggunaan parkir.</span>
+                  <span>Parking Pattern Analysis: Optimizing parking availability and usage.</span>
                 </li>
                 <li className="flex items-center">
                   <BarChart2 className="h-5 w-5 mr-2 text-indigo-500" />
-                  <span>Analisis Tren Historis: Menganalisis pola lalu lintas jangka panjang.</span>
+                  <span>Historical Trend Analysis: Analyzing long-term traffic patterns.</span>
                 </li>
               </ul>
             </div>
             <p className="lg:col-span-2 text-sm text-gray-500 mt-4">
-              *Analisis ini dilakukan oleh sistem Python backend dan divisualisasikan di sini.
+              *These analyses are performed by a backend Python system and visualized here.
             </p>
           </CardContent>
         </Card>
 
         <div className="lg:col-span-2 mt-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
-            <Target className="h-6 w-6 mr-2 text-indigo-600" /> Ikhtisar Perencanaan Proyek
+            <Target className="h-6 w-6 mr-2 text-indigo-600" /> Project Planning Overview
           </h2>
           <ProjectPlanningSection id="project-planning-overview" />
         </div>
@@ -316,7 +316,7 @@ const DataAnalysisPage = () => {
         {/* New section for Traffic Changes Insights */}
         <div className="lg:col-span-2 mt-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
-            <AlertTriangle className="h-6 w-6 mr-2 text-red-600" /> Wawasan & Prediksi Perubahan Lalu Lintas
+            <AlertTriangle className="h-6 w-6 mr-2 text-red-600" /> Traffic Changes Insights & Predictions
           </h2>
           <TrafficChangesInsights id="traffic-changes-insights" />
         </div>

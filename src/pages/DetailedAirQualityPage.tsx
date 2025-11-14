@@ -12,7 +12,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer }
   from 'recharts';
 import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale'; // Import enUS locale for English dates
 
 const DetailedAirQualityPage: React.FC = () => {
   const { isAirQualityFeatureEnabled } = useSettings();
@@ -28,21 +28,21 @@ const DetailedAirQualityPage: React.FC = () => {
   };
 
   const getAqiDescription = (aqi: number) => {
-    if (aqi <= 50) return "Baik";
-    if (aqi <= 100) return "Sedang";
-    if (aqi <= 150) return "Tidak Sehat (Kelompok Sensitif)";
-    if (aqi <= 200) return "Tidak Sehat";
-    if (aqi <= 300) return "Sangat Tidak Sehat";
-    return "Berbahaya";
+    if (aqi <= 50) return "Good";
+    if (aqi <= 100) return "Moderate";
+    if (aqi <= 150) return "Unhealthy for Sensitive Groups";
+    if (aqi <= 200) return "Unhealthy";
+    if (aqi <= 300) return "Very Unhealthy";
+    return "Hazardous";
   };
 
   const getHealthRecommendation = (aqi: number) => {
-    if (aqi <= 50) return "Kualitas udara memuaskan, polusi udara menimbulkan sedikit atau tanpa risiko.";
-    if (aqi <= 100) return "Kualitas udara dapat diterima; namun, bagi beberapa polutan mungkin ada kekhawatiran kesehatan moderat untuk sejumlah kecil orang yang sangat sensitif terhadap polusi udara.";
-    if (aqi <= 150) return "Anggota kelompok sensitif mungkin mengalami efek kesehatan. Masyarakat umum tidak mungkin terpengaruh.";
-    if (aqi <= 200) return "Setiap orang mungkin mulai mengalami efek kesehatan; anggota kelompok sensitif mungkin mengalami efek yang lebih serius.";
-    if (aqi <= 300) return "Peringatan kesehatan: setiap orang mungkin mengalami efek kesehatan yang lebih serius.";
-    return "Peringatan kesehatan: setiap orang mungkin mengalami efek kesehatan yang sangat serius.";
+    if (aqi <= 50) return "Air quality is satisfactory, and air pollution poses little or no risk.";
+    if (aqi <= 100) return "Air quality is acceptable; however, for some pollutants there may be a moderate health concern for a very small number of people who are unusually sensitive to air pollution.";
+    if (aqi <= 150) return "Members of sensitive groups may experience health effects. The general public is not likely to be affected.";
+    if (aqi <= 200) return "Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.";
+    if (aqi <= 300) return "Health warnings of emergency conditions. The entire population is more likely to be affected.";
+    return "Health alert: everyone may experience more serious health effects.";
   };
 
   const getPollutantValue = (iaqi: any, pollutant: string) => {
@@ -55,12 +55,12 @@ const DetailedAirQualityPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <Leaf className="h-8 w-8 mr-3 text-gray-500" />
-            Kualitas Udara Torino
+            Torino Air Quality
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -69,11 +69,11 @@ const DetailedAirQualityPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
                 <Leaf className="h-5 w-5 mr-2 text-gray-500" />
-                Fitur Kualitas Udara Dinonaktifkan
+                Air Quality Feature Disabled
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Fitur kualitas udara saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data.</p>
+              <p>The air quality feature is currently disabled. Enable it in Settings to view data.</p>
             </CardContent>
           </Card>
         </main>
@@ -85,7 +85,7 @@ const DetailedAirQualityPage: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 items-center justify-center">
         <Leaf className="h-12 w-12 mr-3 text-indigo-600 animate-pulse" />
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Memuat Kualitas Udara...</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Loading Air Quality...</h1>
       </div>
     );
   }
@@ -96,12 +96,12 @@ const DetailedAirQualityPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <Leaf className="h-8 w-8 mr-3 text-indigo-600" />
-            Kualitas Udara Torino
+            Torino Air Quality
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -110,12 +110,12 @@ const DetailedAirQualityPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-red-500 flex items-center">
                 <AlertCircle className="h-5 w-5 mr-2" />
-                Kesalahan Kualitas Udara
+                Air Quality Error
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Gagal memuat data kualitas udara: {error.message}</p>
-              <p className="text-sm text-gray-500">Pastikan kunci API AQICN Anda benar dan koneksi internet stabil.</p>
+              <p>Failed to load air quality data: {error.message}</p>
+              <p className="text-sm text-gray-500">Please ensure your AQICN API key is correct and internet connection is stable.</p>
             </CardContent>
           </Card>
         </main>
@@ -123,18 +123,18 @@ const DetailedAirQualityPage: React.FC = () => {
     );
   }
 
-  if (!data || data.aqi === undefined) {
+  if (!data || data.aqi === undefined) { // FIX 3: This check is now robust
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <Leaf className="h-8 w-8 mr-3 text-indigo-600" />
-            Kualitas Udara Torino
+            Torino Air Quality
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -143,11 +143,11 @@ const DetailedAirQualityPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
                 <Leaf className="h-5 w-5 mr-2 text-indigo-600" />
-                Data Kualitas Udara Tidak Tersedia
+                Air Quality Data Not Available
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Tidak ada data kualitas udara yang dapat dimuat saat ini.</p>
+              <p>No air quality data could be loaded at this time.</p>
             </CardContent>
           </Card>
         </main>
@@ -177,12 +177,12 @@ const DetailedAirQualityPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <Leaf className="h-8 w-8 mr-3 text-indigo-600" />
-          Kualitas Udara Torino
+          Torino Air Quality
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -193,7 +193,7 @@ const DetailedAirQualityPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Leaf className="h-5 w-5 mr-2 text-green-600" />
-              Kualitas Udara Terkini di {data.city.name}
+              Current Air Quality in {data.city.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
@@ -201,13 +201,13 @@ const DetailedAirQualityPage: React.FC = () => {
               <span className="text-5xl font-bold">{aqi} AQI</span>
               <Badge className={`text-lg px-4 py-2 ${getAqiColor(aqi)}`}>{aqiDescription}</Badge>
             </div>
-            <p className="text-lg text-gray-600 dark:text-gray-400">Polutan Dominan: <span className="font-medium">{dominantPollutant}</span></p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">Dominant Pollutant: <span className="font-medium">{dominantPollutant}</span></p>
             <div className="flex items-start space-x-2">
               <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-1" />
               <p className="text-base">{healthRecommendation}</p>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })}
+              *Data provided by AQICN.org. Last updated: {new Date(data.time.iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
             </p>
           </CardContent>
         </Card>
@@ -217,7 +217,7 @@ const DetailedAirQualityPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Cloud className="h-5 w-5 mr-2 text-gray-600" />
-              Detail Polutan Utama
+              Main Pollutant Details
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -237,7 +237,7 @@ const DetailedAirQualityPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Thermometer className="h-5 w-5 mr-2 text-orange-600" />
-              Tren AQI Historis (7 Hari Terakhir)
+              Historical AQI Trend (Last 7 Days)
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
@@ -252,10 +252,10 @@ const DetailedAirQualityPage: React.FC = () => {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-                <XAxis dataKey="date" tickFormatter={(dateStr) => format(new Date(dateStr), 'dd MMM', { locale: id })} className="text-sm text-gray-600 dark:text-gray-400" />
+                <XAxis dataKey="date" tickFormatter={(dateStr) => format(new Date(dateStr), 'dd MMM', { locale: enUS })} className="text-sm text-gray-600 dark:text-gray-400" />
                 <YAxis domain={[0, 300]} className="text-sm text-gray-600 dark:text-gray-400" />
                 <Tooltip
-                  labelFormatter={(label) => format(new Date(label), 'EEEE, dd MMMM yyyy', { locale: id })}
+                  labelFormatter={(label) => format(new Date(label), 'EEEE, dd MMMM yyyy', { locale: enUS })}
                   formatter={(value: number) => [`${value} AQI`, 'AQI']}
                   contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
                   labelStyle={{ color: 'hsl(var(--foreground))' }}
@@ -265,7 +265,7 @@ const DetailedAirQualityPage: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-500 mt-4 text-center">
-              *Ini adalah data tren historis yang disimulasikan. Data aktual mungkin bervariasi.
+              *This is simulated historical trend data. Actual data may vary.
             </p>
           </CardContent>
         </Card>

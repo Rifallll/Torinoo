@@ -29,7 +29,7 @@ const AllGtfsRoutesPage: React.FC = () => {
       case 5: return 'Cable Car';
       case 6: return 'Gondola';
       case 7: return 'Funicular';
-      default: return 'Lainnya';
+      default: return 'Other';
     }
   };
 
@@ -83,12 +83,12 @@ const AllGtfsRoutesPage: React.FC = () => {
       <header className="flex items-center justify-between mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <Route className="h-8 w-8 md:h-10 md:w-10 mr-3 text-indigo-600" />
-          Semua Rute Transportasi Publik (GTFS)
+          All Public Transport Routes (GTFS)
         </h1>
         <Button asChild variant="outline" className="px-4 py-2 text-sm md:text-base">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -101,7 +101,7 @@ const AllGtfsRoutesPage: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   type="text"
-                  placeholder="Cari rute (ID, nama, deskripsi, operator)..."
+                  placeholder="Search routes (ID, name, description, operator)..."
                   className="pl-9 pr-8 w-full h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -120,10 +120,10 @@ const AllGtfsRoutesPage: React.FC = () => {
 
               <Select onValueChange={setSelectedRouteType} value={selectedRouteType}>
                 <SelectTrigger className="w-full sm:w-[200px] h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500">
-                  <SelectValue placeholder="Filter Tipe Rute" />
+                  <SelectValue placeholder="Filter Route Type" />
                 </SelectTrigger>
                 <SelectContent className="dark:bg-gray-700 dark:text-gray-200">
-                  <SelectItem value="all">Semua Tipe</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {availableRouteTypes.map(type => (
                     <SelectItem key={type} value={String(type)}>
                       {getRouteTypeLabel(type)}
@@ -135,7 +135,7 @@ const AllGtfsRoutesPage: React.FC = () => {
               {(searchTerm || selectedRouteType !== 'all') && (
                 <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
                   <XCircle className="h-4 w-4 mr-2" />
-                  Reset Filter
+                  Reset Filters
                 </Button>
               )}
             </div>
@@ -143,11 +143,11 @@ const AllGtfsRoutesPage: React.FC = () => {
         </Card>
 
         {isLoading ? (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-12 text-lg">Memuat data rute GTFS lokal...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-12 text-lg">Loading local GTFS route data...</p>
         ) : error ? (
           <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-xl border-red-500">
             <CardContent className="p-6 text-center text-red-500 text-lg">
-              Gagal memuat rute: {error.message}
+              Failed to load routes: {error.message}
             </CardContent>
           </Card>
         ) : filteredRoutes.length > 0 ? (
@@ -157,12 +157,12 @@ const AllGtfsRoutesPage: React.FC = () => {
                 <Table>
                   <TableHeader className="bg-gray-100 dark:bg-gray-700">
                     <TableRow className="border-b border-gray-200 dark:border-gray-600">
-                      <TableHead className="w-[120px] py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">ID Rute</TableHead>
-                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Nama Pendek</TableHead>
-                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Nama Panjang</TableHead>
-                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Tipe</TableHead>
+                      <TableHead className="w-[120px] py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Route ID</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Short Name</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Long Name</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Type</TableHead>
                       <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Operator</TableHead>
-                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Deskripsi</TableHead>
+                      <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm">Description</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -191,7 +191,7 @@ const AllGtfsRoutesPage: React.FC = () => {
         ) : (
           <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-xl">
             <CardContent className="p-6 text-center text-gray-600 dark:text-gray-400 text-lg">
-              Tidak ada rute transportasi publik yang tersedia dari data GTFS lokal yang cocok dengan filter Anda.
+              No public transport routes available from local GTFS data matching your filters.
             </CardContent>
           </Card>
         )}

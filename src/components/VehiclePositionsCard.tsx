@@ -30,11 +30,11 @@ const VehiclePositionsCard: React.FC = React.memo(() => {
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <Car className="h-5 w-5 mr-2 text-indigo-600" /> Posisi Kendaraan
+            <Car className="h-5 w-5 mr-2 text-indigo-600" /> Vehicle Positions
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat posisi kendaraan...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Loading vehicle positions...</p>
         </CardContent>
       </Card>
     );
@@ -45,11 +45,11 @@ const VehiclePositionsCard: React.FC = React.memo(() => {
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <Car className="h-5 w-5 mr-2 text-indigo-600" /> Posisi Kendaraan
+            <Car className="h-5 w-5 mr-2 text-indigo-600" /> Vehicle Positions
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-red-500 text-center py-4">Gagal memuat posisi kendaraan: {error.message}</p>
+          <p className="text-red-500 text-center py-4">Failed to load vehicle positions: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -59,7 +59,7 @@ const VehiclePositionsCard: React.FC = React.memo(() => {
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-          <Car className="h-5 w-5 mr-2 text-indigo-600" /> Posisi Kendaraan
+          <Car className="h-5 w-5 mr-2 text-indigo-600" /> Vehicle Positions
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -70,7 +70,7 @@ const VehiclePositionsCard: React.FC = React.memo(() => {
                 <div className="flex items-center justify-between mb-1">
                   <h4 className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
                     {getRouteTypeIcon(vp.trip?.route_id)}
-                    Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
+                    Route {vp.trip?.route_id || vp.vehicle?.label || vp.id}
                   </h4>
                   <Badge variant="secondary" className="text-xs">
                     {getVehicleStatus(vp.current_status, vp.occupancy_status)}
@@ -86,10 +86,10 @@ const VehiclePositionsCard: React.FC = React.memo(() => {
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mt-1">
                   <span className="flex items-center">
-                    <Gauge className="h-3 w-3 mr-1" /> Kecepatan: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
+                    <Gauge className="h-3 w-3 mr-1" /> Speed: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
                   </span>
                   <span className="flex items-center">
-                    <TrafficCone className="h-3 w-3 mr-1" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
+                    <TrafficCone className="h-3 w-3 mr-1" /> Congestion: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
                 </div>
               </div>
@@ -98,14 +98,14 @@ const VehiclePositionsCard: React.FC = React.memo(() => {
               <div className="text-center mt-4">
                 <Button asChild variant="outline" className="">
                   <Link to="/all-vehicle-positions">
-                    <span>Lihat Semua ({vehiclePositions.length - 5} lainnya)</span>
+                    <span>View All ({vehiclePositions.length - 5} more)</span>
                   </Link>
                 </Button>
               </div>
             )}
           </>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada posisi kendaraan yang tersedia.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">No vehicle positions available.</p>
         )}
       </CardContent>
     </Card>

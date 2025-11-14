@@ -23,7 +23,7 @@ const AllVehiclePositionsPage: React.FC = () => {
       console.log("[AllVehiclePositionsPage] Fetched Vehicle Positions:", data.vehiclePositions);
     } catch (err) {
       console.error("Failed to fetch or parse GTFS-realtime data:", err);
-      setError("Gagal memuat atau mengurai data posisi kendaraan.");
+      setError("Failed to load or parse vehicle position data.");
     } finally {
       setIsLoading(false);
     }
@@ -117,26 +117,26 @@ const AllVehiclePositionsPage: React.FC = () => {
   const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
     if (status && status !== 'UNKNOWN_STOP_STATUS') {
       switch (status) {
-        case 'IN_TRANSIT_TO': return 'Dalam Perjalanan';
-        case 'STOPPED_AT_STATION': return 'Berhenti di Stasiun';
-        case 'IN_VEHICLE_BAY': return 'Di Teluk Kendaraan';
-        case 'AT_PLATFORM': return 'Di Platform';
+        case 'IN_TRANSIT_TO': return 'In Transit To';
+        case 'STOPPED_AT_STATION': return 'Stopped at Station';
+        case 'IN_VEHICLE_BAY': return 'In Vehicle Bay';
+        case 'AT_PLATFORM': return 'At Platform';
         default: return status.replace(/_/g, ' ');
       }
     }
     if (occupancyStatus) {
       switch (occupancyStatus) {
-        case 'EMPTY': return 'Kosong';
-        case 'MANY_SEATS_AVAILABLE': return 'Banyak Kursi Tersedia';
-        case 'FEW_SEATS_AVAILABLE': return 'Beberapa Kursi Tersedia';
-        case 'STANDING_ROOM_ONLY': return 'Hanya Berdiri';
-        case 'CRUSHED_STANDING_ROOM_ONLY': return 'Sangat Penuh';
-        case 'FULL': return 'Penuh';
-        case 'NOT_APPLICABLE': return 'Tidak Berlaku';
+        case 'EMPTY': return 'Empty';
+        case 'MANY_SEATS_AVAILABLE': return 'Many Seats Available';
+        case 'FEW_SEATS_AVAILABLE': return 'Few Seats Available';
+        case 'STANDING_ROOM_ONLY': return 'Standing Room Only';
+        case 'CRUSHED_STANDING_ROOM_ONLY': return 'Crushed Standing Room Only';
+        case 'FULL': return 'Full';
+        case 'NOT_APPLICABLE': return 'Not Applicable';
         default: return occupancyStatus.replace(/_/g, ' ');
       }
     }
-    return 'Status Tidak Tersedia';
+    return 'Status Not Available';
   };
 
   const getCongestionBadgeClass = (congestionLevel: string | undefined) => {
@@ -153,10 +153,10 @@ const AllVehiclePositionsPage: React.FC = () => {
   const formatCongestionLevel = (congestionLevel: string | undefined) => {
     if (!congestionLevel) return 'N/A';
     switch (congestionLevel) {
-      case 'RUNNING_SMOOTHLY': return 'Lancar';
-      case 'STOP_AND_GO': return 'Berhenti & Jalan';
-      case 'CONGESTION': return 'Macet';
-      case 'SEVERE_CONGESTION': return 'Macet Parah';
+      case 'RUNNING_SMOOTHLY': return 'Running Smoothly';
+      case 'STOP_AND_GO': return 'Stop & Go';
+      case 'CONGESTION': return 'Congestion';
+      case 'SEVERE_CONGESTION': return 'Severe Congestion';
       case 'UNKNOWN_CONGESTION_LEVEL': return 'N/A';
       default: return 'N/A';
     }
@@ -178,19 +178,19 @@ const AllVehiclePositionsPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <Car className="h-8 w-8 mr-3 text-indigo-600" />
-          Semua Posisi Kendaraan Real-Time
+          All Real-Time Vehicle Positions
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
 
       <main className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">Memuat semua posisi kendaraan...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">Loading all vehicle positions...</p>
         ) : error ? (
           <p className="text-red-500 text-center py-4 col-span-full">{error}</p>
         ) : sortedVehiclePositions.length > 0 ? (
@@ -199,7 +199,7 @@ const AllVehiclePositionsPage: React.FC = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold flex items-center">
                   {getRouteTypeIcon(vp.trip?.route_id)}
-                  Jalur {vp.trip?.route_id || vp.vehicle?.label || vp.id}
+                  Route {vp.trip?.route_id || vp.vehicle?.label || vp.id}
                 </CardTitle>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Trip ID: {vp.trip?.trip_id || 'N/A'}</p>
               </CardHeader>
@@ -214,13 +214,13 @@ const AllVehiclePositionsPage: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <span className="flex items-center">
-                    <Gauge className="h-4 w-4 mr-2" /> Kecepatan: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
+                    <Gauge className="h-4 w-4 mr-2" /> Speed: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
                   </span>
                   <span className="flex items-center">
-                    <ArrowRight className="h-4 w-4 mr-2" /> Arah: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
+                    <ArrowRight className="h-4 w-4 mr-2" /> Bearing: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
                   </span>
                   <span className="flex items-center col-span-2">
-                    <TrafficCone className="h-4 w-4 mr-2" /> Kemacetan: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
+                    <TrafficCone className="h-4 w-4 mr-2" /> Congestion: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
                   </span>
                   <span className="flex items-center col-span-2">
                     <Clock className="h-4 w-4 mr-2" /> Update: {formatRelativeTime(vp.timestamp)}
@@ -230,7 +230,7 @@ const AllVehiclePositionsPage: React.FC = () => {
             </Card>
           ))
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">Tidak ada posisi kendaraan yang tersedia.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">No vehicle positions available.</p>
         )}
       </main>
     </div>

@@ -90,7 +90,7 @@ const fetchOpenMeteoWeather = async (city: string): Promise<OpenMeteoParsedData>
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Gagal mengambil data cuaca: ${response.statusText}`);
+    throw new Error(`Failed to fetch weather data: ${response.statusText}`);
   }
 
   const apiResponse: OpenMeteoApiResponse = await response.json();

@@ -127,14 +127,14 @@ const parseCsv = async <T>(filePath: string): Promise<T[]> => {
         complete: (results) => {
           if (results.errors.length > 0) {
             console.error(`Errors parsing ${filePath}:`, results.errors);
-            toast.error(`Gagal mengurai file GTFS ${filePath.split('/').pop()}: ${results.errors[0].message}`);
+            toast.error(`Failed to parse GTFS file ${filePath.split('/').pop()}: ${results.errors[0].message}`);
             reject(new Error(`Parsing error in ${filePath}`));
           }
           resolve(results.data as T[]);
         },
         error: (error: Error) => {
           console.error(`Error reading ${filePath}:`, error);
-          toast.error(`Terjadi kesalahan saat membaca file GTFS ${filePath.split('/').pop()}: ${error.message}`);
+          toast.error(`An error occurred while reading GTFS file ${filePath.split('/').pop()}: ${error.message}`);
           reject(error);
         },
       });
@@ -143,7 +143,7 @@ const parseCsv = async <T>(filePath: string): Promise<T[]> => {
     console.error(`Failed to load ${filePath}:`, error);
     // Only show toast for critical files like routes/stops if they fail
     if (filePath.includes('routes.txt') || filePath.includes('stops.txt')) {
-      toast.error(`Gagal memuat file GTFS ${filePath.split('/').pop()}.`);
+      toast.error(`Failed to load GTFS file ${filePath.split('/').pop()}.`);
     }
     return [];
   }
@@ -162,7 +162,7 @@ export const loadGtfsData = async (): Promise<ParsedGtfsData> => {
     // Add other GTFS files here as needed
   ]);
 
-  toast.success("Data GTFS lokal berhasil dimuat!");
+  toast.success("Local GTFS data loaded successfully!");
   console.log("GTFS Data Loaded:", { agencies, routes, stops, trips, stopTimes, calendar, calendarDates, shapes });
 
   return { agencies, routes, stops, trips, stopTimes, calendar, calendarDates, shapes };

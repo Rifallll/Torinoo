@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useWeather } from '@/hooks/useWeather';
 import { useSettings } from '@/contexts/SettingsContext';
 import { format } from 'date-fns';
-import { id } from 'date-fns/locale'; // Import locale for Indonesian dates
+import { enUS } from 'date-fns/locale'; // Import enUS locale for English dates
 
 const DetailedWeatherPage: React.FC = () => {
   const { isWeatherFeatureEnabled } = useSettings();
@@ -29,20 +29,20 @@ const DetailedWeatherPage: React.FC = () => {
   };
 
   const getWeatherDescription = (weathercode: number) => {
-    if (weathercode === 0) return "Langit cerah";
-    if (weathercode === 1) return "Sebagian besar cerah";
-    if (weathercode === 2) return "Sebagian berawan";
-    if (weathercode === 3) return "Mendung";
-    if (weathercode >= 45 && weathercode <= 48) return "Kabut";
-    if (weathercode >= 51 && weathercode <= 55) return "Gerimis";
-    if (weathercode >= 56 && weathercode <= 57) return "Gerimis beku";
-    if (weathercode >= 61 && weathercode <= 65) return "Hujan";
-    if (weathercode >= 66 && weathercode <= 67) return "Hujan beku";
-    if (weathercode >= 71 && weathercode <= 75) return "Salju";
-    if (weathercode === 77) return "Butiran salju";
-    if (weathercode >= 80 && weathercode <= 82) return "Hujan ringan";
-    if (weathercode >= 85 && weathercode <= 86) return "Hujan salju ringan";
-    if (weathercode >= 95 && weathercode <= 99) return "Badai petir";
+    if (weathercode === 0) return "Clear sky";
+    if (weathercode === 1) return "Mainly clear";
+    if (weathercode === 2) return "Partly cloudy";
+    if (weathercode === 3) return "Overcast";
+    if (weathercode >= 45 && weathercode <= 48) return "Fog";
+    if (weathercode >= 51 && weathercode <= 55) return "Drizzle";
+    if (weathercode >= 56 && weathercode <= 57) return "Freezing Drizzle";
+    if (weathercode >= 61 && weathercode <= 65) return "Rain";
+    if (weathercode >= 66 && weathercode <= 67) return "Freezing Rain";
+    if (weathercode >= 71 && weathercode <= 75) return "Snow fall";
+    if (weathercode === 77) return "Snow grains";
+    if (weathercode >= 80 && weathercode <= 82) return "Rain showers";
+    if (weathercode >= 85 && weathercode <= 86) return "Snow showers";
+    if (weathercode >= 95 && weathercode <= 99) return "Thunderstorm";
     return "N/A";
   };
 
@@ -52,12 +52,12 @@ const DetailedWeatherPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-8 w-8 mr-3 text-gray-500" />
-            Prakiraan Cuaca Torino
+            Torino Weather Forecast
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -66,11 +66,11 @@ const DetailedWeatherPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
                 <CloudSun className="h-5 w-5 mr-2 text-gray-500" />
-                Fitur Cuaca Dinonaktifkan
+                Weather Feature Disabled
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Fitur prakiraan cuaca saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data cuaca.</p>
+              <p>The weather forecast feature is currently disabled. Enable it in Settings to view weather data.</p>
             </CardContent>
           </Card>
         </main>
@@ -82,7 +82,7 @@ const DetailedWeatherPage: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 items-center justify-center">
         <CloudSun className="h-12 w-12 mr-3 text-indigo-600 animate-spin" />
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Memuat Prakiraan Cuaca...</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Loading Weather Forecast...</h1>
       </div>
     );
   }
@@ -93,12 +93,12 @@ const DetailedWeatherPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-            Prakiraan Cuaca Torino
+            Torino Weather Forecast
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -107,12 +107,12 @@ const DetailedWeatherPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-red-500 flex items-center">
                 <Thermometer className="h-5 w-5 mr-2" />
-                Kesalahan Cuaca
+                Weather Error
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Gagal memuat data cuaca: {error.message}</p>
-              <p className="text-sm text-gray-500">Pastikan koneksi internet Anda stabil.</p>
+              <p>Failed to load weather data: {error.message}</p>
+              <p className="text-sm text-gray-500">Please ensure your internet connection is stable.</p>
             </CardContent>
           </Card>
         </main>
@@ -126,12 +126,12 @@ const DetailedWeatherPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-            Prakiraan Cuaca Torino
+            Torino Weather Forecast
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -140,11 +140,11 @@ const DetailedWeatherPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
                 <CloudSun className="h-5 w-5 mr-2 text-indigo-600" />
-                Data Cuaca Tidak Tersedia
+                Weather Data Not Available
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Tidak ada data cuaca yang dapat dimuat saat ini.</p>
+              <p>No weather data could be loaded at this time.</p>
             </CardContent>
           </Card>
         </main>
@@ -183,12 +183,12 @@ const DetailedWeatherPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-          Prakiraan Cuaca Torino
+          Torino Weather Forecast
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -199,7 +199,7 @@ const DetailedWeatherPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Thermometer className="h-5 w-5 mr-2 text-red-600" />
-              Cuaca Terkini di {data.city}
+              Current Weather in {data.city}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
@@ -214,15 +214,15 @@ const DetailedWeatherPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center">
                 <Droplet className="h-5 w-5 mr-2 text-blue-500" />
-                <span>Kelembaban: {data.current.relativehumidity_2m}%</span>
+                <span>Humidity: {data.current.relativehumidity_2m}%</span>
               </div>
               <div className="flex items-center">
                 <Wind className="h-5 w-5 mr-2 text-gray-500" />
-                <span>Kecepatan Angin: {data.current.windspeed_10m.toFixed(1)} m/s</span>
+                <span>Wind Speed: {data.current.windspeed_10m.toFixed(1)} m/s</span>
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              *Data disediakan oleh Open-Meteo.
+              *Data provided by Open-Meteo.
             </p>
           </CardContent>
         </Card>
@@ -232,17 +232,17 @@ const DetailedWeatherPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Clock className="h-5 w-5 mr-2 text-blue-600" />
-              Prakiraan Per Jam (24 Jam Berikutnya)
+              Hourly Forecast (Next 24 Hours)
             </CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <div className="flex space-x-4 pb-2">
               {hourlyForecast.map((hourData, index) => (
                 <div key={index} className="flex-shrink-0 text-center p-3 border rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-                  <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{format(hourData.time, 'HH:mm', { locale: id })}</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{format(hourData.time, 'HH:mm', { locale: enUS })}</p>
                   <div className="my-2">{getWeatherIcon(data.current.weathercode)}</div> {/* Using current weather icon for simplicity */}
                   <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{Math.round(hourData.temperature)}°C</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Hujan: {hourData.rain.toFixed(1)} mm</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Rain: {hourData.rain.toFixed(1)} mm</p>
                 </div>
               ))}
             </div>
@@ -254,7 +254,7 @@ const DetailedWeatherPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <CalendarDays className="h-5 w-5 mr-2 text-green-600" />
-              Prakiraan Harian (7 Hari)
+              Daily Forecast (7 Days)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -263,7 +263,7 @@ const DetailedWeatherPage: React.FC = () => {
                 <div className="flex items-center space-x-3 w-1/3">
                   {getWeatherIcon(dayData.weathercode)}
                   <div>
-                    <p className="font-medium text-gray-800 dark:text-gray-100">{format(dayData.date, 'EEEE, dd MMM', { locale: id })}</p>
+                    <p className="font-medium text-gray-800 dark:text-gray-100">{format(dayData.date, 'EEEE, dd MMM', { locale: enUS })}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{getWeatherDescription(dayData.weathercode)}</p>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } => 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,7 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
 
   const handleUpload = () => {
     if (selectedFile) {
-      toast.info(`Mengunggah dan memulai analisis simulasi untuk file '${selectedFile.name}'...`);
+      toast.info(`Uploading and starting simulated analysis for file '${selectedFile.name}'...`);
       
       Papa.parse(selectedFile, {
         header: true,
@@ -38,7 +38,7 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
         complete: (results) => {
           if (results.errors.length > 0) {
             console.error("CSV parsing errors:", results.errors);
-            toast.error(`Gagal mengurai CSV: ${results.errors[0].message}`);
+            toast.error(`Failed to parse CSV: ${results.errors[0].message}`);
             setSelectedFile(null);
             return;
           }
@@ -46,18 +46,18 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
           // Type assertion here, assuming the CSV structure matches TrafficDataRow
           const parsedData = results.data as TrafficDataRow[]; 
           uploadData(parsedData); // Pass parsed data to context
-          toast.success(`File '${selectedFile.name}' berhasil diunggah dan analisis dimulai.`);
+          toast.success(`File '${selectedFile.name}' uploaded successfully and analysis started.`);
           onClose();
           setSelectedFile(null); // Clear selected file after upload
         },
         error: (error: Error) => {
           console.error("Error parsing CSV:", error);
-          toast.error(`Terjadi kesalahan saat mengurai file: ${error.message}`);
+          toast.error(`An error occurred while parsing the file: ${error.message}`);
           setSelectedFile(null);
         }
       });
     } else {
-      toast.warning("Harap pilih file CSV terlebih dahulu.");
+      toast.warning("Please select a CSV file first.");
     }
   };
 
@@ -72,17 +72,17 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <span className="flex items-center">
-              <Upload className="mr-2 h-5 w-5" /> Unggah Data CSV
+              <Upload className="mr-2 h-5 w-5" /> Upload CSV Data
             </span>
           </DialogTitle>
           <DialogDescription>
-            Pilih file CSV yang berisi data lalu lintas untuk analisis.
+            Select a CSV file containing traffic data for analysis.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="csvFile" className="text-right">
-              File CSV
+              CSV File
             </Label>
             <Input
               id="csvFile"
@@ -93,12 +93,12 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
           {selectedFile && (
-            <p className="text-sm text-gray-600 text-center">File dipilih: <span className="font-medium">{selectedFile.name}</span></p>
+            <p className="text-sm text-gray-600 text-center">Selected file: <span className="font-medium">{selectedFile.name}</span></p>
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>Batal</Button>
-          <Button onClick={handleUpload} disabled={!selectedFile}>Unggah</Button>
+          <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleUpload} disabled={!selectedFile}>Upload</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -40,26 +40,26 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-red-600 flex items-center justify-center">
                 <AlertCircle className="h-7 w-7 mr-3" />
-                Terjadi Kesalahan!
+                An Error Occurred!
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
               <p className="text-lg">
-                Maaf, terjadi masalah tak terduga.
+                Sorry, an unexpected problem occurred.
               </p>
               <p className="text-sm text-gray-500">
-                Kami sedang berupaya memperbaikinya. Silakan coba muat ulang halaman.
+                We are working to fix it. Please try reloading the page.
               </p>
               {this.state.error && (
                 <details className="text-left text-sm text-gray-600 dark:text-gray-400 p-2 border rounded-md bg-gray-100 dark:bg-gray-700">
-                  <summary className="font-semibold cursor-pointer">Detail Error</summary>
+                  <summary className="font-semibold cursor-pointer">Error Details</summary>
                   <pre className="mt-2 whitespace-pre-wrap break-all">
                     {this.state.error.message}
                   </pre>
                 </details>
               )}
               <Button onClick={() => window.location.reload()} className="mt-4">
-                Muat Ulang Halaman
+                Reload Page
               </Button>
             </CardContent>
           </Card>

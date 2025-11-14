@@ -89,7 +89,7 @@ const loadProto = async () => {
   } catch (error) {
     console.error("Failed to load GTFS-realtime .proto:", error);
     // TODO: Remove or make less frequent for production
-    toast.error("Gagal memuat definisi Protobuf GTFS-realtime.");
+    toast.error("Failed to load GTFS-realtime Protobuf definition.");
     throw error;
   }
 };
@@ -102,7 +102,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       // Suppress toast for missing trip_update and alert files, as we'll provide dummy data
       if (type === 'vehicle_position') {
         // TODO: Remove or make less frequent for production
-        toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public.`);
+        toast.warning(`Failed to fetch ${type}.bin. Ensure the file exists in the public folder.`);
       }
       return [];
     }
@@ -114,7 +114,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       // Suppress toast for empty trip_update and alert files
       if (type === 'vehicle_position') {
         // TODO: Remove or make less frequent for production
-        toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai.`);
+        toast.warning(`Empty ${type}.bin file. No data to parse.`);
       }
       return [];
     }
@@ -169,7 +169,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     if (type === 'vehicle_position') {
       console.error(`Error parsing ${type}.bin from ${path}:`, error);
       // TODO: Remove or make less frequent for production
-      toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
+      toast.error(`Failed to parse ${type}.bin data: ${error instanceof Error ? error.message : String(error)}. File might be corrupt or not in the correct Protobuf format.`);
     }
     return [];
   }
@@ -183,23 +183,23 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
 export const formatRelativeTime = (timestamp?: number | string) => {
   if (timestamp === undefined || timestamp === null) return 'N/A';
   const numTimestamp = typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp;
-  if (isNaN(numTimestamp)) return 'Tanggal Tidak Valid';
+  if (isNaN(numTimestamp)) return 'Invalid Date';
 
   const now = Math.floor(Date.now() / 1000); // Current time in seconds
   const secondsAgo = now - numTimestamp;
 
-  if (secondsAgo < 0) return 'Di masa depan'; // Should not happen for "last updated"
-  if (secondsAgo < 10) return 'Baru saja';
-  if (secondsAgo < 60) return `${secondsAgo} detik lalu`;
+  if (secondsAgo < 0) return 'In the future'; // Should not happen for "last updated"
+  if (secondsAgo < 10) return 'Just now';
+  if (secondsAgo < 60) return `${secondsAgo} seconds ago`;
   
   const minutesAgo = Math.floor(secondsAgo / 60);
-  if (minutesAgo < 60) return `${minutesAgo} menit lalu`;
+  if (minutesAgo < 60) return `${minutesAgo} minutes ago`;
 
   const hoursAgo = Math.floor(minutesAgo / 60);
-  if (hoursAgo < 24) return `${hoursAgo} jam lalu`;
+  if (hoursAgo < 24) return `${hoursAgo} hours ago`;
 
   const daysAgo = Math.floor(hoursAgo / 24);
-  return `${daysAgo} hari lalu`;
+  return `${daysAgo} days ago`;
 };
 
 /**
@@ -274,7 +274,7 @@ export const parseGtfsRealtimeData = async (
       },
     ];
     // TODO: Remove for production
-    toast.info("Menggunakan data dummy untuk Pembaruan Perjalanan.");
+    toast.info("Using dummy data for Trip Updates.");
   }
 
   if (alerts.length === 0) {
@@ -286,8 +286,8 @@ export const parseGtfsRealtimeData = async (
         informed_entity: [{ route_id: 'BUS-A', route_type: 3 }], // Bus route
         cause: 'ACCIDENT',
         effect: 'DETOUR',
-        header_text: { translation: [{ text: 'Jalur BUS-A dialihkan karena kecelakaan', language: 'id' }] },
-        description_text: { translation: [{ text: 'Kecelakaan di Via Roma menyebabkan pengalihan jalur BUS-A. Harap gunakan rute alternatif.', language: 'id' }] },
+        header_text: { translation: [{ text: 'BUS-A route diverted due to accident', language: 'en' }] },
+        description_text: { translation: [{ text: 'An accident on Via Roma is causing a diversion for BUS-A route. Please use alternative routes.', language: 'en' }] },
       },
       {
         id: 'dummy-alert-2',
@@ -295,20 +295,20 @@ export const parseGtfsRealtimeData = async (
         informed_entity: [{ route_id: 'TRAM-4', route_type: 0 }], // Tram route
         cause: 'MAINTENANCE',
         effect: 'STOP_MOVED',
-        header_text: { translation: [{ text: 'Perbaikan Jalur TRAM-4, halte sementara dipindahkan', language: 'id' }] },
-        description_text: { translation: [{ text: 'Perbaikan mendesak di jalur TRAM-4. Halte di Piazza Castello dipindahkan 50m ke utara.', language: 'id' }] },
+        header_text: { translation: [{ text: 'TRAM-4 line maintenance, temporary stop moved', language: 'en' }] },
+        description_text: { translation: [{ text: 'Urgent maintenance on TRAM-4 line. The stop at Piazza Castello has been moved 50m north.', language: 'en' }] },
       },
     ];
     // TODO: Remove for production
-    toast.info("Menggunakan data dummy untuk Peringatan.");
+    toast.info("Using dummy data for Alerts.");
   }
 
   if (tripUpdates.length > 0 || vehiclePositions.length > 0 || alerts.length > 0) {
     // TODO: Remove for production
-    toast.success("Data GTFS-realtime berhasil diurai atau data dummy dimuat!");
+    toast.success("GTFS-realtime data successfully parsed or dummy data loaded!");
   } else {
     // TODO: Remove for production
-    toast.info("Tidak ada data GTFS-realtime yang ditemukan di file yang diunggah atau diurai.");
+    toast.info("No GTFS-realtime data found in uploaded or parsed files.");
   }
   
   return { tripUpdates, vehiclePositions, alerts };
@@ -316,10 +316,10 @@ export const parseGtfsRealtimeData = async (
 
 // Utility functions moved from RealtimePublicTransport.tsx
 export const formatDelay = (delaySeconds: number | undefined) => {
-  if (delaySeconds === undefined || delaySeconds === 0) return 'Tepat Waktu';
+  if (delaySeconds === undefined || delaySeconds === 0) return 'On Time';
   const minutes = Math.abs(Math.round(delaySeconds / 60));
-  if (delaySeconds > 0) return `${minutes} mnt Terlambat`;
-  return `${minutes} mnt Lebih Awal`;
+  if (delaySeconds > 0) return `${minutes} min Late`;
+  return `${minutes} min Early`;
 };
 
 export const getDelayBadgeClass = (delaySeconds: number | undefined) => {
@@ -348,26 +348,26 @@ export const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
 export const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
   if (status && status !== 'UNKNOWN_STOP_STATUS') {
     switch (status) {
-      case 'IN_TRANSIT_TO': return 'Dalam Perjalanan';
-      case 'STOPPED_AT_STATION': return 'Berhenti di Stasiun';
-      case 'IN_VEHICLE_BAY': return 'Di Teluk Kendaraan';
-      case 'AT_PLATFORM': return 'Di Platform';
+      case 'IN_TRANSIT_TO': return 'In Transit To';
+      case 'STOPPED_AT_STATION': return 'Stopped at Station';
+      case 'IN_VEHICLE_BAY': return 'In Vehicle Bay';
+      case 'AT_PLATFORM': return 'At Platform';
       default: return status.replace(/_/g, ' ');
     }
   }
   if (occupancyStatus) {
     switch (occupancyStatus) {
-      case 'EMPTY': return 'Kosong';
-      case 'MANY_SEATS_AVAILABLE': return 'Banyak Kursi Tersedia';
-      case 'FEW_SEATS_AVAILABLE': return 'Beberapa Kursi Tersedia';
-      case 'STANDING_ROOM_ONLY': return 'Hanya Berdiri';
-      case 'CRUSHED_STANDING_ROOM_ONLY': return 'Sangat Penuh';
-      case 'FULL': return 'Penuh';
-      case 'NOT_APPLICABLE': return 'Tidak Berlaku';
+      case 'EMPTY': return 'Empty';
+      case 'MANY_SEATS_AVAILABLE': return 'Many Seats Available';
+      case 'FEW_SEATS_AVAILABLE': return 'Few Seats Available';
+      case 'STANDING_ROOM_ONLY': return 'Standing Room Only';
+      case 'CRUSHED_STANDING_ROOM_ONLY': return 'Crushed Standing Room Only';
+      case 'FULL': return 'Full';
+      case 'NOT_APPLICABLE': return 'Not Applicable';
       default: return occupancyStatus.replace(/_/g, ' ');
     }
   }
-  return 'Status Tidak Tersedia';
+  return 'Status Not Available';
 };
 
 export const getCongestionBadgeClass = (congestionLevel: string | undefined) => {
@@ -384,10 +384,10 @@ export const getCongestionBadgeClass = (congestionLevel: string | undefined) => 
 export const formatCongestionLevel = (congestionLevel: string | undefined) => {
   if (!congestionLevel) return 'N/A';
   switch (congestionLevel) {
-    case 'RUNNING_SMOOTHLY': return 'Lancar';
-    case 'STOP_AND_GO': return 'Berhenti & Jalan';
-    case 'CONGESTION': return 'Macet';
-    case 'SEVERE_CONGESTION': return 'Macet Parah';
+    case 'RUNNING_SMOOTHLY': return 'Running Smoothly';
+    case 'STOP_AND_GO': return 'Stop & Go';
+    case 'CONGESTION': return 'Congestion';
+    case 'SEVERE_CONGESTION': return 'Severe Congestion';
     case 'UNKNOWN_CONGESTION_LEVEL': return 'N/A';
     default: return 'N/A';
   }

@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react'; // Only need one icon for the title
 
-// Interface untuk data perubahan lalu lintas yang diekstrak dari HTML
+// Interface for traffic change data extracted from HTML
 export interface TrafficChange {
   id: string;
   title: string;
@@ -12,28 +12,28 @@ export interface TrafficChange {
   fullDescription?: string;
   latitude: number;
   longitude: number;
-  startDate?: string; // Misalnya, 'Da lunedì 10 novembre'
-  endDate?: string;   // Misalnya, 'Fino a venerdì 8 desember'
-  type?: 'closure' | 'roadwork' | 'reduction' | 'pedestrianization'; // Tipe perubahan
-  responsibleEntity?: string; // Misalnya, 'Comune di Torino', 'SMAT', 'IRETI'
+  startDate?: string; // e.g., 'From Monday 10 November'
+  endDate?: string;   // e.g., 'Until Friday 8 December'
+  type?: 'closure' | 'roadwork' | 'reduction' | 'pedestrianization'; // Type of change
+  responsibleEntity?: string; // e.g., 'Comune di Torino', 'SMAT', 'IRETI'
 }
 
-// Data dummy yang diekstrak secara manual dari HTML yang Anda berikan
+// Dummy data manually extracted from your provided HTML
 export const mockTrafficChanges: TrafficChange[] = [
   {
     id: '668853',
-    title: 'CHIUSURA IN CORSO MORTARA',
-    description: 'Da lunedì 10 novembre, per lavori del comune di Torino, è prevista la chiusura dell\'utimo tratto di corso Mortara in direzione piazza Baldissera con obbligo di svolta a destra su corso Principe Oddone.',
+    title: 'CLOSURE IN CORSO MORTARA',
+    description: 'From Monday, November 10, due to municipal works, the last section of Corso Mortara towards Piazza Baldissera will be closed with a mandatory right turn onto Corso Principe Oddone.',
     latitude: 45.0918,
     longitude: 7.66297,
-    startDate: '2025-11-10', // Asumsi tahun 2025 dari konteks
+    startDate: '2025-11-10', // Assuming year 2025 from context
     type: 'closure',
     responsibleEntity: 'Comune di Torino',
   },
   {
     id: '667941',
-    title: '14/11 CHIUSURA IN SOTTOPASSO MORTARA',
-    description: 'Venerdì 14 novembre dalle 9:30 alle 16:30, per lavori del Comune di Torino, è prevista la chiusura del sottopasso Mortara in direzione via Orvieto.',
+    title: '14/11 CLOSURE IN MORTARA UNDERPASS',
+    description: 'Friday, November 14, from 9:30 AM to 4:30 PM, due to municipal works, the Mortara underpass towards Via Orvieto will be closed.',
     latitude: 45.0918,
     longitude: 7.66297,
     startDate: '2025-11-14',
@@ -43,8 +43,8 @@ export const mockTrafficChanges: TrafficChange[] = [
   },
   {
     id: '668781',
-    title: 'LAVORI IN PIAZZA SOFIA',
-    description: 'Fino a venerdì 14 november, per lavori SMAT, sono previste riduzioni di carreggiata in piazza Sofia all\'intersezione con strada Settimo.',
+    title: 'WORKS IN PIAZZA SOFIA',
+    description: 'Until Friday, November 14, due to SMAT works, lane reductions are planned in Piazza Sofia at the intersection with Strada Settimo.',
     latitude: 45.0951,
     longitude: 7.71709,
     endDate: '2025-11-14',
@@ -53,8 +53,8 @@ export const mockTrafficChanges: TrafficChange[] = [
   },
   {
     id: '668498',
-    title: 'LAVORI SU CONTROVIALI DI CORSO TASSONI',
-    description: 'Da lunedì 17 november a mercoledì 17 dicembre, per lavori del comune di Torino, sono previsti lavori con chiusure di carreggiata sui controviali est e ovest di corso Tassoni tra piazza Bernini e corso Regina Margherita.',
+    title: 'WORKS ON CORSO TASSONI SERVICE ROADS',
+    description: 'From Monday, November 17 to Wednesday, December 17, due to municipal works, road closures are planned on the east and west service roads of Corso Tassoni between Piazza Bernini and Corso Regina Margherita.',
     latitude: 45.0814,
     longitude: 7.65617,
     startDate: '2025-11-17',
@@ -64,9 +64,9 @@ export const mockTrafficChanges: TrafficChange[] = [
   },
   {
     id: '668465',
-    title: 'LAVORI AL PARCO DEL VALENTINO',
-    description: 'Per lavori all\'interno del parco del Valentino sono previste chiusure viabili. Baca tutto...',
-    fullDescription: 'Per lavori all\'interno del parco del Valentino sono previste chiusure viabili. Da lunedì 10 november 2025 a domenica 1 marzo 2026 adalah penutupan diviale Turr antara viale Boiardo dan via Millio. Hingga Minggu 1 Maret 2026 adalah penutupan di: - viale Stefano Turr antara viale Boiardo dan viale Marinai d\'Italia - viale Boiardo antara via Turr dan viale Marinai d\'Italia - viale Marinai d\'Italia antara viale Boiardo dan viale Turr - viale Millio antara viale Turr dan pintu masuk ke Borgo Medievale',
+    title: 'WORKS AT VALENTINO PARK',
+    description: 'Due to works inside Valentino Park, road closures are planned. Read more...',
+    fullDescription: 'Due to works inside Valentino Park, road closures are planned. From Monday, November 10, 2025 to Sunday, March 1, 2026, Viale Turr will be closed between Viale Boiardo and Via Millio. Until Sunday, March 1, 2026, closures are also in effect on: - Viale Stefano Turr between Viale Boiardo and Viale Marinai d\'Italia - Viale Boiardo between Via Turr and Viale Marinai d\'Italia - Viale Marinai d\'Italia between Viale Boiardo and Viale Turr - Viale Millio between Viale Turr and the entrance to the Medieval Village',
     latitude: 45.0501,
     longitude: 7.68233,
     startDate: '2025-11-10',
@@ -76,12 +76,12 @@ export const mockTrafficChanges: TrafficChange[] = [
   },
   {
     id: '667923',
-    title: 'PEDONALIZZAZIONE VIA ROMA',
-    description: 'Per lavori propedeutici alla pedonalizzazione di via Roma sono previste chiusure nel cento città. Baca tutto...',
-    fullDescription: 'Per lavori propedeutici alla pedonalizzazione di via Roma sono previste chiusure nel cento città. Hingga Rabu 31 Desember adalah penutupan di: - piazza CLN antara via Giolitti dan via Rossi - piazza CLN antara via Rossi dan via Amendola - piazza CLN antara via Alfieri dan via Frola - via Frola antara via XX Settembre dan via piazza CLN. Hingga Sabtu 31 Januari 2026 juga adalah penutupan via Roma antara via Cavour dan via Buozzi.',
+    title: 'VIA ROMA PEDESTRIANIZATION',
+    description: 'Due to preparatory works for the pedestrianization of Via Roma, closures are planned in the city center. Read more...',
+    fullDescription: 'Due to preparatory works for the pedestrianization of Via Roma, closures are planned in the city center. Until Wednesday, December 31, closures are in effect on: - Piazza CLN between Via Giolitti and Via Rossi - Piazza CLN between Via Rossi and Via Amendola - Piazza CLN between Via Alfieri and Via Frola - Via Frola between Via XX Settembre and Piazza CLN. Until Saturday, January 31, 2026, Via Roma will also be closed between Via Cavour and Via Buozzi.',
     latitude: 45.066,
     longitude: 7.68131,
-    startDate: '2025-09-22', // Asumsi dari deskripsi di HTML asli
+    startDate: '2025-09-22', // Assumed from original HTML description
     endDate: '2026-01-31',
     type: 'pedestrianization',
     responsibleEntity: 'Comune di Torino',
@@ -99,12 +99,12 @@ const TrafficChangesInsights: React.FC<TrafficChangesInsightsProps> = ({ id }) =
       <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
         <CardHeader className="pb-4">
           <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <AlertTriangle className="h-5 w-5 mr-2 text-red-600" /> Wawasan & Prediksi Perubahan Lalu Lintas (Simplified)
+            <AlertTriangle className="h-5 w-5 mr-2 text-red-600" /> Traffic Changes Insights & Predictions (Simplified)
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Ini adalah versi sederhana dari Wawasan Perubahan Lalu Lintas.</p>
-          <p>Jika Anda melihat ini, komponen berhasil dirender tanpa crash.</p>
+          <p>This is a simplified version of Traffic Changes Insights.</p>
+          <p>If you see this, the component rendered successfully without crashing.</p>
         </CardContent>
       </Card>
     </div>

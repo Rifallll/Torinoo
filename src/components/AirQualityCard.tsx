@@ -23,12 +23,12 @@ const AirQualityCard: React.FC = React.memo(() => {
   };
 
   const getAqiDescription = (aqi: number) => {
-    if (aqi <= 50) return "Baik";
-    if (aqi <= 100) return "Sedang";
-    if (aqi <= 150) return "Tidak Sehat (Kelompok Sensitif)";
-    if (aqi <= 200) return "Tidak Sehat";
-    if (aqi <= 300) return "Sangat Tidak Sehat";
-    return "Berbahaya";
+    if (aqi <= 50) return "Good";
+    if (aqi <= 100) return "Moderate";
+    if (aqi <= 150) return "Unhealthy for Sensitive Groups";
+    if (aqi <= 200) return "Unhealthy";
+    if (aqi <= 300) return "Very Unhealthy";
+    return "Hazardous";
   };
 
   const getPollutantValue = (iaqi: any, pollutant: string) => {
@@ -41,11 +41,11 @@ const AirQualityCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <Leaf className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="ml-2">Fitur Kualitas Udara Dinonaktifkan</span>
+            <span className="ml-2">Air Quality Feature Disabled</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Fitur kualitas udara saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data.</p>
+          <p>The air quality feature is currently disabled. Enable it in Settings to view data.</p>
         </CardContent>
       </Card>
     );
@@ -57,11 +57,11 @@ const AirQualityCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <Leaf className="h-5 w-5 mr-2 text-indigo-600 animate-pulse" />
-            <span className="ml-2">Memuat Kualitas Udara...</span>
+            <span className="ml-2">Loading Air Quality...</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Mengambil data kualitas udara terkini untuk Torino.</p>
+          <p>Fetching current air quality data for Torino.</p>
         </CardContent>
       </Card>
     );
@@ -73,12 +73,12 @@ const AirQualityCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-red-500 flex items-center">
             <AlertCircle className="h-5 w-5 mr-2" />
-            <span className="ml-2">Kesalahan Kualitas Udara</span>
+            <span className="ml-2">Air Quality Error</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Gagal memuat data kualitas udara: {error.message}</p>
-          <p className="text-sm text-gray-500">Pastikan kunci API AQICN Anda benar dan koneksi internet stabil.</p>
+          <p>Failed to load air quality data: {error.message}</p>
+          <p className="text-sm text-gray-500">Please ensure your AQICN API key is correct and internet connection is stable.</p>
         </CardContent>
       </Card>
     );
@@ -90,11 +90,11 @@ const AirQualityCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <Leaf className="h-5 w-5 mr-2 text-indigo-600" />
-            <span className="ml-2">Data Kualitas Udara Tidak Tersedia</span>
+            <span className="ml-2">Air Quality Data Not Available</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Tidak ada data kualitas udara yang dapat dimuat saat ini.</p>
+          <p>No air quality data could be loaded at this time.</p>
         </CardContent>
       </Card>
     );
@@ -109,10 +109,10 @@ const AirQualityCard: React.FC = React.memo(() => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Leaf className="h-5 w-5 mr-2 text-green-600" />
-          <span className="ml-2">Kualitas Udara di {data.city.name}</span> {/* FIX 6: Use non-null assertion and .name */}
+          <span className="ml-2">Air Quality in {data.city.name}</span> {/* FIX 6: Use non-null assertion and .name */}
         </CardTitle>
         <Link to="/detailed-air-quality" className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center">
-          Lihat Detail <ArrowRight className="ml-1 h-4 w-4" />
+          View Details <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </CardHeader>
       <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
@@ -120,10 +120,10 @@ const AirQualityCard: React.FC = React.memo(() => {
           <span className="text-4xl font-bold">{aqi} AQI</span>
           <Badge className={`text-base px-3 py-1 ${getAqiColor(aqi)}`}>{aqiDescription}</Badge>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Polutan Dominan: <span className="font-medium">{dominantPollutant}</span></p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Dominant Pollutant: <span className="font-medium">{dominantPollutant}</span></p>
         
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">Indeks Polutan Utama:</h4>
+          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">Main Pollutant Index:</h4>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
             <div className="flex items-center justify-between">
               <span>PM2.5:</span>
@@ -152,7 +152,7 @@ const AirQualityCard: React.FC = React.memo(() => {
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-4">
-          *Data disediakan oleh AQICN.org. Terakhir diperbarui: {new Date(data.time.iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })} {/* FIX 13: Use non-null assertion */}
+          *Data provided by AQICN.org. Last updated: {new Date(data.time.iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })} {/* FIX 13: Use non-null assertion */}
         </p>
       </CardContent>
     </Card>

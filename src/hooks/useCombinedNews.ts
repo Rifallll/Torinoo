@@ -44,7 +44,7 @@ interface GNewsApiResponse {
 const fetchNewsFromNewsApi = async (query: string, language: string): Promise<NewsArticle[]> => {
   const apiKey = import.meta.env.VITE_NEWSAPI_KEY;
   if (!apiKey) {
-    console.warn("NewsAPI Key tidak ditemukan. Melewatkan pengambilan dari NewsAPI.");
+    console.warn("NewsAPI Key not found. Skipping fetch from NewsAPI.");
     return [];
   }
 
@@ -64,9 +64,9 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     const response = await fetch(url);
     if (!response.ok) {
       const errorData = await response.json();
-      console.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`, errorData);
+      console.error(`Failed to fetch news from NewsAPI: ${errorData.message || response.statusText}`, errorData);
       // Menyederhanakan pesan error untuk pengguna
-      toast.error(`Gagal mengambil berita dari NewsAPI. Coba lagi nanti.`);
+      toast.error(`Failed to fetch news from NewsAPI. Please try again later.`);
       return [];
     }
 
@@ -74,7 +74,7 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     return result.articles;
   } catch (error) {
     console.error("Error fetching from NewsAPI:", error);
-    toast.error(`Terjadi kesalahan saat mengambil berita dari NewsAPI. Coba lagi nanti.`);
+    toast.error(`An error occurred while fetching news from NewsAPI. Please try again later.`);
     return [];
   }
 };
@@ -82,8 +82,8 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
 const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<NewsArticle[]> => {
   const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
   if (!apiKey) {
-    console.warn("GNews.io API Key tidak ditemukan. Melewatkan pengambilan dari GNews.io.");
-    toast.error("Kunci API GNews.io tidak ditemukan. Harap tambahkan VITE_GNEWS_API_KEY ke file .env Anda.");
+    console.warn("GNews.io API Key not found. Skipping fetch from GNews.io.");
+    toast.error("GNews.io API key not found. Please add VITE_GNEWS_API_KEY to your .env file.");
     return [];
   }
 
@@ -100,9 +100,9 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
     const response = await fetch(url);
     if (!response.ok) {
       const errorData = await response.json();
-      console.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`, errorData);
+      console.error(`Failed to fetch news from GNews.io: ${errorData.errors?.[0] || response.statusText}`, errorData);
       // Menyederhanakan pesan error untuk pengguna
-      toast.error(`Gagal mengambil berita dari GNews.io. Pastikan kunci API Anda valid dan coba lagi.`);
+      toast.error(`Failed to fetch news from GNews.io. Please ensure your API key is valid and try again.`);
       return [];
     }
 
@@ -122,7 +122,7 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
     }));
   } catch (error) {
     console.error("Error fetching from GNews.io:", error);
-    toast.error(`Terjadi kesalahan saat mengambil berita dari GNews.io. Coba lagi nanti.`);
+    toast.error(`An error occurred while fetching news from GNews.io. Please try again later.`);
     return [];
   }
 };
@@ -197,7 +197,7 @@ const fetchCombinedNews = async (query: string, language: string): Promise<NewsA
       // If both/neither have image, then prioritize article with a description
       else if (newHasDescription && !existingHasDescription) {
         shouldReplace = true;
-      } else if (!newHasDescription && existingHasDescription) {
+      } else if (!newHasDescription && existingHasImage) {
         shouldReplace = false; // Keep existing
       }
       // If both/neither have image/description, then prioritize newer article

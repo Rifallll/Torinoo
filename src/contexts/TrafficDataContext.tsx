@@ -58,7 +58,7 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
       if (progress >= 100) {
         clearInterval(interval);
         setAnalysisStatus('completed');
-        toast.success("Analisis data lalu lintas selesai!");
+        toast.success("Traffic data analysis complete!");
 
         // Perform actual analysis based on the new CSV structure
         const totalRecords = data.length;
@@ -139,7 +139,7 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
     if (uploadedData) {
       simulateAnalysis(uploadedData);
     } else {
-      toast.error("Tidak ada data untuk dianalisis. Harap unggah file CSV terlebih dahulu.");
+      toast.error("No data to analyze. Please upload a CSV file first.");
     }
   }, [uploadedData, simulateAnalysis]);
 
@@ -148,7 +148,7 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
     setAnalysisStatus('idle');
     setAnalysisProgress(0);
     setAnalysisResults(null);
-    toast.info("Status analisis telah direset.");
+    toast.info("Analysis status has been reset.");
   }, []);
 
   return (

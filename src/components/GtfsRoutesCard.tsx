@@ -24,7 +24,7 @@ const GtfsRoutesCard: React.FC = React.memo(() => {
       case 5: return 'Cable Car';
       case 6: return 'Gondola';
       case 7: return 'Funicular';
-      default: return 'Lainnya';
+      default: return 'Other';
     }
   };
 
@@ -33,11 +33,11 @@ const GtfsRoutesCard: React.FC = React.memo(() => {
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <Route className="h-5 w-5 mr-2 text-indigo-600" /> Rute Transportasi Publik (Lokal GTFS)
+            <Route className="h-5 w-5 mr-2 text-indigo-600" /> Public Transport Routes (Local GTFS)
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat rute transportasi publik lokal...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Loading local public transport routes...</p>
         </CardContent>
       </Card>
     );
@@ -48,11 +48,11 @@ const GtfsRoutesCard: React.FC = React.memo(() => {
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <Route className="h-5 w-5 mr-2 text-indigo-600" /> Rute Transportasi Publik (Lokal GTFS)
+            <Route className="h-5 w-5 mr-2 text-indigo-600" /> Public Transport Routes (Local GTFS)
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-red-500 text-center py-4">Gagal memuat rute lokal: {error.message}</p>
+          <p className="text-red-500 text-center py-4">Failed to load local routes: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -64,7 +64,7 @@ const GtfsRoutesCard: React.FC = React.memo(() => {
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-          <Route className="h-5 w-5 mr-2 text-indigo-600" /> Rute Transportasi Publik (Lokal GTFS)
+          <Route className="h-5 w-5 mr-2 text-indigo-600" /> Public Transport Routes (Local GTFS)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -90,14 +90,14 @@ const GtfsRoutesCard: React.FC = React.memo(() => {
               <div className="text-center mt-4">
                 <Button asChild variant="outline" className="">
                   <Link to="/all-gtfs-routes">
-                    <span>Lihat Semua Rute ({transitlandRoutes.length - 5} lainnya)</span>
+                    <span>View All Routes ({transitlandRoutes.length - 5} more)</span>
                   </Link>
                 </Button>
               </div>
             )}
           </div>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada rute transportasi publik yang tersedia dari data GTFS lokal.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">No public transport routes available from local GTFS data.</p>
         )}
       </CardContent>
     </Card>

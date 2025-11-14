@@ -32,7 +32,7 @@ interface AirQualityApiResponse {
 const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
   const apiKey = import.meta.env.VITE_AQICN_API_KEY;
   if (!apiKey) {
-    throw new Error("AQICN API Key tidak ditemukan di environment variables.");
+    throw new Error("AQICN API Key not found in environment variables.");
   }
 
   // Coordinates for Torino, Italy
@@ -43,7 +43,7 @@ const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Gagal mengambil data kualitas udara: ${response.statusText}`);
+    throw new Error(`Failed to fetch air quality data: ${response.statusText}`);
   }
 
   const result: AirQualityApiResponse = await response.json();
@@ -55,7 +55,7 @@ const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
       country: "IT", // Hardcode country for Torino
     };
   } else {
-    throw new Error(`API AQICN mengembalikan status error: ${result.data}`);
+    throw new Error(`AQICN API returned an error status: ${result.data}`);
   }
 };
 

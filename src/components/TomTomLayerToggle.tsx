@@ -14,7 +14,7 @@ const TomTomLayerToggle: React.FC = () => {
       <div className="flex items-center">
         <TrafficCone className="h-4 w-4 mr-3 text-gray-700 dark:text-gray-200" />
         <Label htmlFor="tomtom-layer" className="text-sm font-medium text-gray-700 dark:text-gray-200">
-          Lapisan Lalu Lintas TomTom
+          TomTom Traffic Layer
         </Label>
       </div>
       <Switch

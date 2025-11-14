@@ -14,7 +14,7 @@ const AirQualityFeatureToggle: React.FC = () => {
       <div className="flex items-center">
         <Leaf className="h-4 w-4 mr-3 text-gray-700 dark:text-gray-200" />
         <Label htmlFor="air-quality-feature" className="text-sm font-medium text-gray-700 dark:text-gray-200">
-          Fitur Kualitas Udara
+          Air Quality Feature
         </Label>
       </div>
       <Switch

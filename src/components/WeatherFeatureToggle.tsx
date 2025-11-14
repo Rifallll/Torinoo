@@ -14,7 +14,7 @@ const WeatherFeatureToggle: React.FC = () => {
       <div className="flex items-center">
         <CloudSun className="h-4 w-4 mr-3 text-gray-700 dark:text-gray-200" />
         <Label htmlFor="weather-feature" className="text-sm font-medium text-gray-700 dark:text-gray-200">
-          Fitur Cuaca
+          Weather Feature
         </Label>
       </div>
       <Switch

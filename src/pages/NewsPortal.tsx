@@ -10,9 +10,9 @@ import { Input } from '@/components/ui/input';
 import { useCombinedNews } from '@/hooks/useCombinedNews';
 
 const NewsPortal = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffico OR incidente)');
+  const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffic OR incident)');
   // currentQuery state removed, use searchTerm directly for the hook
-  const fixedLanguage = 'it'; // Fixed language to Italian
+  const fixedLanguage = 'en'; // Fixed language to English
 
   // Fetch news based on searchTerm and fixedLanguage
   const { data: newsArticles, isLoading, error } = useCombinedNews(searchTerm, fixedLanguage);
@@ -20,7 +20,7 @@ const NewsPortal = () => {
   // handleSearch function removed as search is now live
 
   const handleResetFilters = () => {
-    setSearchTerm('Torino AND (traffico OR incidente)');
+    setSearchTerm('Torino AND (traffic OR incident)');
     // Language is now fixed, no need to reset it here
   };
 
@@ -30,7 +30,7 @@ const NewsPortal = () => {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 items-center justify-center">
         <Newspaper className="h-12 w-12 mr-3 text-indigo-600 animate-pulse" />
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Memuat Berita Terbaru...</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Loading Latest News...</h1>
       </div>
     );
   }
@@ -41,12 +41,12 @@ const NewsPortal = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <Newspaper className="h-8 w-8 mr-3 text-indigo-600" />
-            Portal Berita Lalu Lintas
+            Traffic News Portal
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -55,12 +55,12 @@ const NewsPortal = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-red-500 flex items-center">
                 <AlertCircle className="h-5 w-5 mr-2" />
-                Kesalahan Memuat Berita
+                Error Loading News
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Gagal memuat artikel berita: {error.message}</p>
-              <p className="text-sm text-gray-500">Pastikan kunci API NewsAPI dan GNews.io Anda benar dan koneksi internet stabil.</p>
+              <p>Failed to load news articles: {error.message}</p>
+              <p className="text-sm text-gray-500">Please ensure your NewsAPI and GNews.io API keys are correct and internet connection is stable.</p>
             </CardContent>
           </Card>
         </main>
@@ -73,12 +73,12 @@ const NewsPortal = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center">
           <Newspaper className="h-8 w-8 mr-3 text-indigo-600" />
-          Portal Berita Lalu Lintas
+          Traffic News Portal
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -89,7 +89,7 @@ const NewsPortal = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             <Input
               type="text"
-              placeholder="Cari berita (mis. 'Torino traffic', 'kemacetan')..."
+              placeholder="Search news (e.g., 'Torino traffic', 'congestion')..."
               className="pl-9 pr-8 w-full h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -111,10 +111,10 @@ const NewsPortal = () => {
 
           {/* Search button removed as search is now live */}
 
-          {searchTerm !== 'Torino AND (traffico OR incidente)' && ( // Condition adjusted
+          {searchTerm !== 'Torino AND (traffic OR incident)' && ( // Condition adjusted
             <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
               <XCircle className="h-4 w-4 mr-2" />
-              Reset Filter
+              Reset Filters
             </Button>
           )}
         </div>
@@ -131,18 +131,18 @@ const NewsPortal = () => {
               />
               <CardHeader>
                 <CardTitle className="text-xl font-semibold">{article.title}</CardTitle>
-                <p className="text-sm text-gray-500">{new Date(article.publishedAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p className="text-sm text-gray-500">{new Date(article.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between">
-                <p className="text-gray-700 mb-4">{article.description || article.content || 'Tidak ada deskripsi tersedia.'}</p>
+                <p className="text-gray-700 mb-4">{article.description || article.content || 'No description available.'}</p>
                 <Button variant="link" className="p-0 h-auto justify-start" asChild>
-                  <a href={article.url} target="_blank" rel="noopener noreferrer">Baca Selengkapnya</a>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer">Read More</a>
                 </Button>
               </CardContent>
             </Card>
           ))
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">Tidak ada artikel berita yang dapat dimuat saat ini.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">No news articles could be loaded at this time.</p>
         )}
       </main>
     </div>

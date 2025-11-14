@@ -17,11 +17,11 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <Bus className="h-5 w-5 mr-2 text-indigo-600" />
-            Transportasi Publik Real-Time
+            Real-Time Public Transport
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat peringatan transportasi publik...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Loading public transport alerts...</p>
         </CardContent>
       </Card>
     );
@@ -33,11 +33,11 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <Bus className="h-5 w-5 mr-2 text-indigo-600" />
-            Transportasi Publik Real-Time
+            Real-Time Public Transport
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-red-500 text-center py-4">Gagal memuat peringatan: {error.message}</p>
+          <p className="text-red-500 text-center py-4">Failed to load alerts: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -48,14 +48,14 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <Bus className="h-5 w-5 mr-2 text-indigo-600" />
-          Transportasi Publik Real-Time
+          Real-Time Public Transport
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {alerts.length > 0 ? (
           <div className="space-y-2">
             <h3 className="font-semibold text-orange-600 dark:text-orange-400 flex items-center mb-2">
-              <AlertTriangle className="h-4 w-4 mr-2" /> Peringatan Aktif
+              <AlertTriangle className="h-4 w-4 mr-2" /> Active Alerts
             </h3>
             {alerts.map(alert => (
               <div key={alert.id} className="border-l-4 border-orange-500 pl-3 py-2 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-md">
@@ -65,7 +65,7 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
                   {alert.informed_entity?.map((entity, idx) => (
                     entity.route_id && (
                       <Badge key={idx} variant="secondary" className="text-xs flex items-center">
-                        {getRouteTypeIcon(entity.route_id, entity.route_type)} Jalur {entity.route_id}
+                        {getRouteTypeIcon(entity.route_id, entity.route_type)} Route {entity.route_id}
                       </Badge>
                     )
                   ))}
@@ -74,7 +74,7 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada peringatan transportasi publik aktif.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">No active public transport alerts.</p>
         )}
       </CardContent>
     </Card>

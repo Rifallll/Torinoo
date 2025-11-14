@@ -53,12 +53,12 @@ const WeatherPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-8 w-8 mr-3 text-gray-500" />
-            Prakiraan Cuaca Torino
+            Torino Weather Forecast
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -67,11 +67,11 @@ const WeatherPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
                 <CloudSun className="h-5 w-5 mr-2 text-gray-500" />
-                Fitur Cuaca Dinonaktifkan
+                Weather Feature Disabled
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Fitur prakiraan cuaca saat ini dinonaktifkan. Aktifkan di Pengaturan untuk melihat data cuaca.</p>
+              <p>The weather forecast feature is currently disabled. Enable it in Settings to view weather data.</p>
             </CardContent>
           </Card>
         </main>
@@ -83,7 +83,7 @@ const WeatherPage: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 items-center justify-center">
         <CloudSun className="h-12 w-12 mr-3 text-indigo-600 animate-spin" />
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Memuat Prakiraan Cuaca...</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Loading Weather Forecast...</h1>
       </div>
     );
   }
@@ -94,12 +94,12 @@ const WeatherPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-            Prakiraan Cuaca Torino
+            Torino Weather Forecast
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -108,12 +108,12 @@ const WeatherPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-red-500 flex items-center">
                 <Thermometer className="h-5 w-5 mr-2" />
-                Kesalahan Cuaca
+                Weather Error
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Gagal memuat data cuaca: {error.message}</p>
-              <p className="text-sm text-gray-500">Pastikan koneksi internet Anda stabil.</p>
+              <p>Failed to load weather data: {error.message}</p>
+              <p className="text-sm text-gray-500">Please ensure your internet connection is stable.</p>
             </CardContent>
           </Card>
         </main>
@@ -127,12 +127,12 @@ const WeatherPage: React.FC = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-            Prakiraan Cuaca Torino
+            Torino Weather Forecast
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </Button>
         </header>
@@ -141,11 +141,11 @@ const WeatherPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
                 <CloudSun className="h-5 w-5 mr-2 text-indigo-600" />
-                Data Cuaca Tidak Tersedia
+                Weather Data Not Available
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Tidak ada data cuaca yang dapat dimuat saat ini.</p>
+              <p>No weather data could be loaded at this time.</p>
             </CardContent>
           </Card>
         </main>
@@ -161,12 +161,12 @@ const WeatherPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <CloudSun className="h-8 w-8 mr-3 text-indigo-600" />
-          Prakiraan Cuaca Torino
+          Torino Weather Forecast
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -176,7 +176,7 @@ const WeatherPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center">
               <Thermometer className="h-5 w-5 mr-2 text-red-600" />
-              Cuaca Terkini di {data.city}
+              Current Weather in {data.city}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700 dark:text-gray-300">
@@ -191,15 +191,15 @@ const WeatherPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center">
                 <Droplet className="h-5 w-5 mr-2 text-blue-500" />
-                <span>Kelembaban: {data.current.relativehumidity_2m}%</span>
+                <span>Humidity: {data.current.relativehumidity_2m}%</span>
               </div>
               <div className="flex items-center">
                 <Wind className="h-5 w-5 mr-2 text-gray-500" />
-                <span>Kecepatan Angin: {data.current.windspeed_10m.toFixed(1)} m/s</span>
+                <span>Wind Speed: {data.current.windspeed_10m.toFixed(1)} m/s</span>
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              *Data disediakan oleh Open-Meteo.
+              *Data provided by Open-Meteo.
             </p>
           </CardContent>
         </Card>
