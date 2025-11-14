@@ -118,7 +118,7 @@ export const useGeoJsonLayer = ({
             return {
               color: color,
               weight: weight,
-              opacity: 0.1
+              opacity: 0.7 // Opacity ditingkatkan dari 0.1 menjadi 0.7
             };
           }
         });
