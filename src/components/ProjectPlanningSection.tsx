@@ -62,7 +62,7 @@ interface ProjectPlanningSectionProps {
   id?: string;
 }
 
-const ProjectPlanningSection: React.FC<ProjectPlanningSectionProps> = ({ id }) => {
+const ProjectPlanningSection: React.FC<ProjectPlanningSectionProps> = React.memo(({ id }) => {
   return (
     <div id={id} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projectPlanningData.map((item, index) => {
@@ -87,6 +87,6 @@ const ProjectPlanningSection: React.FC<ProjectPlanningSectionProps> = ({ id }) =
       })}
     </div>
   );
-};
+});
 
 export default ProjectPlanningSection;

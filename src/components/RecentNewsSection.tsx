@@ -30,7 +30,7 @@ const recentNewsArticles = [
   },
 ];
 
-const RecentNewsSection: React.FC = () => {
+const RecentNewsSection: React.FC = React.memo(() => {
   return (
     <Card className="lg:col-span-3"> {/* Span across all columns on large screens */}
       <CardHeader className="flex flex-row items-center justify-between">
@@ -62,6 +62,6 @@ const RecentNewsSection: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default RecentNewsSection;

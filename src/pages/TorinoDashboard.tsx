@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react'; // Import useCallback
 import { Link } from 'react-router-dom';
 import { Home, Users, MapPin, BarChart2, Bell, Search, User, Plus, TrendingUp, Clock, AlertTriangle, Car, Activity, Newspaper, Upload, Info, Download, Filter, Gauge, Leaf } from 'lucide-react'; // Import Leaf icon
 import { Button } from '@/components/ui/button';
@@ -82,6 +82,15 @@ const TorinoDashboard = () => {
     { hour: '23:00', volume: 160 },
   ];
 
+  // Memoize callback functions for QuickActionsCard
+  const handleUploadCSVClick = useCallback(() => {
+    setIsUploadCSVModalOpen(true);
+  }, []);
+
+  const handleExportClick = useCallback(() => {
+    setIsExportModalOpen(true);
+  }, []);
+
   return (
     <div className="flex h-screen overflow-hidden">
       <TorinoSidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
@@ -110,7 +119,7 @@ const TorinoDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{dummyStats.resolvedIncidents}</div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className className="text-xs text-muted-foreground mt-1">
                   <span className="text-green-600 font-medium">+8%</span> from last month
                 </p>
               </CardContent>
@@ -238,8 +247,8 @@ const TorinoDashboard = () => {
 
               {/* Menggunakan komponen QuickActionsCard yang baru */}
               <QuickActionsCard
-                onUploadCSVClick={() => setIsUploadCSVModalOpen(true)}
-                onExportClick={() => setIsExportModalOpen(true)}
+                onUploadCSVClick={handleUploadCSVClick}
+                onExportClick={handleExportClick}
               />
             </div>
           </div>
@@ -253,7 +262,7 @@ const TorinoDashboard = () => {
 
       {/* Modals */}
       <UploadCSVModal isOpen={isUploadCSVModalOpen} onClose={() => setIsUploadCSVModalOpen(false)} />
-      <TrafficAnalysisModal isOpen={isTrafficAnalysisModalOpen} onClose={() => setIsTrafficAnalysisModalOpen(false)} />
+      <TrafficAnalysisModal isOpen={isTrafficAnalysisModalOpen} onClose={() => setIsTrafficAnalysisModalModalOpen(false)} />
       <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
     </div>
   );
