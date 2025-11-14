@@ -26,7 +26,7 @@ export const useGeoJsonLayer = ({
   useEffect(() => {
     if (!map || !geoJsonLayerGroup) return;
 
-    const fetchGeoJSON = async () => {
+    const fetchAndRenderGeoJSON = async () => {
       try {
         const response = await fetch('/export.geojson');
         if (!response.ok) {
@@ -90,17 +90,20 @@ export const useGeoJsonLayer = ({
         });
         geoJsonLayerRef.current.addTo(geoJsonLayerGroup);
 
-        // Optionally, fit map bounds to the GeoJSON layer if it's valid
-        if (geoJsonLayerRef.current.getBounds().isValid()) {
+        // Only fit map bounds if the layer group is currently on the map
+        // and the map is ready. This prevents the _leaflet_pos error.
+        if (map.hasLayer(geoJsonLayerGroup) && geoJsonLayerRef.current.getBounds().isValid()) {
           map.fitBounds(geoJsonLayerRef.current.getBounds());
         }
+
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
         toast.error(`Gagal memuat data GeoJSON: ${error instanceof Error ? error.message : String(error)}. Pastikan file 'export.geojson' ada di folder 'public'.`);
       }
     };
 
-    fetchGeoJSON();
+    // Call fetch and render when map is ready
+    map.whenReady(fetchAndRenderGeoJSON);
 
     // Cleanup function
     return () => {
@@ -109,7 +112,7 @@ export const useGeoJsonLayer = ({
         geoJsonLayerRef.current = null;
       }
     };
-  }, [map, geoJsonLayerGroup, selectedVehicleType, roadConditionFilter]);
+  }, [map, geoJsonLayerGroup, selectedVehicleType, roadConditionFilter]); // Dependencies for re-fetching/re-rendering
 
   // Effect for managing visibility based on zoom
   useEffect(() => {
@@ -130,10 +133,14 @@ export const useGeoJsonLayer = ({
     };
 
     map.on('zoomend', updateVisibility);
-    updateVisibility(); // Initial check
+    map.whenReady(updateVisibility); // Initial check after map is ready
 
     return () => {
       map.off('zoomend', updateVisibility);
+      if (map.hasLayer(geoJsonLayerGroup)) { // Ensure layer is removed on unmount
+        map.removeLayer(geoJsonLayerGroup);
+      }
     };
-  }, [map, geoJsonLayerGroup, minZoomForGeoJSON]);
+  }, [map, geoJsonLayerGroup, minZoomForGeoJSON]); // Dependencies for visibility management
+
 };

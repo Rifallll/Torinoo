@@ -56,13 +56,11 @@ export const useMapInitialization = ({ mapContainerId, center, zoom }: MapInitia
       gtfsRoutesLayerGroup,
     };
 
-    // Set mapInstance AND add layer groups to map ONLY after the map is fully loaded and its internal structures are ready
+    // Set mapInstance ONLY after the map is fully loaded and its internal structures are ready
     map.whenReady(() => {
       setMapInstance(map);
-      // Now it's safe to add layer groups to the map
-      geoJsonLayerGroup.addTo(map);
-      subwayStationsLayerGroup.addTo(map);
-      gtfsRoutesLayerGroup.addTo(map);
+      // IMPORTANT: Layer groups are NOT added to the map here.
+      // Individual layer hooks will manage adding/removing their respective layer groups.
     });
 
     return () => {

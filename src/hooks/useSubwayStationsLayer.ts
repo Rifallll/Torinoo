@@ -27,25 +27,30 @@ export const useSubwayStationsLayer = ({
   useEffect(() => {
     if (!map || !subwayStationsLayerGroup) return;
 
-    // Clear existing markers
-    subwayStationsLayerGroup.clearLayers();
+    const renderSubwayStations = () => {
+      // Clear existing markers
+      subwayStationsLayerGroup.clearLayers();
 
-    // Add subway stations to their layer group
-    subwayStationsData.forEach(station => {
-      const { latitude, longitude } = convertCoordinates(station.x, station.y);
-      if (latitude !== 0 || longitude !== 0) { // Check for valid conversion
-        L.marker([latitude, longitude], {
-          icon: L.divIcon({
-            className: 'subway-station-marker',
-            html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
+      // Add subway stations to their layer group
+      subwayStationsData.forEach(station => {
+        const { latitude, longitude } = convertCoordinates(station.x, station.y);
+        if (latitude !== 0 || longitude !== 0) { // Check for valid conversion
+          L.marker([latitude, longitude], {
+            icon: L.divIcon({
+              className: 'subway-station-marker',
+              html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            })
           })
-        })
-        .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
-        .addTo(subwayStationsLayerGroup);
-      }
-    });
+          .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
+          .addTo(subwayStationsLayerGroup);
+        }
+      });
+    };
+
+    // Render stations when map is ready
+    map.whenReady(renderSubwayStations);
 
     // Effect for managing visibility based on zoom
     const updateVisibility = () => {
@@ -63,10 +68,13 @@ export const useSubwayStationsLayer = ({
     };
 
     map.on('zoomend', updateVisibility);
-    updateVisibility(); // Initial check
+    map.whenReady(updateVisibility); // Initial check after map is ready
 
     return () => {
       map.off('zoomend', updateVisibility);
+      if (map.hasLayer(subwayStationsLayerGroup)) { // Ensure layer is removed on unmount
+        map.removeLayer(subwayStationsLayerGroup);
+      }
       subwayStationsLayerGroup.clearLayers(); // Clear all layers on unmount
     };
   }, [map, subwayStationsLayerGroup, subwayStationsData, minZoomForSubwayStations]);
