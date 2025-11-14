@@ -5,6 +5,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
+import 'leaflet-draw/dist/leaflet.draw.css'; // Import Leaflet.draw CSS
+import 'leaflet-draw'; // Import Leaflet.draw JS
 import { toast } from 'sonner';
 import ReactDOM from 'react-dom/client'; // Import ReactDOM for rendering React component into Leaflet control
 
@@ -94,7 +96,6 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     selectedVehicleType,
     roadConditionFilter,
     minZoom: minZoomForGeoJSON,
-    // Removed getCustomIcon prop as it's handled internally by useGeoJsonLayer
     isMapLoaded, // Pass the state
   });
 
@@ -165,6 +166,76 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       }
     };
   }, [map, isMapLoaded]); // Re-run when map or isMapLoaded changes
+
+  // Effect to add Leaflet.draw controls
+  useEffect(() => {
+    if (!map || !isMapLoaded) return;
+
+    // Initialize a FeatureGroup for drawn items
+    const drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    // Initialize the draw control and pass it the FeatureGroup of drawn items
+    const drawControl = new (L.Control as any).Draw({
+      edit: {
+        featureGroup: drawnItems,
+        poly: {
+          allowIntersection: false
+        }
+      },
+      draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: true
+        },
+        polyline: {
+          metric: true
+        },
+        circlemarker: false, // Disable circlemarker
+        rectangle: {
+          showArea: true
+        },
+        circle: {
+          showRadius: true
+        },
+        marker: true
+      }
+    });
+    map.addControl(drawControl);
+
+    // Event listeners for when shapes are drawn
+    map.on((L.Draw as any).Event.CREATED, function (event: any) {
+      const layer = event.layer;
+      drawnItems.addLayer(layer);
+      toast.success(`Bentuk ${event.layerType} digambar!`);
+      console.log("Drawn shape GeoJSON:", layer.toGeoJSON());
+    });
+
+    map.on((L.Draw as any).Event.EDITED, function (event: any) {
+      const layers = event.layers;
+      layers.eachLayer(function (layer: any) {
+        toast.info(`Bentuk diedit!`);
+        console.log("Edited shape GeoJSON:", layer.toGeoJSON());
+      });
+    });
+
+    map.on((L.Draw as any).Event.DELETED, function (event: any) {
+      const layers = event.layers;
+      layers.eachLayer(function (layer: any) {
+        toast.warning(`Bentuk dihapus!`);
+        console.log("Deleted shape GeoJSON:", layer.toGeoJSON());
+      });
+    });
+
+    return () => {
+      // Clean up draw control and layers when component unmounts
+      map.removeControl(drawControl);
+      map.removeLayer(drawnItems);
+      map.off((L.Draw as any).Event.CREATED);
+      map.off((L.Draw as any).Event.EDITED);
+      map.off((L.Draw as any).Event.DELETED);
+    };
+  }, [map, isMapLoaded]);
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
