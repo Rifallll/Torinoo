@@ -167,7 +167,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
 
     return L.divIcon({
       className: 'custom-poi-marker',
-      html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:${borderRadius}; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize / 2}px; font-weight:bold; opacity:0.1;">${iconText}</div>`,
+      html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:${borderRadius}; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize / 2}px; font-weight:bold; opacity:0.7;">${iconText}</div>`, // Increased opacity to 0.7
       iconSize: [iconSize, iconSize],
       iconAnchor: [iconSize / 2, iconSize / 2]
     });
@@ -180,11 +180,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
       if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
         geoJsonLayerGroupRef.current.addTo(mapRef.current);
+        // TODO: Remove or make less frequent for production
         toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
       }
     } else {
       if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
         mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
+        // TODO: Remove or make less frequent for production
         toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
       }
     }
@@ -197,11 +199,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
       if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
         subwayStationsLayerGroupRef.current.addTo(mapRef.current);
+        // TODO: Remove or make less frequent for production
         toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
       }
     } else {
       if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
         mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
+        // TODO: Remove or make less frequent for production
         toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
       }
     }
@@ -223,6 +227,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     if (isTomTomLayerEnabled && isWithinTorino) {
       if (!isTomTomLayerActive) {
         tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
+        // TODO: Remove or make less frequent for production
         toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
         console.log("  Adding TomTom layer to map.");
       } else {
@@ -231,6 +236,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     } else {
       if (isTomTomLayerActive) {
         mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
+        // TODO: Remove or make less frequent for production
         toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
         console.log("  Removing TomTom layer from map.");
       } else {
@@ -286,6 +292,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
           }
         );
       } else {
+        // TODO: Remove or make less frequent for production
         toast.warning("Kunci API TomTom tidak ditemukan atau belum diatur. Lapisan lalu lintas TomTom tidak akan tersedia.");
         console.warn("TomTom API Key is missing or is the placeholder. TomTom traffic layer will not be available.");
       }

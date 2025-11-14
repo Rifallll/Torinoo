@@ -88,6 +88,7 @@ const loadProto = async () => {
     console.log("GTFS-realtime .proto loaded successfully.");
   } catch (error) {
     console.error("Failed to load GTFS-realtime .proto:", error);
+    // TODO: Remove or make less frequent for production
     toast.error("Gagal memuat definisi Protobuf GTFS-realtime.");
     throw error;
   }
@@ -100,6 +101,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       console.warn(`Failed to fetch ${type}.bin from ${path}: ${response.statusText}.`);
       // Suppress toast for missing trip_update and alert files, as we'll provide dummy data
       if (type === 'vehicle_position') {
+        // TODO: Remove or make less frequent for production
         toast.warning(`Gagal mengambil file ${type}.bin. Pastikan file ada di folder public.`);
       }
       return [];
@@ -111,6 +113,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       console.warn(`Fetched ${type}.bin from ${path} but it was empty.`);
       // Suppress toast for empty trip_update and alert files
       if (type === 'vehicle_position') {
+        // TODO: Remove or make less frequent for production
         toast.warning(`File ${type}.bin kosong. Tidak ada data untuk diurai.`);
       }
       return [];
@@ -165,6 +168,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
     // For trip_update and alert, suppress console output for parsing errors.
     if (type === 'vehicle_position') {
       console.error(`Error parsing ${type}.bin from ${path}:`, error);
+      // TODO: Remove or make less frequent for production
       toast.error(`Gagal mengurai data ${type}.bin: ${error instanceof Error ? error.message : String(error)}. File mungkin rusak atau tidak dalam format Protobuf yang benar.`);
     }
     return [];
@@ -269,6 +273,7 @@ export const parseGtfsRealtimeData = async (
         delay: -30,
       },
     ];
+    // TODO: Remove for production
     toast.info("Menggunakan data dummy untuk Pembaruan Perjalanan.");
   }
 
@@ -294,12 +299,15 @@ export const parseGtfsRealtimeData = async (
         description_text: { translation: [{ text: 'Perbaikan mendesak di jalur TRAM-4. Halte di Piazza Castello dipindahkan 50m ke utara.', language: 'id' }] },
       },
     ];
+    // TODO: Remove for production
     toast.info("Menggunakan data dummy untuk Peringatan.");
   }
 
   if (tripUpdates.length > 0 || vehiclePositions.length > 0 || alerts.length > 0) {
+    // TODO: Remove for production
     toast.success("Data GTFS-realtime berhasil diurai atau data dummy dimuat!");
   } else {
+    // TODO: Remove for production
     toast.info("Tidak ada data GTFS-realtime yang ditemukan di file yang diunggah atau diurai.");
   }
   
