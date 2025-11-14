@@ -25,6 +25,43 @@ export const useGeoJsonLayer = ({
 }: GeoJsonLayerProps) => {
   const geoJsonDataRef = useRef<L.GeoJSON | null>(null);
 
+  // Helper function to get custom icon for features (kept here as it's used by GeoJSON layer)
+  const getCustomIconInternal = useCallback((feature: L.GeoJSON.Feature) => {
+    const properties = feature.properties;
+    let iconText = '?';
+    let bgColor = '#6b7280'; // Default gray
+    let textColor = 'white';
+
+    if (properties) {
+      const vehicleType = properties.vehicle_type;
+      const amenity = properties.amenity;
+      const buildingType = properties.building_type;
+
+      if (vehicleType) {
+        iconText = vehicleType.charAt(0).toUpperCase();
+        bgColor = '#3b82f6'; // Blue for vehicles
+      } else if (amenity) {
+        iconText = amenity.charAt(0).toUpperCase();
+        bgColor = '#10b981'; // Green for amenities
+      } else if (buildingType) {
+        iconText = buildingType.charAt(0).toUpperCase();
+        bgColor = '#f59e0b'; // Amber for buildings
+      }
+    }
+
+    // Increased size for better visibility
+    const htmlString = `<div style="background-color:${bgColor}; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:${textColor}; font-size:14px; font-weight:bold;">${iconText}</div>`;
+    console.log("GeoJSON Icon HTML:", htmlString);
+
+    return L.divIcon({
+      className: 'custom-poi-marker',
+      html: htmlString,
+      iconSize: [28, 28], // Increased icon size
+      iconAnchor: [14, 14] // Adjusted anchor for new size
+    });
+  }, []);
+
+
   const updateVisibility = useCallback(() => {
     if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
@@ -93,7 +130,7 @@ export const useGeoJsonLayer = ({
               console.warn("Leaflet markerPane not yet available. Skipping GeoJSON marker creation for now.");
               return L.marker(latlng); // Fallback to default marker if pane not ready
             }
-            return L.marker(latlng, { icon: getCustomIcon(feature) });
+            return L.marker(latlng, { icon: getCustomIconInternal(feature) }); // Use the internal getCustomIcon
           },
           style: (feature) => {
             const trafficLevel = feature?.properties?.traffic_level;
@@ -131,7 +168,7 @@ export const useGeoJsonLayer = ({
     };
 
     fetchGeoJSON();
-  }, [map, layerGroup, selectedVehicleType, roadConditionFilter, getCustomIcon, updateVisibility, isMapLoaded]); // Add isMapLoaded to dependencies
+  }, [map, layerGroup, selectedVehicleType, roadConditionFilter, getCustomIconInternal, updateVisibility, isMapLoaded]); // Add isMapLoaded to dependencies
 
   return layerGroup;
 };
