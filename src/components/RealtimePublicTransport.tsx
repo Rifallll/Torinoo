@@ -228,12 +228,12 @@ const RealtimePublicTransport: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         {alerts.length > 0 && (
-          <div className="space-y-2 mb-4">
-            <h3 className="font-semibold text-orange-600 dark:text-orange-400 flex items-center">
+          <div className="space-y-2"> {/* Removed mb-4 */}
+            <h3 className="font-semibold text-orange-600 dark:text-orange-400 flex items-center mb-2"> {/* Added mb-2 */}
               <AlertTriangle className="h-4 w-4 mr-2" /> Peringatan Aktif
             </h3>
             {alerts.map(alert => (
-              <div key={alert.id} className="border-l-4 border-orange-500 pl-3 py-1 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-md">
+              <div key={alert.id} className="border-l-4 border-orange-500 pl-3 py-2 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-md"> {/* Changed py-1 to py-2 */}
                 <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{alert.header_text?.translation?.[0]?.text || 'N/A'}</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">{alert.description_text?.translation?.[0]?.text || 'N/A'}</p>
                 <div className="flex flex-wrap gap-1 mt-1">
@@ -250,7 +250,7 @@ const RealtimePublicTransport: React.FC = () => {
           </div>
         )}
 
-        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center mb-2"> {/* Added mb-2 */}
           <Car className="h-4 w-4 mr-2" /> Posisi Kendaraan
         </h3>
         {isLoadingRealtime ? (
@@ -272,7 +272,7 @@ const RealtimePublicTransport: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span className="flex items-center">
-                    <MapPin className="h-3 w-3 mr-1" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
+                    <MapPin className="h-4 w-4 mr-2" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
                   </span>
                   <span className="flex items-center">
                     <Clock className="h-3 w-3 mr-1" /> Update: {formatRelativeTime(vp.timestamp)}
@@ -302,7 +302,7 @@ const RealtimePublicTransport: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada posisi kendaraan yang tersedia.</p>
         )}
 
-        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center mb-2"> {/* Added mb-2 */}
           <Clock className="h-4 w-4 mr-2" /> Pembaruan Perjalanan
         </h3>
         {isLoadingRealtime ? (
@@ -356,7 +356,7 @@ const RealtimePublicTransport: React.FC = () => {
         )}
 
         {/* New section for Local GTFS Public Transport Routes */}
-        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center mt-6">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 flex items-center mb-2"> {/* Removed mt-6, added mb-2 */}
           <Route className="h-4 w-4 mr-2" /> Rute Transportasi Publik (Lokal GTFS)
         </h3>
         {isLoadingGtfs ? (
