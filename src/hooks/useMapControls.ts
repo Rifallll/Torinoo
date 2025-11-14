@@ -23,16 +23,33 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
   const fullscreenControlRef = useRef<L.Control | null>(null);
   const layerControlRef = useRef<L.Control.Layers | null>(null);
   const resetViewControlRef = useRef<L.Control | null>(null);
+  // New ref to track if controls have been added for the current map instance
+  const controlsAddedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!map || !layerGroups) {
+      // If map or layerGroups are not available, ensure controlsAddedRef is false
+      controlsAddedRef.current = false;
       return;
     }
 
-    // Define a function to add controls
+    // If controls have already been added for this map instance, do nothing.
+    if (controlsAddedRef.current) {
+      return;
+    }
+
     const addControls = () => {
-      // If controls are already added for this map instance, do nothing.
+      // Double check if map._controlCorners is defined before adding controls
+      // This is an extra safeguard, as map.whenReady() should ideally handle it.
+      // @ts-ignore - _controlCorners is an internal Leaflet property
+      if (!map._controlCorners) {
+        console.warn("Leaflet map._controlCorners is not defined, delaying control addition.");
+        return;
+      }
+
+      // Prevent adding controls if they somehow got added between the outer check and this point
       if (geocoderRef.current && map.hasControl(geocoderRef.current)) {
+        controlsAddedRef.current = true; // Mark as added
         return;
       }
 
@@ -105,24 +122,27 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
       });
       const resetViewControl = new ResetViewControl({ position: 'topleft' }).addTo(map);
       resetViewControlRef.current = resetViewControl;
+
+      controlsAddedRef.current = true; // Mark controls as added
     };
 
-    // Call addControls when the map is ready
+    // Use map.whenReady to ensure the map is fully initialized
     map.whenReady(addControls);
 
     // Cleanup function for the useEffect
     return () => {
       if (map) {
-        if (geocoderRef.current && map.hasControl(geocoderRef.current)) map.removeControl(geocoderRef.current);
-        if (fullscreenControlRef.current && map.hasControl(fullscreenControlRef.current)) map.removeControl(fullscreenControlRef.current);
-        if (layerControlRef.current && map.hasControl(layerControlRef.current)) map.removeControl(layerControlRef.current);
-        if (resetViewControlRef.current && map.hasControl(resetViewControlRef.current)) map.removeControl(resetViewControlRef.current);
+        if (geocoderRef.current) map.removeControl(geocoderRef.current);
+        if (fullscreenControlRef.current) map.removeControl(fullscreenControlRef.current);
+        if (layerControlRef.current) map.removeControl(layerControlRef.current);
+        if (resetViewControlRef.current) map.removeControl(resetViewControlRef.current);
       }
-      // Clear refs to allow re-initialization if the map instance changes
+      // Reset refs and controlsAddedRef on cleanup
       geocoderRef.current = null;
       fullscreenControlRef.current = null;
       layerControlRef.current = null;
       resetViewControlRef.current = null;
+      controlsAddedRef.current = false; // Important: reset for next map instance
     };
   }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]);
 };
