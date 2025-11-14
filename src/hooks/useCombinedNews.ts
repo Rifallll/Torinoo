@@ -52,7 +52,7 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     q: query,
     language: language,
     sortBy: 'publishedAt',
-    pageSize: '100', // Mengubah dari '10' menjadi '100'
+    pageSize: '100',
     apiKey: apiKey,
   });
 
@@ -86,7 +86,7 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
   const params = new URLSearchParams({
     q: query,
     lang: language,
-    max: '100', // Mengubah dari '10' menjadi '100'
+    max: '100',
     token: apiKey,
   });
 
@@ -104,10 +104,10 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
     const result: GNewsApiResponse = await response.json();
     return result.articles.map(gNewsArticle => ({
       source: {
-        id: null, // GNews.io doesn't provide source ID in the same way
+        id: null,
         name: gNewsArticle.source.name,
       },
-      author: null, // GNews.io doesn't provide author
+      author: null,
       title: gNewsArticle.title,
       description: gNewsArticle.description,
       url: gNewsArticle.url,
@@ -122,30 +122,63 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
   }
 };
 
+// Helper to normalize a string for comparison (e.g., for titles)
+const normalizeTitle = (title: string | null | undefined) => {
+  if (!title) return '';
+  // Convert to lowercase, remove punctuation, and extra spaces
+  // Using \p{L} for Unicode letters, \p{N} for Unicode numbers
+  return title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+};
+
 const fetchCombinedNews = async (query: string, language: string): Promise<NewsArticle[]> => {
   const [newsApiResult, gNewsResult] = await Promise.allSettled([
     fetchNewsFromNewsApi(query, language),
     fetchNewsFromGNewsApi(query, language),
   ]);
 
-  let combinedArticles: NewsArticle[] = [];
+  let allArticles: NewsArticle[] = [];
 
   if (newsApiResult.status === 'fulfilled') {
-    combinedArticles = combinedArticles.concat(newsApiResult.value);
+    allArticles = allArticles.concat(newsApiResult.value);
   }
   if (gNewsResult.status === 'fulfilled') {
-    combinedArticles = combinedArticles.concat(gNewsResult.value);
+    allArticles = allArticles.concat(gNewsResult.value);
   }
 
-  // Deduplicate by URL
-  const uniqueArticlesMap = new Map<string, NewsArticle>();
-  for (const article of combinedArticles) {
-    if (article.url) {
-      uniqueArticlesMap.set(article.url, article);
+  const deduplicatedArticles = new Map<string, NewsArticle>(); // Key: URL or normalized title
+
+  for (const article of allArticles) {
+    // Use URL as primary key, fallback to normalized title if URL is missing or generic
+    const key = article.url || normalizeTitle(article.title); 
+
+    if (!key) continue; // Skip articles without a valid key
+
+    if (deduplicatedArticles.has(key)) {
+      const existingArticle = deduplicatedArticles.get(key)!;
+      
+      // Compare articles and keep the one with more complete data or is newer
+      const existingHasImage = !!existingArticle.urlToImage;
+      const newHasImage = !!article.urlToImage;
+      const existingHasDescription = !!existingArticle.description;
+      const newHasDescription = !!article.description;
+
+      // Prioritize article with image, then description, then newer published date
+      if (
+        (newHasImage && !existingHasImage) || // New has image, existing doesn't
+        (!newHasImage && existingHasImage) || // Existing has image, new doesn't (keep existing)
+        (newHasImage === existingHasImage && newHasDescription && !existingHasDescription) || // Same image status, new has description, existing doesn't
+        (newHasImage === existingHasImage && !newHasDescription && existingHasDescription) || // Same image status, existing has description, new doesn't (keep existing)
+        (newHasImage === existingHasImage && newHasDescription === existingHasDescription && new Date(article.publishedAt) > new Date(existingArticle.publishedAt))
+      ) {
+        // If new article is "better" (more info or newer), replace existing
+        deduplicatedArticles.set(key, article);
+      }
+    } else {
+      deduplicatedArticles.set(key, article);
     }
   }
 
-  const finalArticles = Array.from(uniqueArticlesMap.values());
+  const finalArticles = Array.from(deduplicatedArticles.values());
 
   // Sort by publishedAt in descending order
   finalArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
