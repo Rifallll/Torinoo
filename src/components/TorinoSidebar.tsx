@@ -51,9 +51,9 @@ const navItems: NavItemConfig[] = [
     icon: CloudSun,
     isCategory: true,
     subItems: [
-      { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun },
-      { label: "Detailed Weather Forecast", path: "/detailed-weather", icon: CloudSun }, // New
-      { label: "Detailed Air Quality", path: "/detailed-air-quality", icon: Leaf }, // New
+      // { label: "Torino Weather Forecast", path: "/weather", icon: CloudSun }, // Removed as per user request
+      { label: "Detailed Weather Forecast", path: "/detailed-weather", icon: CloudSun },
+      { label: "Detailed Air Quality", path: "/detailed-air-quality", icon: Leaf },
     ],
   },
   { label: "News Portal", path: "/news", icon: Newspaper },
