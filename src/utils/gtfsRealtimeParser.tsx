@@ -78,6 +78,8 @@ interface ParsedGtfsRealtimeData {
 let root: protobuf.Root | null = null;
 let FeedMessage: protobuf.Type | null = null;
 
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB limit for binary files
+
 const loadProto = async () => {
   if (root && FeedMessage) {
     return; // Already loaded
@@ -115,6 +117,15 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       }
       return [];
     }
+
+    // --- SECURITY FIX: Add size limit check ---
+    if (buffer.byteLength > MAX_FILE_SIZE_BYTES) {
+      const errorMessage = `File ${type}.bin terlalu besar (${(buffer.byteLength / (1024 * 1024)).toFixed(2)} MB). Ukuran maksimum yang diizinkan adalah ${MAX_FILE_SIZE_BYTES / (1024 * 1024)} MB.`;
+      console.error(errorMessage);
+      toast.error(errorMessage);
+      return [];
+    }
+    // --- END SECURITY FIX ---
 
     const message = FeedMessage.decode(new Uint8Array(buffer));
     const payload = FeedMessage.toObject(message, {

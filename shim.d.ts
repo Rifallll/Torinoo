@@ -22,8 +22,8 @@ declare module 'leaflet' {
 interface ImportMetaEnv {
   readonly VITE_TOMTOM_API_KEY: string;
   readonly VITE_AQICN_API_KEY: string;
-  readonly VITE_NEWSAPI_KEY: string; // New: NewsAPI Key
-  readonly VITE_GNEWS_API_KEY: string; // New: GNews.io API Key
+  // VITE_NEWSAPI_KEY and VITE_GNEWS_API_KEY are removed from client-side exposure
+  // In a real application, these would be accessed securely on a backend server.
   // more env variables...
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify'; // Import DOMPurify
 
 interface GeoJsonLayerProps {
   map: L.Map | null;
@@ -170,7 +171,9 @@ export const useGeoJsonLayer = ({ map, geoJsonPath, minZoomForGeoJSON, selectedV
               if (feature.properties) {
                 let popupContent = "<table>";
                 for (const key in feature.properties) {
-                  popupContent += `<tr><td><b>${key}:</b></td><td>${feature.properties[key]}</td></tr>`;
+                  // Sanitize each property value before adding to HTML
+                  const sanitizedValue = DOMPurify.sanitize(String(feature.properties[key]));
+                  popupContent += `<tr><td><b>${key}:</b></td><td>${sanitizedValue}</td></tr>`;
                 }
                 popupContent += "</table>";
                 layer.bindPopup(popupContent);
