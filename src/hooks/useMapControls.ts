@@ -33,25 +33,28 @@ export const useMapControls = ({
   const fullscreenControlRef = useRef<L.Control | null>(null);
   const layerControlRef = useRef<L.Control.Layers | null>(null);
   const resetViewControlRef = useRef<L.Control | null>(null);
-  const controlsAddedRef = useRef<boolean>(false);
+  const controlsAddedRef = useRef<boolean>(false); // Tracks if static controls are added
 
+  // Effect 1: Add static controls (geocoder, fullscreen, layer control, reset view)
   useEffect(() => {
     if (!map || !layerGroups) {
       controlsAddedRef.current = false;
       return;
     }
 
+    // Only add static controls once per map instance
     if (controlsAddedRef.current) {
       return;
     }
 
-    const addControls = () => {
+    const addStaticControls = () => {
       // @ts-ignore - _controlCorners is an internal Leaflet property
       if (!map._controlCorners) {
-        console.warn("Leaflet map._controlCorners is not defined, delaying control addition.");
+        console.warn("Leaflet map._controlCorners is not defined, delaying static control addition.");
         return;
       }
 
+      // Prevent re-adding if already present (e.g., if map.whenReady fires multiple times)
       if (geocoderRef.current && map.hasControl(geocoderRef.current)) {
         controlsAddedRef.current = true;
         return;
@@ -93,7 +96,7 @@ export const useMapControls = ({
       const fullscreenControl = new FullscreenControl({ position: 'topleft' }).addTo(map);
       fullscreenControlRef.current = fullscreenControl;
 
-      // Add Layer control
+      // Add Layer control (without TomTom layer initially)
       const baseLayers = {
         "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }),
         "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
@@ -107,15 +110,6 @@ export const useMapControls = ({
 
       const layerControl = L.control.layers(baseLayers, overlayLayers).addTo(map);
       layerControlRef.current = layerControl;
-
-      // Add TomTom layer to map and control if it exists
-      if (tomtomTrafficFlowLayer instanceof L.TileLayer) {
-        // Ensure TomTom layer is added to map here, if it's not already
-        if (!map.hasLayer(tomtomTrafficFlowLayer)) {
-          tomtomTrafficFlowLayer.addTo(map);
-        }
-        layerControl.addOverlay(tomtomTrafficFlowLayer, "TomTom Traffic Flow");
-      }
 
       // Reset view control
       const ResetViewControl = L.Control.extend({
@@ -135,19 +129,15 @@ export const useMapControls = ({
       controlsAddedRef.current = true;
     };
 
-    map.whenReady(addControls);
+    map.whenReady(addStaticControls);
 
-    // Cleanup function for the useEffect
+    // Cleanup for static controls
     return () => {
       if (map) {
         if (geocoderRef.current) map.removeControl(geocoderRef.current);
         if (fullscreenControlRef.current) map.removeControl(fullscreenControlRef.current);
         if (layerControlRef.current) map.removeControl(layerControlRef.current);
         if (resetViewControlRef.current) map.removeControl(resetViewControlRef.current);
-        // Ensure TomTom layer is removed from map on cleanup if it was added
-        if (tomtomTrafficFlowLayer && map.hasLayer(tomtomTrafficFlowLayer)) {
-          map.removeLayer(tomtomTrafficFlowLayer);
-        }
       }
       geocoderRef.current = null;
       fullscreenControlRef.current = null;
@@ -155,9 +145,48 @@ export const useMapControls = ({
       resetViewControlRef.current = null;
       controlsAddedRef.current = false;
     };
-  }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]);
+  }, [map, layerGroups, torinoCenter, defaultZoom]);
 
-  // Effect to manage TomTom Traffic Flow layer visibility (opacity)
+  // Effect 2: Manage TomTom Traffic Flow layer addition/removal to map and layer control
+  useEffect(() => {
+    if (!map || !layerControlRef.current || !tomtomTrafficFlowLayer) {
+      return;
+    }
+
+    const currentLayerControl = layerControlRef.current;
+    const currentTomTomLayer = tomtomTrafficFlowLayer;
+
+    const addTomTomLayerToMapAndControl = () => {
+      if (!map.hasLayer(currentTomTomLayer)) {
+        currentTomTomLayer.addTo(map);
+      }
+      // Only add to control if it's not already there
+      // Leaflet's addOverlay handles duplicates, but this is a safeguard
+      if (!Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer)) {
+        currentLayerControl.addOverlay(currentTomTomLayer, "TomTom Traffic Flow");
+      }
+    };
+
+    const removeTomTomLayerFromMapAndControl = () => {
+      if (map.hasLayer(currentTomTomLayer)) {
+        map.removeLayer(currentTomTomLayer);
+      }
+      // Remove from control if it's there
+      if (Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer)) {
+        currentLayerControl.removeLayer(currentTomTomLayer);
+      }
+    };
+
+    // Add TomTom layer when map is ready and layer is available
+    map.whenReady(addTomTomLayerToMapAndControl);
+
+    // Cleanup for TomTom layer
+    return () => {
+      removeTomTomLayerFromMapAndControl();
+    };
+  }, [map, layerControlRef.current, tomtomTrafficFlowLayer]); // Dependencies for this effect
+
+  // Effect 3: Manage TomTom Traffic Flow layer visibility (opacity)
   useEffect(() => {
     if (!map || !tomtomTrafficFlowLayer) {
       return;
