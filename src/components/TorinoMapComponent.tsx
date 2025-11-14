@@ -215,15 +215,26 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
     const isWithinTorino = currentMapBounds.intersects(torinoBounds);
 
+    console.log("TomTom Visibility Check:");
+    console.log("  isTomTomLayerEnabled:", isTomTomLayerEnabled);
+    console.log("  isWithinTorinoBounds:", isWithinTorino);
+    console.log("  isTomTomLayerCurrentlyActive:", isTomTomLayerActive);
+
     if (isTomTomLayerEnabled && isWithinTorino) {
       if (!isTomTomLayerActive) {
         tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
         toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
+        console.log("  Adding TomTom layer to map.");
+      } else {
+        console.log("  TomTom layer already active.");
       }
     } else {
       if (isTomTomLayerActive) {
         mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
         toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
+        console.log("  Removing TomTom layer from map.");
+      } else {
+        console.log("  TomTom layer already inactive or not added.");
       }
     }
   };
@@ -263,8 +274,9 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
 
       // Get TomTom API Key from environment variables
       const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+      console.log("TomTom API Key (masked):", tomtomApiKey ? tomtomApiKey.substring(0, 5) + '...' + tomtomApiKey.substring(tomtomApiKey.length - 5) : 'NOT_SET');
       
-      if (tomtomApiKey) {
+      if (tomtomApiKey && tomtomApiKey !== 'YOUR_TOMTOM_API_KEY_HERE') {
         tomtomTrafficFlowLayerRef.current = L.tileLayer(
           `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
           {
@@ -274,7 +286,8 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
           }
         );
       } else {
-        toast.warning("Kunci API TomTom tidak ditemukan. Lapisan lalu lintas TomTom tidak akan tersedia.");
+        toast.warning("Kunci API TomTom tidak ditemukan atau belum diatur. Lapisan lalu lintas TomTom tidak akan tersedia.");
+        console.warn("TomTom API Key is missing or is the placeholder. TomTom traffic layer will not be available.");
       }
 
       // Add Geocoder control
@@ -458,6 +471,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
 
   // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
   useEffect(() => {
+    console.log("TomTom layer enabled state changed:", isTomTomLayerEnabled);
     updateTomTomTrafficVisibility();
   }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
 
