@@ -12,7 +12,7 @@ declare module 'leaflet' {
   namespace GeoJSON {
     interface Feature<G = Geometry, P = GeoJsonProperties> extends globalThis.GeoJSON.Feature<G, P> {}
     interface FeatureCollection<G = Geometry, P = GeoJsonProperties> extends globalThis.GeoJSON.FeatureCollection<G, P> {}
-    interface Point extends globalThis.GeoJSON.Point {}
+    interface Point extends globalthis.GeoJSON.Point {}
     interface Geometry extends globalThis.GeoJSON.Geometry {}
     interface GeoJsonProperties extends globalThis.GeoJSON.GeoJsonProperties {}
   }
@@ -21,7 +21,9 @@ declare module 'leaflet' {
 // Extend Window interface for Vite environment variables
 interface ImportMetaEnv {
   readonly VITE_TOMTOM_API_KEY: string;
-  readonly VITE_AQICN_API_KEY: string; // New: AQICN API Key
+  readonly VITE_AQICN_API_KEY: string;
+  readonly VITE_NEWSAPI_KEY: string; // New: NewsAPI Key
+  readonly VITE_GNEWS_API_KEY: string; // New: GNews.io API Key
   // more env variables...
 }
 
