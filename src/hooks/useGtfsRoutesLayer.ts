@@ -29,7 +29,7 @@ export const useGtfsRoutesLayer = ({
 
     gtfsRoutesLayerGroup.clearLayers(); // Clear existing routes
 
-    const { routes, shapes, agencies } = gtfsData;
+    const { routes, shapes, trips, agencies } = gtfsData; // Destructure trips as well
 
     // Create a map for efficient shape lookup
     const shapesByShapeId = new Map<string, L.LatLng[]>();
@@ -45,32 +45,46 @@ export const useGtfsRoutesLayer = ({
       return matchesType;
     });
 
+    // Now, iterate through filtered routes, find associated trips, and then their shapes
     filteredRoutes.forEach(route => {
-      if (route.shape_id && shapesByShapeId.has(route.shape_id)) {
-        const routeShape = shapesByShapeId.get(route.shape_id);
-        if (routeShape && routeShape.length > 1) {
-          const lineColor = getGtfsRouteColor(route.route_type);
-          const lineWeight = route.route_type === 1 ? 5 : route.route_type === 0 ? 4 : 3; // Subway thicker, Tram slightly thicker
+      // Find all trips for this route
+      const tripsForRoute = trips.filter(trip => trip.route_id === route.route_id);
 
-          const polyline = L.polyline(routeShape, {
-            color: lineColor,
-            weight: lineWeight,
-            opacity: 0.7,
-          });
-
-          const agency = agencies.find(a => a.agency_id === route.agency_id);
-          const popupContent = `
-            <b>${route.route_short_name || route.route_long_name || 'N/A'}</b><br/>
-            Tipe: ${route.route_type === 0 ? 'Tram' : route.route_type === 1 ? 'Subway' : route.route_type === 3 ? 'Bus' : 'Lainnya'}<br/>
-            Nama Panjang: ${route.route_long_name || 'N/A'}<br/>
-            Operator: ${agency?.agency_name || 'N/A'}<br/>
-            Deskripsi: ${route.route_desc || 'N/A'}
-          `;
-          polyline.bindPopup(popupContent);
-
-          polyline.addTo(gtfsRoutesLayerGroup);
+      // Collect unique shape_ids for these trips
+      const uniqueShapeIds = new Set<string>();
+      tripsForRoute.forEach(trip => {
+        if (trip.shape_id) {
+          uniqueShapeIds.add(trip.shape_id);
         }
-      }
+      });
+
+      uniqueShapeIds.forEach(shapeId => {
+        if (shapesByShapeId.has(shapeId)) {
+          const routeShape = shapesByShapeId.get(shapeId);
+          if (routeShape && routeShape.length > 1) {
+            const lineColor = getGtfsRouteColor(route.route_type);
+            const lineWeight = route.route_type === 1 ? 5 : route.route_type === 0 ? 4 : 3; // Subway thicker, Tram slightly thicker
+
+            const polyline = L.polyline(routeShape, {
+              color: lineColor,
+              weight: lineWeight,
+              opacity: 0.7,
+            });
+
+            const agency = agencies.find(a => a.agency_id === route.agency_id);
+            const popupContent = `
+              <b>${route.route_short_name || route.route_long_name || 'N/A'}</b><br/>
+              Tipe: ${route.route_type === 0 ? 'Tram' : route.route_type === 1 ? 'Subway' : route.route_type === 3 ? 'Bus' : 'Lainnya'}<br/>
+              Nama Panjang: ${route.route_long_name || 'N/A'}<br/>
+              Operator: ${agency?.agency_name || 'N/A'}<br/>
+              Deskripsi: ${route.route_desc || 'N/A'}
+            `;
+            polyline.bindPopup(popupContent);
+
+            polyline.addTo(gtfsRoutesLayerGroup);
+          }
+        }
+      });
     });
 
     // Cleanup function
