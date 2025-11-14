@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useAirQuality } from '@/hooks/useAirQuality';
 import { useSettings } from '@/contexts/SettingsContext';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer }
+  from 'recharts';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -157,7 +158,7 @@ const DetailedAirQualityPage: React.FC = () => {
   const aqi = data!.aqi;
   const dominantPollutant = data!.dominant_pollutant?.toUpperCase() || 'N/A';
   const aqiDescription = getAqiDescription(aqi);
-  const healthRecommendation = getHealthRecommendation(aqi); // FIX: Define healthRecommendation
+  const healthRecommendation = getHealthRecommendation(aqi); // Define healthRecommendation here
 
   // Dummy data for historical trend (replace with actual API data if available)
   const historicalData = [
@@ -220,12 +221,14 @@ const DetailedAirQualityPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(data!.iaqi || {}).map(([pollutant, valueObj]) => (
-              <div key={pollutant} className="flex items-center justify-between p-3 border rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-                <span className="font-medium text-gray-800 dark:text-gray-100">{pollutant.toUpperCase()}:</span>
-                <Badge variant="secondary" className="text-base">{getPollutantValue(data!.iaqi, pollutant)}</Badge>
-              </div>
-            ))}
+            {Object.entries(data!.iaqi || {}).map(([pollutant, valueObj]) => {
+              return (
+                <div key={pollutant} className="flex items-center justify-between p-3 border rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                  <span className="font-medium text-gray-800 dark:text-gray-100">{pollutant.toUpperCase()}:</span>
+                  <Badge variant="secondary" className="text-base">{getPollutantValue(data!.iaqi, pollutant)}</Badge>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
 
