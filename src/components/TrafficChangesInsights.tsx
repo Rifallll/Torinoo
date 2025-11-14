@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, CalendarDays, AlertTriangle, Lightbulb, TrendingUp, Clock, Users } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react'; // Only need one icon for the title
 
 // Interface untuk data perubahan lalu lintas yang diekstrak dari HTML
-export interface TrafficChange { // Export interface
+export interface TrafficChange {
   id: string;
   title: string;
   description: string;
@@ -19,7 +19,7 @@ export interface TrafficChange { // Export interface
 }
 
 // Data dummy yang diekstrak secara manual dari HTML yang Anda berikan
-export const mockTrafficChanges: TrafficChange[] = [ // Export the data
+export const mockTrafficChanges: TrafficChange[] = [
   {
     id: '668853',
     title: 'CHIUSURA IN CORSO MORTARA',
@@ -72,7 +72,7 @@ export const mockTrafficChanges: TrafficChange[] = [ // Export the data
     startDate: '2025-11-10',
     endDate: '2026-03-01',
     type: 'closure',
-    responsibleEntity: 'Comune di Torino',
+    responsibleEntity: 'Comune de Torino',
   },
   {
     id: '667923',
@@ -93,139 +93,18 @@ interface TrafficChangesInsightsProps {
 }
 
 const TrafficChangesInsights: React.FC<TrafficChangesInsightsProps> = ({ id }) => {
-  // Hitung statistik dasar dari data dummy
-  const totalChanges = mockTrafficChanges.length;
-  const ongoingChanges = mockTrafficChanges.filter(change => {
-    const now = new Date();
-    const start = change.startDate ? new Date(change.startDate) : null;
-    const end = change.endDate ? new Date(change.endDate) : null;
-    return (!start || now >= start) && (!end || now <= end);
-  }).length;
-
-  const responsibleEntities = [...new Set(mockTrafficChanges.map(c => c.responsibleEntity))];
-
+  console.log("Rendering simplified TrafficChangesInsights"); // Add log to check if it renders
   return (
-    <div id={id} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id={id} className="grid grid-cols-1 gap-6">
       <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
         <CardHeader className="pb-4">
           <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <AlertTriangle className="h-5 w-5 mr-2 text-red-600" /> Ringkasan Perubahan Lalu Lintas
+            <AlertTriangle className="h-5 w-5 mr-2 text-red-600" /> Wawasan & Prediksi Perubahan Lalu Lintas (Simplified)
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p><strong>Total Perubahan Terdaftar:</strong> {totalChanges}</p>
-          <p><strong>Perubahan Sedang Berlangsung:</strong> {ongoingChanges}</p>
-          <p><strong>Entitas Bertanggung Jawab:</strong> {responsibleEntities.join(', ')}</p>
-          <p className="text-sm text-gray-500 mt-2">
-            *Data ini disimulasikan dari contoh HTML yang diberikan.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <MapPin className="h-5 w-5 mr-2 text-blue-600" /> Analisis Spasial & Hotspot
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>
-            Dengan data lokasi (latitude, longitude), kita dapat:
-          </p>
-          <ul className="list-disc list-inside pl-4 space-y-1 text-sm">
-            <li>**Mengidentifikasi Hotspot:** Area mana yang paling sering mengalami perubahan lalu lintas (penutupan, pekerjaan jalan)?</li>
-            <li>**Visualisasi Peta:** Tampilkan semua perubahan di peta untuk melihat distribusi geografisnya.</li>
-            <li>**Analisis Klaster:** Kelompokkan perubahan yang berdekatan secara geografis.</li>
-          </ul>
-          <p className="text-sm text-gray-500 mt-2">
-            Ini membantu perencanaan kota dan pengalihan rute.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <CalendarDays className="h-5 w-5 mr-2 text-purple-600" /> Pola Temporal & Durasi
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>
-            Dengan data tanggal mulai dan berakhir, kita dapat:
-          </p>
-          <ul className="list-disc list-inside pl-4 space-y-1 text-sm">
-            <li>**Tren Musiman:** Apakah ada bulan atau musim tertentu dengan lebih banyak pekerjaan jalan?</li>
-            <li>**Durasi Rata-rata:** Berapa lama rata-rata penutupan atau pekerjaan jalan berlangsung berdasarkan jenisnya?</li>
-            <li>**Pola Harian/Mingguan:** Apakah ada pola perubahan lalu lintas yang terjadi pada hari/jam tertentu?</li>
-          </ul>
-          <p className="text-sm text-gray-500 mt-2">
-            Ini penting untuk penjadwalan dan komunikasi publik.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <Lightbulb className="h-5 w-5 mr-2 text-yellow-600" /> Ide Prediksi
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>
-            Untuk tugas data science Anda, data ini bisa digunakan untuk:
-          </p>
-          <ul className="list-disc list-inside pl-4 space-y-1 text-sm">
-            <li>**Prediksi Durasi Perubahan:** Berdasarkan jenis pekerjaan, lokasi, dan entitas yang bertanggung jawab, prediksi berapa lama perubahan akan berlangsung.</li>
-            <li>**Prediksi Dampak Lalu Lintas:** Gabungkan data ini dengan data kecepatan/aliran lalu lintas historis Anda (dari CSV) untuk memprediksi dampak kemacetan.</li>
-            <li>**Prediksi Kebutuhan Sumber Daya:** Prediksi kapan dan di mana sumber daya (misalnya, tim perbaikan, pengalihan) akan paling dibutuhkan.</li>
-          </ul>
-          <p className="text-sm text-gray-500 mt-2">
-            Ini akan memberikan wawasan proaktif untuk manajemen lalu lintas.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <TrendingUp className="h-5 w-5 mr-2 text-green-600" /> Analisis Data Kecepatan (CSV Anda)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>
-            Mengenai data kecepatan Anda dari Januari hingga Maret, Anda bisa melakukan:
-          </p>
-          <ul className="list-disc list-inside pl-4 space-y-1 text-sm">
-            <li>**Tren Kecepatan Harian/Mingguan/Bulanan:** Bagaimana kecepatan rata-rata berubah dari waktu ke waktu?</li>
-            <li>**Pola Puncak/Lembah:** Identifikasi jam-jam sibuk (kecepatan rendah) dan jam-jam lengang (kecepatan tinggi).</li>
-            <li>**Perbandingan Lokasi:** Bandingkan kecepatan di berbagai detektor/lokasi.</li>
-            <li>**Prediksi Kecepatan Masa Depan:** Gunakan model deret waktu (misalnya, ARIMA, Prophet) untuk memprediksi kecepatan di masa depan berdasarkan pola historis.</li>
-            <li>**Deteksi Anomali:** Identifikasi penurunan kecepatan yang tidak biasa yang mungkin menunjukkan insiden atau kemacetan.</li>
-          </ul>
-          <p className="text-sm text-gray-500 mt-2">
-            Ini akan membantu Anda memahami dinamika lalu lintas dan membuat prediksi yang akurat.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold flex items-center text-gray-800 dark:text-gray-100">
-            <Users className="h-5 w-5 mr-2 text-orange-600" /> Kolaborasi Data
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>
-            Menggabungkan data perubahan lalu lintas (dari halaman web) dengan data kecepatan Anda (dari CSV) akan sangat kuat:
-          </p>
-          <ul className="list-disc list-inside pl-4 space-y-1 text-sm">
-            <li>**Analisis Kausal:** Apakah penutupan jalan di suatu area menyebabkan penurunan kecepatan di area tersebut atau rute alternatif?</li>
-            <li>**Model Prediksi yang Lebih Baik:** Gunakan informasi tentang perubahan jalan sebagai fitur dalam model prediksi kecepatan Anda untuk meningkatkan akurasi.</li>
-            <li>**Rekomendasi Rute Dinamis:** Berikan rekomendasi rute real-time kepada pengemudi yang mempertimbangkan baik kondisi lalu lintas saat ini maupun perubahan jalan yang direncanakan.</li>
-          </ul>
-          <p className="text-sm text-gray-500 mt-2">
-            Ini adalah inti dari sistem informasi mobilitas cerdas.
-          </p>
+          <p>Ini adalah versi sederhana dari Wawasan Perubahan Lalu Lintas.</p>
+          <p>Jika Anda melihat ini, komponen berhasil dirender tanpa crash.</p>
         </CardContent>
       </Card>
     </div>
