@@ -9,6 +9,7 @@ import { toast } from 'sonner'; // Import toast for user feedback
 import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
 import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
 import { TrafficChange } from './TrafficChangesInsights'; // Import TrafficChange interface
+import { TrafficCone } from 'lucide-react'; // Import TrafficCone icon
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -517,9 +518,16 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     trafficChangesLayerGroupRef.current.clearLayers(); // Clear existing markers
 
     trafficChanges.forEach(change => {
+      // Menggunakan satu ikon TrafficCone untuk semua jenis perubahan lalu lintas
       const iconHtml = `
-        <div style="background-color:#eab308; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold; opacity:0.8;">
-          ${change.type === 'closure' ? 'X' : change.type === 'roadwork' ? '🚧' : change.type === 'reduction' ? '⬇️' : 'ℹ️'}
+        <div style="background-color:#facc15; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#333; font-size:16px; font-weight:bold; opacity:0.9; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-traffic-cone">
+            <path d="M9.9 2.5 4.2 12.9a1 1 0 0 0 .9 1.6h13.8a1 1 0 0 0 .9-1.6L14.1 2.5"/>
+            <path d="M10.5 16.5H13"/>
+            <path d="M8 22h8"/>
+            <path d="M8 19h8"/>
+            <path d="M10 6h4"/>
+          </svg>
         </div>
       `;
       const customIcon = L.divIcon({
