@@ -7,11 +7,13 @@ import { toast } from 'sonner';
 interface UseTomTomTrafficLayerProps {
   map: L.Map | null;
   tomtomApiKey: string | undefined;
+  isTomTomLayerEnabled: boolean; // Add this prop
 }
 
 export const useTomTomTrafficLayer = ({
   map,
   tomtomApiKey,
+  isTomTomLayerEnabled, // Use this prop
 }: UseTomTomTrafficLayerProps) => {
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null);
 
@@ -24,10 +26,10 @@ export const useTomTomTrafficLayer = ({
         {
           attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
           maxZoom: 19,
-          opacity: 0, // Start with 0 opacity (hidden)
+          opacity: isTomTomLayerEnabled ? 0.7 : 0, // Set initial opacity based on state
         }
       );
-      console.log("TomTom Traffic Flow layer initialized (hidden).");
+      console.log("TomTom Traffic Flow layer initialized (opacity set based on state).");
     } else if (!tomtomApiKey && tomtomTrafficFlowLayerRef.current) {
       // If API key is removed, clean up the layer
       tomtomTrafficFlowLayerRef.current = null;
@@ -38,7 +40,7 @@ export const useTomTomTrafficLayer = ({
     return () => {
       tomtomTrafficFlowLayerRef.current = null;
     };
-  }, [map, tomtomApiKey]); // Only re-run if map or API key changes
+  }, [map, tomtomApiKey, isTomTomLayerEnabled]); // isTomTomLayerEnabled is now a dependency
 
   return tomtomTrafficFlowLayerRef.current;
 };

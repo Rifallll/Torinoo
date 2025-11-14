@@ -66,6 +66,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   const tomtomTrafficFlowLayer = useTomTomTrafficLayer({
     map,
     tomtomApiKey,
+    isTomTomLayerEnabled, // Pass the enabled state here
   });
 
   // 3. Add map controls and manage TomTom layer visibility

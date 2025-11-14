@@ -113,6 +113,7 @@ export const useMapControls = ({
 
       if (tomtomTrafficFlowLayer) {
         // Add TomTom layer to the map immediately if it exists
+        // Its initial opacity is already set in useTomTomTrafficLayer
         if (!map.hasLayer(tomtomTrafficFlowLayer)) {
           tomtomTrafficFlowLayer.addTo(map);
         }
@@ -164,7 +165,7 @@ export const useMapControls = ({
   }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]); // tomtomTrafficFlowLayer is now a dependency here
 
   // Effect 2: Manage TomTom Traffic Flow layer visibility (opacity)
-  // This effect remains separate as it controls the dynamic opacity based on state and map view.
+  // This effect now ONLY controls opacity and does not add/remove the layer from the map.
   useEffect(() => {
     if (!map || !tomtomTrafficFlowLayer) {
       return;
@@ -179,19 +180,16 @@ export const useMapControls = ({
       const currentMapBounds = map.getBounds();
       const isWithinTorino = L.latLngBounds(torinoBounds).intersects(currentMapBounds);
 
-      if (isTomTomLayerEnabled && isWithinTorino) {
-        tomtomTrafficFlowLayer.setOpacity(0.7); // Make visible
-        // Only add to map if it's not already there and should be visible
-        if (!map.hasLayer(tomtomTrafficFlowLayer)) {
-          tomtomTrafficFlowLayer.addTo(map);
-        }
+      // Set opacity based on both the global setting and whether it's within Torino bounds
+      const targetOpacity = (isTomTomLayerEnabled && isWithinTorino) ? 0.7 : 0;
+      tomtomTrafficFlowLayer.setOpacity(targetOpacity);
+
+      // Provide feedback only when the state actually changes
+      // This check prevents toast from firing on every map move/zoom if opacity doesn't change
+      const currentOpacity = tomtomTrafficFlowLayer.getOpacity();
+      if (targetOpacity > 0 && currentOpacity === 0) { // If it was hidden and now should be visible
         toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
-      } else {
-        tomtomTrafficFlowLayer.setOpacity(0); // Hide
-        // Only remove from map if it's there and should be hidden
-        if (map.hasLayer(tomtomTrafficFlowLayer)) {
-          map.removeLayer(tomtomTrafficFlowLayer);
-        }
+      } else if (targetOpacity === 0 && currentOpacity > 0) { // If it was visible and now should be hidden
         toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
       }
     };
