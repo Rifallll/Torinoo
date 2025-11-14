@@ -11,6 +11,7 @@ interface GeoJsonLayerProps {
   roadConditionFilter: string;
   minZoom: number;
   getCustomIcon: (feature: L.GeoJSON.Feature) => L.DivIcon;
+  isMapLoaded: boolean; // New prop
 }
 
 export const useGeoJsonLayer = ({
@@ -20,11 +21,12 @@ export const useGeoJsonLayer = ({
   roadConditionFilter,
   minZoom,
   getCustomIcon,
+  isMapLoaded, // Destructure new prop
 }: GeoJsonLayerProps) => {
   const geoJsonDataRef = useRef<L.GeoJSON | null>(null);
 
   const updateVisibility = useCallback(() => {
-    if (!map || !layerGroup) return;
+    if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
     if (map.getZoom() >= minZoom) {
       if (!map.hasLayer(layerGroup)) {
@@ -37,10 +39,10 @@ export const useGeoJsonLayer = ({
         toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
       }
     }
-  }, [map, layerGroup, minZoom]);
+  }, [map, layerGroup, minZoom, isMapLoaded]); // Add isMapLoaded to dependencies
 
   useEffect(() => {
-    if (!map || !layerGroup) return;
+    if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
     map.on('zoomend', updateVisibility);
     updateVisibility(); // Initial check
@@ -50,10 +52,10 @@ export const useGeoJsonLayer = ({
       layerGroup.clearLayers();
       geoJsonDataRef.current = null;
     };
-  }, [map, layerGroup, updateVisibility]);
+  }, [map, layerGroup, updateVisibility, isMapLoaded]); // Add isMapLoaded to dependencies
 
   useEffect(() => {
-    if (!map || !layerGroup) return;
+    if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
     const fetchGeoJSON = async () => {
       try {
@@ -124,7 +126,7 @@ export const useGeoJsonLayer = ({
     };
 
     fetchGeoJSON();
-  }, [map, layerGroup, selectedVehicleType, roadConditionFilter, getCustomIcon, updateVisibility]);
+  }, [map, layerGroup, selectedVehicleType, roadConditionFilter, getCustomIcon, updateVisibility, isMapLoaded]); // Add isMapLoaded to dependencies
 
   return layerGroup;
 };

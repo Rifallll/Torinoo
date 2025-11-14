@@ -10,6 +10,7 @@ interface SubwayStationsLayerProps {
   layerGroup: L.LayerGroup | null;
   minZoom: number;
   subwayStationsData: { name: string; x: number; y: number }[];
+  isMapLoaded: boolean; // New prop
 }
 
 export const useSubwayStationsLayer = ({
@@ -17,11 +18,12 @@ export const useSubwayStationsLayer = ({
   layerGroup,
   minZoom,
   subwayStationsData,
+  isMapLoaded, // Destructure new prop
 }: SubwayStationsLayerProps) => {
   const stationMarkersRef = useRef<{ [key: string]: L.Marker }>({});
 
   const updateLayerAndMarkers = useCallback(() => {
-    if (!map || !layerGroup) return;
+    if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
     // Ensure markerPane exists before attempting to add markers
     if (!map.getPanes().markerPane) {
@@ -81,10 +83,10 @@ export const useSubwayStationsLayer = ({
         toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
       }
     }
-  }, [map, layerGroup, minZoom, subwayStationsData]);
+  }, [map, layerGroup, minZoom, subwayStationsData, isMapLoaded]); // Add isMapLoaded to dependencies
 
   useEffect(() => {
-    if (!map || !layerGroup) return;
+    if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
     map.on('zoomend', updateLayerAndMarkers);
     updateLayerAndMarkers(); // Initial check
@@ -99,7 +101,7 @@ export const useSubwayStationsLayer = ({
         map.removeLayer(layerGroup);
       }
     };
-  }, [map, layerGroup, updateLayerAndMarkers]);
+  }, [map, layerGroup, updateLayerAndMarkers, isMapLoaded]); // Add isMapLoaded to dependencies
 
   return layerGroup;
 };

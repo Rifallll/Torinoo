@@ -110,6 +110,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     subwayStationsLayerGroup,
     tomtomTrafficFlowLayer,
     publicTransportVehiclesLayerGroup,
+    isMapLoaded, // Receive the new state
   } = useMapInitialization({
     mapContainerId: 'torino-map',
     center: torinoCenter,
@@ -127,6 +128,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     roadConditionFilter,
     minZoom: minZoomForGeoJSON,
     getCustomIcon,
+    isMapLoaded, // Pass the state
   });
 
   // Manage Subway Stations layer
@@ -135,6 +137,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     layerGroup: subwayStationsLayerGroup,
     minZoom: minZoomForSubwayStations,
     subwayStationsData: subwayStationsData,
+    isMapLoaded, // Pass the state
   });
 
   // Manage TomTom Traffic layer
@@ -142,6 +145,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     map,
     layer: tomtomTrafficFlowLayer,
     bounds: torinoBounds,
+    isMapLoaded, // Pass the state
   });
 
   // Manage Public Transport Vehicles layer
@@ -150,6 +154,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     layerGroup: publicTransportVehiclesLayerGroup,
     minZoom: minZoomForPublicTransport,
     bounds: torinoBounds,
+    isMapLoaded, // Pass the state
   });
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;

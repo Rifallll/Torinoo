@@ -39,6 +39,7 @@ export const useMapInitialization = ({
   const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null);
   const publicTransportVehiclesLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false); // New state for map loaded status
 
   useEffect(() => {
     if (mapRef.current) return; // Map already initialized
@@ -144,6 +145,12 @@ export const useMapInitialization = ({
 
     L.control.layers(baseLayers, overlayLayers).addTo(map);
 
+    // Set isMapLoaded to true once the map is fully loaded
+    map.on('load', () => {
+      setIsMapLoaded(true);
+      console.log("Leaflet map is fully loaded and isMapLoaded is true.");
+    });
+
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
@@ -158,5 +165,6 @@ export const useMapInitialization = ({
     subwayStationsLayerGroup: subwayStationsLayerGroupRef.current,
     tomtomTrafficFlowLayer: tomtomTrafficFlowLayerRef.current,
     publicTransportVehiclesLayerGroup: publicTransportVehiclesLayerGroupRef.current,
+    isMapLoaded, // Return the new state
   };
 };

@@ -12,6 +12,7 @@ interface PublicTransportVehiclesLayerProps {
   layerGroup: L.LayerGroup | null;
   minZoom: number;
   bounds: L.LatLngBoundsExpression;
+  isMapLoaded: boolean; // New prop
 }
 
 export const usePublicTransportVehiclesLayer = ({
@@ -19,13 +20,14 @@ export const usePublicTransportVehiclesLayer = ({
   layerGroup,
   minZoom,
   bounds,
+  isMapLoaded, // Destructure new prop
 }: PublicTransportVehiclesLayerProps) => {
   const vehicleMarkersRef = useRef<{ [key: string]: L.Marker }>({});
   const { isPublicTransportLayerEnabled } = useSettings();
   const { data: gtfsRealtimeData } = useGtfsRealtimeData();
 
   const updateVisibilityAndMarkers = useCallback(() => {
-    if (!map || !layerGroup || !gtfsRealtimeData) return;
+    if (!map || !layerGroup || !gtfsRealtimeData || !isMapLoaded) return; // Check isMapLoaded
 
     // Ensure markerPane exists before attempting to add markers
     if (!map.getPanes().markerPane) {
@@ -102,10 +104,10 @@ export const usePublicTransportVehiclesLayer = ({
         toast.info("Lapisan kendaraan transportasi publik dinonaktifkan.");
       }
     }
-  }, [map, layerGroup, minZoom, bounds, isPublicTransportLayerEnabled, gtfsRealtimeData]);
+  }, [map, layerGroup, minZoom, bounds, isPublicTransportLayerEnabled, gtfsRealtimeData, isMapLoaded]); // Add isMapLoaded to dependencies
 
   useEffect(() => {
-    if (!map || !layerGroup) return;
+    if (!map || !layerGroup || !isMapLoaded) return; // Check isMapLoaded
 
     map.on('zoomend', updateVisibilityAndMarkers);
     map.on('moveend', updateVisibilityAndMarkers);
@@ -122,7 +124,7 @@ export const usePublicTransportVehiclesLayer = ({
         map.removeLayer(layerGroup);
       }
     };
-  }, [map, layerGroup, updateVisibilityAndMarkers]);
+  }, [map, layerGroup, updateVisibilityAndMarkers, isMapLoaded]); // Add isMapLoaded to dependencies
 
   return layerGroup;
 };

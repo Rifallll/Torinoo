@@ -9,17 +9,19 @@ interface TomTomTrafficLayerProps {
   map: L.Map | null;
   layer: L.TileLayer | null;
   bounds: L.LatLngBoundsExpression;
+  isMapLoaded: boolean; // New prop
 }
 
 export const useTomTomTrafficLayer = ({
   map,
   layer,
   bounds,
+  isMapLoaded, // Destructure new prop
 }: TomTomTrafficLayerProps) => {
   const { isTomTomLayerEnabled } = useSettings();
 
   const updateVisibility = useCallback(() => {
-    if (!map || !layer) return;
+    if (!map || !layer || !isMapLoaded) return; // Check isMapLoaded
 
     // Ensure the map is fully loaded before attempting to get its bounds
     // The _loaded property is an internal Leaflet flag indicating initial view setup is complete.
@@ -43,10 +45,10 @@ export const useTomTomTrafficLayer = ({
         toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
       }
     }
-  }, [map, layer, bounds, isTomTomLayerEnabled]);
+  }, [map, layer, bounds, isTomTomLayerEnabled, isMapLoaded]); // Add isMapLoaded to dependencies
 
   useEffect(() => {
-    if (!map || !layer) return;
+    if (!map || !layer || !isMapLoaded) return; // Check isMapLoaded
 
     // Add a one-time listener for the 'load' event to ensure map is ready
     // This is crucial for the initial call to updateVisibility
@@ -58,7 +60,6 @@ export const useTomTomTrafficLayer = ({
 
     map.on('moveend', updateVisibility);
     map.on('zoomend', updateVisibility);
-    // Removed: updateVisibility(); // Removed immediate call to prevent premature execution
 
     return () => {
       map.off('load', onMapLoad);
@@ -68,7 +69,7 @@ export const useTomTomTrafficLayer = ({
         map.removeLayer(layer);
       }
     };
-  }, [map, layer, updateVisibility]);
+  }, [map, layer, updateVisibility, isMapLoaded]); // Add isMapLoaded to dependencies
 
   return layer;
 };
