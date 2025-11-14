@@ -38,9 +38,10 @@ L.Icon.Default.mergeOptions({
 interface TorinoMapComponentProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
+  onFeatureClick: (properties: { [key: string]: any }) => void; // Add this prop
 }
 
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter }) => {
+const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter, onFeatureClick }) => {
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15;
@@ -97,6 +98,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     roadConditionFilter,
     minZoom: minZoomForGeoJSON,
     isMapLoaded, // Pass the state
+    onFeatureClick, // Pass the handler here
   });
 
   // Manage Subway Stations layer
