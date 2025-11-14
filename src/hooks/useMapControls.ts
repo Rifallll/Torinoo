@@ -42,6 +42,15 @@ export const useMapControls = ({
     }
 
     const addStaticControls = () => {
+      // Defensive check: Ensure map._controlCorners is defined before adding controls
+      // This is crucial for preventing "Cannot read properties of undefined (reading 'topright')"
+      // @ts-ignore - _controlCorners is an internal Leaflet property
+      if (!map._controlCorners) {
+        console.warn("Leaflet map._controlCorners is not defined, delaying static control addition.");
+        setTimeout(addStaticControls, 50); // Retry after a short delay
+        return;
+      }
+
       // Only add controls if they haven't been added yet
       if (geocoderRef.current && map.hasControl(geocoderRef.current)) {
         return;
