@@ -431,7 +431,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
               return {
                 color: color,
                 weight: weight,
-                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
+                opacity: 0.6 // Mengubah opasitas menjadi 0.6 untuk membuatnya lebih terlihat
               };
             }
           });
