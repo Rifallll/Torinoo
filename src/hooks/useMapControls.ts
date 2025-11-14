@@ -101,13 +101,14 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
         "GTFS Public Routes": layerGroups.gtfsRoutesLayerGroup,
       };
 
-      // Only add TomTom layer to control if it exists
-      if (tomtomTrafficFlowLayer) {
-        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayer;
-      }
-
+      // Initialize layer control without TomTom layer first
       const layerControl = L.control.layers(baseLayers, overlayLayers).addTo(map);
       layerControlRef.current = layerControl;
+
+      // Only add TomTom layer to control if it exists and is a valid instance
+      if (tomtomTrafficFlowLayer instanceof L.TileLayer) {
+        layerControl.addOverlay(tomtomTrafficFlowLayer, "TomTom Traffic Flow");
+      }
 
       // Reset view control
       const ResetViewControl = L.Control.extend({
