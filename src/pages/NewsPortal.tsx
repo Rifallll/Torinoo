@@ -11,20 +11,16 @@ import { useCombinedNews } from '@/hooks/useCombinedNews';
 
 const NewsPortal = () => {
   const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffico OR incidente)');
-  const [currentQuery, setCurrentQuery] = useState<string>('Torino AND (traffico OR incidente)');
+  // currentQuery state removed, use searchTerm directly for the hook
   const fixedLanguage = 'it'; // Fixed language to Italian
 
-  // Fetch news based on currentQuery and fixedLanguage
-  const { data: newsArticles, isLoading, error } = useCombinedNews(currentQuery, fixedLanguage);
+  // Fetch news based on searchTerm and fixedLanguage
+  const { data: newsArticles, isLoading, error } = useCombinedNews(searchTerm, fixedLanguage);
 
-  const handleSearch = () => {
-    setCurrentQuery(searchTerm);
-    // Language is now fixed, no need to set it here
-  };
+  // handleSearch function removed as search is now live
 
   const handleResetFilters = () => {
     setSearchTerm('Torino AND (traffico OR incidente)');
-    setCurrentQuery('Torino AND (traffico OR incidente)');
     // Language is now fixed, no need to reset it here
   };
 
@@ -97,11 +93,7 @@ const NewsPortal = () => {
               className="pl-9 pr-8 w-full h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearch();
-                }
-              }}
+              // onKeyPress removed as search is now live
             />
             {searchTerm && (
               <Button
@@ -117,10 +109,7 @@ const NewsPortal = () => {
 
           {/* Language Select dropdown removed */}
 
-          <Button onClick={handleSearch} className="flex items-center h-10 px-4 py-2 text-base">
-            <Search className="h-4 w-4 mr-2" />
-            Cari
-          </Button>
+          {/* Search button removed as search is now live */}
 
           {searchTerm !== 'Torino AND (traffico OR incidente)' && ( // Condition adjusted
             <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
