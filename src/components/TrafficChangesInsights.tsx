@@ -24,7 +24,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'mortara-ongoing-closure',
     title: 'Ongoing Closure Mortara',
     description: 'Starting Monday, November 10, due to municipal works, the last section of Corso Mortara towards Piazza Baldissera is expected to be closed with a mandatory right turn onto Corso Principe Oddone.',
-    latitude: 45.0918,
+    latitude: 45.0918, // Approx. Corso Mortara near Piazza Baldissera
     longitude: 7.66297,
     startDate: '2025-11-10',
     type: 'closure',
@@ -34,7 +34,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'mortara-underpass-closure-14-11',
     title: '14/11 Closure in Mortara Underpass',
     description: 'On Friday, November 14, from 9:30 AM to 4:30 PM, due to works by the Municipality of Turin, the closure of the Mortara underpass towards Via Orvieto is scheduled.',
-    latitude: 45.0918,
+    latitude: 45.0918, // Approx. Mortara underpass
     longitude: 7.66297,
     startDate: '2025-11-14',
     endDate: '2025-11-14',
@@ -45,7 +45,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'piazza-sofia-works',
     title: 'Works in Piazza Sofia',
     description: 'Until Friday, November 14, due to SMAT works, road reductions are planned in Piazza Sofia at the intersection with Settimo road.',
-    latitude: 45.0951,
+    latitude: 45.0951, // Piazza Sofia
     longitude: 7.71709,
     endDate: '2025-11-14',
     type: 'reduction',
@@ -55,7 +55,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-tassoni-works',
     title: 'Works on Corso Tassoni Counter-Avenues',
     description: 'From Monday, November 17 to Wednesday, December 17, due to works by the Municipality of Turin, road closures are planned on the east and west side roads of Corso Tassoni between Piazza Bernini and Corso Regina Margherita.',
-    latitude: 45.0814,
+    latitude: 45.0814, // Corso Tassoni near Piazza Bernini
     longitude: 7.65617,
     startDate: '2025-11-17',
     endDate: '2025-12-17',
@@ -66,7 +66,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-galileo-ferraris-closure',
     title: 'Closure in Corso Galileo Ferraris',
     description: 'Starting Monday, November 10, due to IRETI works, the west side road of Corso Galileo Ferraris between Corso Trieste and Via Legnano will be closed.',
-    latitude: 45.058,
+    latitude: 45.058, // Corso Galileo Ferraris near Corso Trieste
     longitude: 7.668,
     startDate: '2025-11-10',
     type: 'closure',
@@ -76,7 +76,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-borsi-closure',
     title: 'Closure in Via Borsi',
     description: 'From Monday, November 10 to Friday, December 8, due to IREN ENERGIA works, the closure of Via Borsi from no. 91 to Via Brusa is planned.',
-    latitude: 45.098,
+    latitude: 45.098, // Via Borsi
     longitude: 7.675,
     startDate: '2025-11-10',
     endDate: '2025-12-08',
@@ -87,7 +87,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-novara-pedrotti-closure',
     title: 'Closure in Corso Novara and Via Pedrotti',
     description: 'Starting Monday, November 10, due to IRETI works, the south side road of Corso Novara between Via Bologna and Via Perugia and Via Pedrotti between Via Padova and Corso Novara will be closed.',
-    latitude: 45.080,
+    latitude: 45.080, // Corso Novara near Via Bologna
     longitude: 7.700,
     startDate: '2025-11-10',
     type: 'closure',
@@ -97,7 +97,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-cellini-closure',
     title: 'Closure in Via Cellini',
     description: 'From Monday, November 10 to Friday, December 5, due to IREN ENERGIA works, the closure of Via Cellini between Via Nizza and Via Grossi is planned.',
-    latitude: 45.040,
+    latitude: 45.040, // Via Cellini near Via Nizza
     longitude: 7.675,
     startDate: '2025-11-10',
     endDate: '2025-12-05',
@@ -108,7 +108,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-bramante-closure',
     title: 'Closure in Corso Bramante',
     description: 'Starting Monday, November 10, due to IRETI works, the closure of the south side road of Corso Bramante between Via Genova and number 82 is planned.',
-    latitude: 45.045,
+    latitude: 45.045, // Corso Bramante near Via Genova
     longitude: 7.670,
     startDate: '2025-11-10',
     type: 'closure',
@@ -118,7 +118,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-regio-parco-modena-closure',
     title: 'Closure in Corso Regio Parco and Via Modena',
     description: 'Starting Monday, November 10, due to IRETI works, Corso Regio Parco between Corso Verona and Via Modena and Via Modena between Via Foggia and Corso Regio Parco will be closed.',
-    latitude: 45.085,
+    latitude: 45.085, // Corso Regio Parco near Corso Verona
     longitude: 7.705,
     startDate: '2025-11-10',
     type: 'closure',
@@ -128,7 +128,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-cecchi-night-closure',
     title: 'Night Closure Via Cecchi',
     description: 'Due to works by the Municipality of Turin, from 00:00 on Sunday, November 16 to 07:00 on Monday, November 17, the closure of Via Cecchi between Via Cigna and Piazza Baldissera is scheduled.',
-    latitude: 45.090,
+    latitude: 45.090, // Via Cecchi near Via Cigna
     longitude: 7.670,
     startDate: '2025-11-16',
     endDate: '2025-11-17',
@@ -139,7 +139,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-zino-zini-works',
     title: 'Works in Via Zino Zini',
     description: 'From Saturday, November 15 to April 30, 2026, due to works by the Municipality of Turin, a reduction of the east roadway of Via Zino Zini is planned.',
-    latitude: 45.035,
+    latitude: 45.035, // Via Zino Zini
     longitude: 7.655,
     startDate: '2025-11-15',
     endDate: '2026-04-30',
@@ -151,7 +151,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     title: 'Works at Valentino Park',
     description: 'Due to works inside Valentino Park, road closures are planned. From Monday, November 10, 2025 to Sunday, March 1, 2026, Viale Turr will be closed between Viale Boiardo and Via Millio. Until Sunday, March 1, 2026, closures are also in effect on: - Viale Stefano Turr between Viale Boiardo and Viale Marinai d\'Italia - Viale Boiardo between Via Turr and Viale Marinai d\'Italia - Viale Marinai d\'Italia between Viale Boiardo and Viale Turr - Viale Millio between Viale Turr and the entrance to the Medieval Village',
     fullDescription: 'Due to works inside Valentino Park, road closures are planned. From Monday, November 10, 2025 to Sunday, March 1, 2026, Viale Turr will be closed between Viale Boiardo and Via Millio. Until Sunday, March 1, 2026, closures are also in effect on: - Viale Stefano Turr between Viale Boiardo and Viale Marinai d\'Italia - Viale Boiardo between Via Turr and Viale Marinai d\'Italia - Viale Marinai d\'Italia between Viale Boiardo and Viale Turr - Viale Millio between Viale Turr and the entrance to the Medieval Village',
-    latitude: 45.0501,
+    latitude: 45.0501, // Valentino Park
     longitude: 7.68233,
     startDate: '2025-11-10',
     endDate: '2026-03-01',
@@ -162,7 +162,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-pinerolo-closure',
     title: 'Closure in Via Pinerolo',
     description: 'Until Friday, December 12, due to works by the Municipality of Turin, the closure of Via Pinerolo between Via Cigna and Via Luigi Damiano is planned.',
-    latitude: 45.088,
+    latitude: 45.088, // Via Pinerolo near Via Cigna
     longitude: 7.650,
     endDate: '2025-12-12',
     type: 'closure',
@@ -172,7 +172,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-noe-closure',
     title: 'Closure in Via Noè',
     description: 'Until Friday, December 12, due to works by the Municipality of Turin, the closure of Via Noè between Via Priocca and Corso Giulio Cesare is planned.',
-    latitude: 45.095,
+    latitude: 45.095, // Via Noè near Via Priocca
     longitude: 7.700,
     endDate: '2025-12-12',
     type: 'closure',
@@ -182,7 +182,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-la-salle-closure',
     title: 'Closure in Via La Salle',
     description: 'Until Friday, December 12, due to works by the Municipality of Turin, the closure of Via La Salle between Lungo Dora Savona and Via Noè is planned.',
-    latitude: 45.090,
+    latitude: 45.090, // Via La Salle near Lungo Dora Savona
     longitude: 7.690,
     endDate: '2025-12-12',
     type: 'closure',
@@ -192,7 +192,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-leoncavallo-closure',
     title: 'Closure in Via Leoncavallo',
     description: 'Until Friday, December 12, due to works by the Municipality of Turin, the closure of Via Leoncavallo between Via Ternengo and Corso Novara is planned.',
-    latitude: 45.085,
+    latitude: 45.085, // Via Leoncavallo near Via Ternengo
     longitude: 7.700,
     endDate: '2025-12-12',
     type: 'closure',
@@ -202,7 +202,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-nigra-closure',
     title: 'Closure in Via Nigra',
     description: 'Until Saturday, December 20, due to SMAT works, the closure of Via Nigra between Via Coppino and Via Breglio is planned.',
-    latitude: 45.100,
+    latitude: 45.100, // Via Nigra near Via Coppino
     longitude: 7.660,
     endDate: '2025-12-20',
     type: 'closure',
@@ -212,7 +212,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'piazza-filzi-closure',
     title: 'Closure in Piazza Filzi',
     description: 'Until Thursday, April 30, due to SMAT works, the north roadway of Piazza Filzi from Corso Caduti sul Lavoro to Via Nizza is expected to be closed.',
-    latitude: 45.030,
+    latitude: 45.030, // Piazza Filzi
     longitude: 7.670,
     endDate: '2026-04-30',
     type: 'closure',
@@ -222,7 +222,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-roasio-closure',
     title: 'Closure in Via Roasio',
     description: 'From Monday, November 10 to Wednesday, November 19, due to SMAT works, the closure of Via Roasio between Via Nicola Fabrizi and Via Medici is planned.',
-    latitude: 45.070,
+    latitude: 45.070, // Via Roasio near Via Nicola Fabrizi
     longitude: 7.645,
     startDate: '2025-11-10',
     endDate: '2025-11-19',
@@ -233,7 +233,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'piazza-madama-cristina-closure',
     title: 'Closure in Piazza Madama Cristina',
     description: 'From Monday, November 10 to Friday, November 14, due to SMAT works, the east side of Piazza Madama Cristina between Via Galliari and Via Berthollet will be closed.',
-    latitude: 45.060,
+    latitude: 45.060, // Piazza Madama Cristina
     longitude: 7.685,
     startDate: '2025-11-10',
     endDate: '2025-11-14',
@@ -244,7 +244,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-berthollet-closure',
     title: 'Closure in Via Berthollet',
     description: 'From Monday, November 10 to Friday, November 14, due to SMAT works, the closure of Via Berthollet from Via Ormea to Via Madama Cristina is planned.',
-    latitude: 45.055,
+    latitude: 45.055, // Via Berthollet near Via Ormea
     longitude: 7.685,
     startDate: '2025-11-10',
     endDate: '2025-11-14',
@@ -255,7 +255,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'lungo-dora-colletta-closure',
     title: 'Closure Lungo Dora Colletta',
     description: 'Until December 5, SMAT works are planned at the intersection along Dora Colletta/Via Varano/Corso Tortona. Specifically, the stretch of Lungo Dora Colletta between Corso Tortona and Via Racagni towards Carlo Emanuele I bridge will be closed. In addition, a narrowing of Via Varano near the intersection is planned. Delays are possible in the area.',
-    latitude: 45.075,
+    latitude: 45.075, // Lungo Dora Colletta near Corso Tortona
     longitude: 7.700,
     endDate: '2025-12-05',
     type: 'closure',
@@ -265,7 +265,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-filadelfia-reduction',
     title: 'Works in Via Filadelfia',
     description: 'Until Tuesday, December 23, due to works by the Municipality of Turin, a reduction of Via Filadelfia from Corso Agnelli to Corso Orbassano is planned.',
-    latitude: 45.030,
+    latitude: 45.030, // Via Filadelfia near Corso Agnelli
     longitude: 7.640,
     endDate: '2025-12-23',
     type: 'reduction',
@@ -275,7 +275,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'val-pattonera-closure',
     title: 'Closure in Via Strada Comunale di Val Pattonera',
     description: 'Starting Monday, October 27, due to SMAT works, the municipal road of Val Pattonera is scheduled to be closed at the intersection with Viale XXV Aprile.',
-    latitude: 45.000,
+    latitude: 45.000, // Strada Comunale di Val Pattonera
     longitude: 7.650,
     startDate: '2025-10-27',
     type: 'closure',
@@ -286,7 +286,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     title: 'Via Roma Pedestrianization',
     description: 'For preparatory works for the pedestrianization of Via Roma, closures are planned in the city center. Until Wednesday, December 31, closures are in effect on: - Piazza CLN between Via Giolitti and Via Rossi - Piazza CLN between Via Rossi and Via Amendola - Piazza CLN between Via Alfieri and Via Frola - Via Frola between Via XX Settembre and Piazza CLN. Until Saturday, January 31, 2026, Via Roma will also be closed between Via Cavour and Via Buozzi.',
     fullDescription: 'For preparatory works for the pedestrianization of Via Roma, closures are planned in the city center. Until Wednesday, December 31, closures are in effect on: - Piazza CLN between Via Giolitti and Via Rossi - Piazza CLN between Via Rossi and Via Amendola - Piazza CLN between Via Alfieri and Via Frola - Via Frola between Via XX Settembre and Piazza CLN. Until Saturday, January 31, 2026, Via Roma will also be closed between Via Cavour and Via Buozzi.',
-    latitude: 45.066,
+    latitude: 45.066, // Via Roma (central part)
     longitude: 7.68131,
     startDate: '2025-09-22',
     endDate: '2026-01-31',
@@ -297,7 +297,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-stampini-closure',
     title: 'Closure in Via Stampini',
     description: 'Starting Monday, September 22, due to urgent SMAT works, the closure of the east roadway of Via Stampini from the Via Lanzo roundabout to the intersection with Via Orbetello is planned. Vehicles heading to the city center, from the roundabout are diverted left onto Via Lanzo and then right onto Via Sparone, and then onto Via Stampini again. Delays are possible during peak hours.',
-    latitude: 45.110,
+    latitude: 45.110, // Via Stampini near Via Lanzo roundabout
     longitude: 7.650,
     startDate: '2025-09-22',
     type: 'closure',
@@ -307,7 +307,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-pigafetta-closure',
     title: 'Closure in Via Pigafetta',
     description: 'Starting Monday, November 3, due to SMAT works, the closure of Via Pigafetta between Corso Mediterraneo and Via Bottego is planned.',
-    latitude: 45.050,
+    latitude: 45.050, // Via Pigafetta near Corso Mediterraneo
     longitude: 7.630,
     startDate: '2025-11-03',
     type: 'closure',
@@ -317,7 +317,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-bibiana-closure',
     title: 'Closure in Via Bibiana',
     description: 'Starting Wednesday, September 10, due to GTT works, the closure of Via Bibiana between Via Sospello and Via Breglio is planned.',
-    latitude: 45.105,
+    latitude: 45.105, // Via Bibiana near Via Sospello
     longitude: 7.680,
     startDate: '2025-09-10',
     type: 'closure',
@@ -327,7 +327,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-marconi-closure',
     title: 'Closure in Corso Marconi',
     description: 'Starting Monday, November 3, due to SMAT works, the north side road of Corso Marconi between Via Saluzzo and Via Nizza will be closed.',
-    latitude: 45.050,
+    latitude: 45.050, // Corso Marconi near Via Saluzzo
     longitude: 7.680,
     startDate: '2025-11-03',
     type: 'closure',
@@ -337,7 +337,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-pomaro-closure',
     title: 'Closure in Via Pomaro',
     description: 'Starting Monday, November 3, due to IRETI works, the closure of Via Pomaro between Corso Orbassano and Via Frinco is planned.',
-    latitude: 45.025,
+    latitude: 45.025, // Via Pomaro near Corso Orbassano
     longitude: 7.635,
     startDate: '2025-11-03',
     type: 'closure',
@@ -347,7 +347,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'pino-tunnel-road-works',
     title: 'Works on Pino Tunnel Road',
     description: 'Starting Monday, November 3, due to IRETI works, the establishment of alternating one-way traffic is planned on the Traforo di Pino road between Strada delle Traverse and Tetti Bertoglio road.',
-    latitude: 45.040,
+    latitude: 45.040, // Traforo di Pino road
     longitude: 7.750,
     startDate: '2025-11-03',
     type: 'roadwork',
@@ -357,7 +357,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-bramante-reduction',
     title: 'Works in Progress Bramante',
     description: 'Starting Monday, October 27, due to works by the Municipality of Turin, a reduction of the roadway is planned on Corso Bramante between Via Madama Cristina and Via Nizza.',
-    latitude: 45.045,
+    latitude: 45.045, // Corso Bramante between Via Madama Cristina and Via Nizza
     longitude: 7.670,
     startDate: '2025-10-27',
     type: 'reduction',
@@ -367,7 +367,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-massimo-dazeglio-reduction',
     title: 'Works Ongoing Massimo D\'Azeglio',
     description: 'Until Friday, December 5, due to ITALGAS works, the roadway of Corso Massimo d\'Azeglio between Corso Vittorio Emanuele II and Corso Marconi is expected to be reduced.',
-    latitude: 45.050,
+    latitude: 45.050, // Corso Massimo d'Azeglio between Corso Vittorio Emanuele II and Corso Marconi
     longitude: 7.685,
     endDate: '2025-12-05',
     type: 'reduction',
@@ -377,7 +377,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'piazza-baldissera-works',
     title: 'Works in Piazza Baldissera',
     description: 'Preparatory works for the construction of a traffic light intersection in Piazza Baldissera continue, with roadway narrowing in the current roundabout area and on the entry and exit branches. Details on the Municipality of Turin website.',
-    latitude: 45.095,
+    latitude: 45.095, // Piazza Baldissera
     longitude: 7.690,
     type: 'roadwork',
     responsibleEntity: 'Municipality of Turin',
@@ -386,7 +386,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-bevilacqua-closure',
     title: 'Closure in Via Bevilacqua',
     description: 'Until Friday, November 14, due to SMAT works, the closure of Via Bevilacqua between Via Chambery and Via Ponzio is planned.',
-    latitude: 45.060,
+    latitude: 45.060, // Via Bevilacqua
     longitude: 7.620,
     endDate: '2025-11-14',
     type: 'closure',
@@ -396,7 +396,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-cirio-closure',
     title: 'Closure in Via Cirio',
     description: 'Starting Monday, October 20, due to works by the Municipality of Turin, the closure of Via Cirio between Via Pesaro and Via Robassomero is planned.',
-    latitude: 45.115,
+    latitude: 45.115, // Via Cirio
     longitude: 7.670,
     startDate: '2025-10-20',
     type: 'closure',
@@ -406,7 +406,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-cremona-varese-closure',
     title: 'Closure in Via Cremona and Via Varese',
     description: 'Until Saturday, November 15, due to works by the Municipality of Turin, closures are planned in Via Cremona from Largo Palermo to Via Denza and in Via Varese from Via Aosta to Via Denza.',
-    latitude: 45.080,
+    latitude: 45.080, // Via Cremona and Via Varese area
     longitude: 7.690,
     endDate: '2025-11-15',
     type: 'closure',
@@ -416,7 +416,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-porporati-closure',
     title: 'Closure in Via Porporati',
     description: 'Starting Monday, October 20, due to works by the Municipality of Turin, the closure of Via Porporati between Corso XI Febbraio and Corso Giulio Cesare is planned.',
-    latitude: 45.075,
+    latitude: 45.075, // Via Porporati
     longitude: 7.695,
     startDate: '2025-10-20',
     type: 'closure',
@@ -426,7 +426,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-rivarolo-closure',
     title: 'Closure in Via Rivarolo',
     description: 'Starting Monday, October 20, due to works by the Municipality of Turin, the closure of Via Rivarolo between Corso XI Febbraio and Corso Giulio Cesare is planned.',
-    latitude: 45.075,
+    latitude: 45.075, // Via Rivarolo
     longitude: 7.695,
     startDate: '2025-10-20',
     type: 'closure',
@@ -436,7 +436,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-pisano-closure',
     title: 'Closure in Via Pisano',
     description: 'Starting Monday, October 20, due to works by the Municipality of Turin, the closure of Via Pisano between Corso XI Febbraio and Via Priocca is planned.',
-    latitude: 45.075,
+    latitude: 45.075, // Via Pisano
     longitude: 7.695,
     startDate: '2025-10-20',
     type: 'closure',
@@ -446,7 +446,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-priocca-reduction',
     title: 'Works in Via Priocca',
     description: 'Starting Monday, October 20, due to works by the Municipality of Turin, the roadway of Via Priocca between Via Pisano and Via Rivarolo is expected to be reduced.',
-    latitude: 45.075,
+    latitude: 45.075, // Via Priocca
     longitude: 7.695,
     startDate: '2025-10-20',
     type: 'reduction',
@@ -456,7 +456,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-siracusa-reduction',
     title: 'Roadworks in Siracusa',
     description: 'Until Friday, November 28, due to works by the Municipality of Turin, the roadway of the Corso Siracusa service road between Corso Sebastopoli and Via Guglielminetti is expected to be reduced.',
-    latitude: 45.030,
+    latitude: 45.030, // Corso Siracusa
     longitude: 7.630,
     endDate: '2025-11-28',
     type: 'reduction',
@@ -466,7 +466,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-donizetti-closure',
     title: 'Closure in Via Donizetti',
     description: 'Until Friday, November 28, due to IREN Energia works, the closure of Via Donizetti between Via Ormea and Via Madama Cristina is planned.',
-    latitude: 45.055,
+    latitude: 45.055, // Via Donizetti
     longitude: 7.685,
     endDate: '2025-11-28',
     type: 'closure',
@@ -477,7 +477,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     title: 'Pedestrianization Via Roma (Extended Closures)',
     description: 'Until Friday, November 8, due to works by the Municipality of Turin, extensive closures are planned in the city center for the pedestrianization of Via Roma.',
     fullDescription: 'Until Friday, November 8, due to works by the Municipality of Turin, closures are planned in: - Piazza CLN between Via Giolitti and Via Rossi - Piazza CLN between Via Rossi and Via Amendola - Piazza CLN between Via Alfieri and Via Frola - Via Roma between Piazza CLN and Via Cavour - Via Roma from Piazza San Carlo to Via Monte di Pietà - Via Viotti from Via Bertola to Via Monte di Pietà - Via Bertola from Via XX Settembre to Via Viott - Via Frola between Via XX Settembre and Piazza CLN - Via Principe Amedeo from Via Duse to Via Roma - Piazza Carlo Felice between Piazza Lagrange and Piazza Paleocapa',
-    latitude: 45.066,
+    latitude: 45.066, // Via Roma (central part)
     longitude: 7.68131,
     endDate: '2025-11-08',
     type: 'pedestrianization',
@@ -487,7 +487,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-asiago-reduction',
     title: 'Works in Via Asiago',
     description: 'Starting Monday, October 27, due to IREN Energia works, a reduction of the roadway of Via Asiago between Via Germonio and Via Villafranca is planned.',
-    latitude: 45.035,
+    latitude: 45.035, // Via Asiago
     longitude: 7.625,
     startDate: '2025-10-27',
     type: 'reduction',
@@ -497,7 +497,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-gardoncini-closure',
     title: 'Closure in Via Gardoncini',
     description: 'Starting Thursday, October 23, due to ITALGAS works, the closure of Via Gardoncini between Corso Svizzera and Corso Appio Claudio is planned.',
-    latitude: 45.080,
+    latitude: 45.080, // Via Gardoncini
     longitude: 7.630,
     startDate: '2025-10-23',
     type: 'closure',
@@ -507,7 +507,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-giulio-cesare-closure',
     title: 'Closure in Corso Giulio Cesare',
     description: 'From Tuesday, November 11 to Friday, November 14, due to ITALGAS works, Corso Giulio Cesare will be closed from Via Porpora to Via Pergolesi.',
-    latitude: 45.085,
+    latitude: 45.085, // Corso Giulio Cesare
     longitude: 7.700,
     startDate: '2025-11-11',
     endDate: '2025-11-14',
@@ -518,7 +518,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'ferdinando-di-savoia-bridge-works',
     title: 'Works on Ferdinando di Savoia Bridge',
     description: 'Until February 2026, due to works by the Municipality of Turin, a reduction of the roadway is planned on the Ferdinando di Savoia bridge.',
-    latitude: 45.070,
+    latitude: 45.070, // Ferdinando di Savoia bridge
     longitude: 7.690,
     endDate: '2026-02-28',
     type: 'reduction',
@@ -528,7 +528,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'piazza-benghazi-closure',
     title: 'Closure in Piazza Benghazi',
     description: 'Starting Wednesday, October 1, due to works by the City of Turin, the east side of Piazza Bengasi is expected to be closed, due to the construction of a new underground parking lot and for the redevelopment of the current market area.',
-    latitude: 45.030,
+    latitude: 45.030, // Piazza Bengasi
     longitude: 7.670,
     startDate: '2025-10-01',
     type: 'closure',
@@ -538,7 +538,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'corso-unita-ditalia-narrowing',
     title: 'Works on Corso Unità d\'Italia',
     description: 'Due to SMAT works, narrowing is planned on Corso Unità d\'Italia between the Bayley pedestrian bridge and the Lingotto underpass exit towards Maroncelli roundabout.',
-    latitude: 45.020,
+    latitude: 45.020, // Corso Unità d'Italia
     longitude: 7.670,
     type: 'reduction',
     responsibleEntity: 'SMAT',
@@ -547,7 +547,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-baiardi-closure',
     title: 'Closure in Via Baiardi',
     description: 'Until Friday, November 14, due to SMAT works, the gradual closure of Via Baiardi between Via Ventimiglia and Via Nizza is planned.',
-    latitude: 45.025,
+    latitude: 45.025, // Via Baiardi
     longitude: 7.680,
     endDate: '2025-11-14',
     type: 'closure',
@@ -557,7 +557,7 @@ export const mockTrafficChanges: TrafficChange[] = [
     id: 'via-vado-one-way',
     title: 'One-Way Street Via Vado',
     description: 'Starting Friday, December 6, due to INFRATO works, Via Vado between Via Spotorno and Via Nizza will be reopened as one-way from east to west.',
-    latitude: 45.030,
+    latitude: 45.030, // Via Vado
     longitude: 7.660,
     startDate: '2025-12-06',
     type: 'roadwork',
