@@ -6,7 +6,6 @@ import { ArrowLeft, AlertTriangle, Car, Clock, CheckCircle2, MapPin, CalendarDay
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'; // Import Alert components
 
 // Mock data for incidents (should ideally come from an API)
 const incidentData = [
@@ -132,18 +131,6 @@ const IncidentDetailPage = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* IDOR Warning */}
-            <Alert variant="destructive" className="mb-4">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Peringatan Keamanan (IDOR)</AlertTitle>
-              <AlertDescription>
-                Saat ini, detail insiden dimuat dari data mock. Dalam aplikasi nyata yang terhubung ke API,
-                penting untuk menerapkan pemeriksaan otorisasi sisi server yang kuat. Tanpa ini,
-                pengguna dapat mengakses detail insiden apa pun hanya dengan mengubah ID di URL,
-                yang merupakan kerentanan Insecure Direct Object Reference (IDOR).
-              </AlertDescription>
-            </Alert>
-
             <div className="flex items-center text-gray-700">
               <MapPin className="h-5 w-5 mr-2 text-gray-500" />
               <strong>Location:</strong> {incident.location}

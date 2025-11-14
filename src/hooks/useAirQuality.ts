@@ -2,12 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useRef } from "react"; // Import useRef
 
 interface AirQualityData {
   aqi: number;
   dominant_pollutant: string;
-  city: { name: string; url: string; };
+  city: { name: string; url: string; }; // FIX 1: Changed city to an object
   country: string;
   iaqi: {
     co?: { v: number };
@@ -32,8 +31,8 @@ interface AirQualityApiResponse {
 
 const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
   const apiKey = import.meta.env.VITE_AQICN_API_KEY;
-  if (!apiKey || apiKey === "YOUR_AQICN_API_KEY_HERE") {
-    throw new Error("AQICN API Key tidak ditemukan atau belum diatur di environment variables.");
+  if (!apiKey) {
+    throw new Error("AQICN API Key tidak ditemukan di environment variables.");
   }
 
   // Coordinates for Torino, Italy
@@ -52,7 +51,7 @@ const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
   if (result.status === "ok") {
     return {
       ...result.data,
-      city: result.data.city,
+      city: result.data.city, // FIX 1: Use the city object directly
       country: "IT", // Hardcode country for Torino
     };
   } else {
@@ -61,22 +60,12 @@ const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
 };
 
 export const useAirQuality = (city: string = "Torino", enabled: boolean = true) => {
-  const hasWarnedAboutApiKey = useRef(false); // To prevent repeated toasts
-
-  const queryResult = useQuery<AirQualityData, Error>({
+  return useQuery<AirQualityData, Error>({
     queryKey: ["airQuality", city],
     queryFn: () => fetchAirQualityData(city),
     staleTime: 10 * 60 * 1000, // Data considered fresh for 10 minutes
     refetchOnWindowFocus: false,
-    enabled: enabled,
+    enabled: enabled, // Only run the query if enabled is true
+    // FIX 2: Removed onError to resolve TypeScript compile error
   });
-
-  // Show warning if API key is missing/placeholder and feature is enabled
-  if (enabled && !hasWarnedAboutApiKey.current && (!import.meta.env.VITE_AQICN_API_KEY || import.meta.env.VITE_AQICN_API_KEY === "YOUR_AQICN_API_KEY_HERE")) {
-    toast.warning("Kunci API AQICN tidak ditemukan atau belum diatur. Fitur kualitas udara tidak akan tersedia.");
-    console.warn("AQICN API Key is missing or is the placeholder. Air quality feature will not be available.");
-    hasWarnedAboutApiKey.current = true;
-  }
-
-  return queryResult;
 };
