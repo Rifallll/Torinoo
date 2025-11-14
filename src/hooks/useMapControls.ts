@@ -36,6 +36,7 @@ export const useMapControls = ({
   const controlsAddedRef = useRef<boolean>(false); // Tracks if static controls are added
 
   // Effect 1: Add static controls (geocoder, fullscreen, layer control, reset view)
+  // This effect now also handles the initial addition of the TomTom layer to the map and layer control.
   useEffect(() => {
     if (!map || !layerGroups) {
       controlsAddedRef.current = false;
@@ -103,12 +104,21 @@ export const useMapControls = ({
         "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
       };
 
-      // Define overlay layers, WITHOUT TomTom initially
+      // Define overlay layers, including TomTom if available
       const overlayLayers: { [key: string]: L.Layer } = {
         "Traffic Data (GeoJSON)": layerGroups.geoJsonLayerGroup,
         "Subway Stations": layerGroups.subwayStationsLayerGroup,
         "GTFS Public Routes": layerGroups.gtfsRoutesLayerGroup,
       };
+
+      if (tomtomTrafficFlowLayer) {
+        // Add TomTom layer to the map immediately if it exists
+        if (!map.hasLayer(tomtomTrafficFlowLayer)) {
+          tomtomTrafficFlowLayer.addTo(map);
+        }
+        // Add TomTom layer to the overlay control
+        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayer;
+      }
 
       const layerControl = L.control.layers(baseLayers, overlayLayers).addTo(map);
       layerControlRef.current = layerControl;
@@ -140,6 +150,10 @@ export const useMapControls = ({
         if (fullscreenControlRef.current) map.removeControl(fullscreenControlRef.current);
         if (layerControlRef.current) map.removeControl(layerControlRef.current);
         if (resetViewControlRef.current) map.removeControl(resetViewControlRef.current);
+        // Ensure TomTom layer is removed from map on cleanup if it was added
+        if (tomtomTrafficFlowLayer && map.hasLayer(tomtomTrafficFlowLayer)) {
+          map.removeLayer(tomtomTrafficFlowLayer);
+        }
       }
       geocoderRef.current = null;
       fullscreenControlRef.current = null;
@@ -147,51 +161,10 @@ export const useMapControls = ({
       resetViewControlRef.current = null;
       controlsAddedRef.current = false;
     };
-  }, [map, layerGroups, torinoCenter, defaultZoom]);
+  }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]); // tomtomTrafficFlowLayer is now a dependency here
 
-  // Effect 2: Add TomTom Traffic Flow layer to map and layer control AFTER static controls are ready
-  useEffect(() => {
-    if (!map || !layerControlRef.current || !tomtomTrafficFlowLayer) {
-      return;
-    }
-
-    const currentLayerControl = layerControlRef.current;
-    const currentTomTomLayer = tomtomTrafficFlowLayer;
-
-    const addTomTomLayer = () => {
-      // Add to map if not already added
-      if (!map.hasLayer(currentTomTomLayer)) {
-        currentTomTomLayer.addTo(map);
-      }
-
-      // Add to layer control if not already added
-      // @ts-ignore - _layers is an internal property, but necessary for this check
-      const isTomTomInControl = Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer);
-      if (!isTomTomInControl) {
-        currentLayerControl.addOverlay(currentTomTomLayer, "TomTom Traffic Flow");
-      }
-    };
-
-    const removeTomTomLayer = () => {
-      if (map.hasLayer(currentTomTomLayer)) {
-        map.removeLayer(currentTomTomLayer);
-      }
-      // @ts-ignore
-      const isTomTomInControl = Object.values(currentLayerControl['_layers']).some((layer: any) => layer.layer === currentTomTomLayer);
-      if (isTomTomInControl) {
-        currentLayerControl.removeLayer(currentTomTomLayer);
-      }
-    };
-
-    // Ensure map is ready before attempting to add layer
-    map.whenReady(addTomTomLayer);
-
-    return () => {
-      removeTomTomLayer();
-    };
-  }, [map, layerControlRef.current, tomtomTrafficFlowLayer]); // Dependencies for this effect
-
-  // Effect 3: Manage TomTom Traffic Flow layer visibility (opacity)
+  // Effect 2: Manage TomTom Traffic Flow layer visibility (opacity)
+  // This effect remains separate as it controls the dynamic opacity based on state and map view.
   useEffect(() => {
     if (!map || !tomtomTrafficFlowLayer) {
       return;
@@ -208,9 +181,17 @@ export const useMapControls = ({
 
       if (isTomTomLayerEnabled && isWithinTorino) {
         tomtomTrafficFlowLayer.setOpacity(0.7); // Make visible
+        // Only add to map if it's not already there and should be visible
+        if (!map.hasLayer(tomtomTrafficFlowLayer)) {
+          tomtomTrafficFlowLayer.addTo(map);
+        }
         toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
       } else {
         tomtomTrafficFlowLayer.setOpacity(0); // Hide
+        // Only remove from map if it's there and should be hidden
+        if (map.hasLayer(tomtomTrafficFlowLayer)) {
+          map.removeLayer(tomtomTrafficFlowLayer);
+        }
         toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
       }
     };
