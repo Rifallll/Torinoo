@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Route, Bus, TramFront, Info, Search, XCircle, TrainFront, CableCar, Ferry, Cable } from 'lucide-react'; // Added more specific icons
+import { ArrowLeft, Route, Bus, TramFront, Info, Search, XCircle, TrainFront, CableCar, Ship, Cable } from 'lucide-react'; // Replaced Ferry with Ship
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +39,7 @@ const AllGtfsRoutesPage: React.FC = () => {
       case 1: return <TrainFront className="h-4 w-4 mr-1" />; // Subway
       case 2: return <TrainFront className="h-4 w-4 mr-1" />; // Rail
       case 3: return <Bus className="h-4 w-4 mr-1" />;
-      case 4: return <Ferry className="h-4 w-4 mr-1" />;
+      case 4: return <Ship className="h-4 w-4 mr-1" />; // Ferry (using Ship icon)
       case 5: return <CableCar className="h-4 w-4 mr-1" />; // Cable Car
       case 6: return <Cable className="h-4 w-4 mr-1" />; // Gondola (using Cable as a generic icon)
       case 7: return <CableCar className="h-4 w-4 mr-1" />; // Funicular (using CableCar as a generic icon)

@@ -2,7 +2,7 @@
 
 import * as protobuf from 'protobufjs';
 import { toast } from 'sonner';
-import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock, AlertTriangle, TrainFront, CableCar, Ferry, Cable } from 'lucide-react'; // Import AlertTriangle, TrainFront, CableCar, Ferry, Cable
+import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock, AlertTriangle, TrainFront, CableCar, Ship, Cable } from 'lucide-react'; // Replaced Ferry with Ship
 import React from 'react'; // Import React for JSX icons
 
 // Define interfaces for the parsed data based on the .proto schema
@@ -337,7 +337,7 @@ export const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
       case 1: return <TrainFront className="h-4 w-4 mr-1" />; // Subway
       case 2: return <TrainFront className="h-4 w-4 mr-1" />; // Rail
       case 3: return <Bus className="h-4 w-4 mr-1" />; // Bus
-      case 4: return <Ferry className="h-4 w-4 mr-1" />; // Ferry
+      case 4: return <Ship className="h-4 w-4 mr-1" />; // Ferry (using Ship icon)
       case 5: return <CableCar className="h-4 w-4 mr-1" />; // Cable Car
       case 6: return <Cable className="h-4 w-4 mr-1" />; // Gondola
       case 7: return <CableCar className="h-4 w-4 mr-1" />; // Funicular
