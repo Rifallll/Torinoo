@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Speedometer, Cloud } from 'lucide-react';
+import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Cloud } from 'lucide-react'; // Speedometer dihapus, Gauge sudah ada
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -107,7 +107,7 @@ const DataAnalysisPage = () => {
                 <Database className="h-4 w-4 mr-2" />
                 Sinkronkan Data Sekarang
               </Button>
-            </div>
+            </Button>
           </CardContent>
         </Card>
 
@@ -146,7 +146,7 @@ const DataAnalysisPage = () => {
               <Card className="lg:col-span-2 flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold flex items-center">
-                    <Speedometer className="h-5 w-5 mr-2 text-blue-600" /> Tren Kecepatan Rata-rata Harian
+                    <Gauge className="h-5 w-5 mr-2 text-blue-600" /> Tren Kecepatan Rata-rata Harian
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
@@ -200,7 +200,7 @@ const DataAnalysisPage = () => {
               <Card className="lg:col-span-2 flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold flex items-center">
-                    <Speedometer className="h-5 w-5 mr-2 text-purple-600" /> Tren Kecepatan Rata-rata Per Jam
+                    <Gauge className="h-5 w-5 mr-2 text-purple-600" /> Tren Kecepatan Rata-rata Per Jam
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
