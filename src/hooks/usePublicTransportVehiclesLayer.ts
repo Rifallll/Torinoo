@@ -3,11 +3,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
-// import { renderToString } from 'react-dom/server'; // No longer needed
+// Removed: import { renderToString } from 'react-dom/server';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-import React from 'react'; // Import React for JSX rendering (still needed for getRouteTypeIcon if it returns JSX, but not for rendering to string here)
+// Removed: import React from 'react';
 
 interface PublicTransportVehiclesLayerProps {
   map: L.Map | null;
@@ -55,13 +55,13 @@ export const usePublicTransportVehiclesLayer = ({
             iconAnchor: [15, 15],
           });
 
-          // Directly use text for the popup icon, avoiding renderToString
-          const popupRouteIconText = routeId.charAt(0); // Or a more descriptive text if needed
+          // Get the string icon from the utility function
+          const popupRouteIconString = getRouteTypeIcon(routeId);
 
           const popupContent = `
             <div class="font-sans text-sm">
               <h3 class="font-bold text-base mb-1 flex items-center">
-                <span class="mr-1">${popupRouteIconText}</span> Jalur ${routeId}
+                <span class="mr-1">${popupRouteIconString}</span> Jalur ${routeId}
               </h3>
               <p><strong>Kendaraan:</strong> ${vehicleLabel}</p>
               <p><strong>Status:</strong> ${getVehicleStatus(vp.current_status, vp.occupancy_status)}</p>
