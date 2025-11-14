@@ -14,7 +14,7 @@ import TorinoHeader from '@/components/TorinoHeader';
 import UploadCSVModal from '@/components/modals/UploadCSVModal';
 import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
 import ExportModal from '@/components/modals/ExportModal';
-import FilterDropdowns from '@/components/FilterDropdowns';
+// import FilterDropdowns from '@/components/FilterDropdowns'; // Dihapus: FilterDropdowns tidak lagi digunakan
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
 import AirQualityCard from '@/components/AirQualityCard'; // New: Import AirQualityCard
@@ -31,7 +31,7 @@ const TorinoDashboard = () => {
   const [isTrafficAnalysisModalOpen, setIsTrafficAnalysisModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // State for filters
+  // State untuk filter, dipertahankan dengan nilai default untuk TorinoMapComponent
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
@@ -155,16 +155,7 @@ const TorinoDashboard = () => {
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Torino Traffic Map</CardTitle>
-                  <div className="flex space-x-2">
-                    <FilterDropdowns
-                      timeFilter={timeFilter}
-                      setTimeFilter={setTimeFilter}
-                      vehicleTypeFilter={vehicleTypeFilter}
-                      setVehicleTypeFilter={setVehicleTypeFilter}
-                      roadConditionFilter={roadConditionFilter}
-                      setRoadConditionFilter={setRoadConditionFilter}
-                    />
-                  </div>
+                  {/* FilterDropdowns dihapus dari sini */}
                 </CardHeader>
                 <CardContent className="h-[500px] p-0">
                   <TorinoMapComponent 
