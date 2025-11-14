@@ -41,11 +41,17 @@ const navItems: NavItemConfig[] = [
       { label: "Incidents", path: "/incidents", icon: AlertTriangle },
       // { label: "Reports", path: "/reports", icon: BarChart2 }, // Removed: Uses dummy data
       { label: "All Vehicle Positions", path: "/all-vehicle-positions", icon: Car },
-      // { label: "All Trip Updates", path: "/all-trip-updates", icon: Clock }, // Removed
       { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route },
     ],
   },
-  { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
+  {
+    label: "Analytics & Data", // New category for Data Analysis
+    icon: BarChart2,
+    isCategory: true,
+    subItems: [
+      { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
+    ],
+  },
   {
     label: "Environment",
     icon: CloudSun,
@@ -56,12 +62,12 @@ const navItems: NavItemConfig[] = [
       { label: "Detailed Air Quality", path: "/detailed-air-quality", icon: Leaf },
     ],
   },
-  { label: "News Portal", path: "/news", icon: Newspaper },
   {
-    label: "City Info",
-    icon: Info,
+    label: "Information & News", // Combined News Portal and City Info
+    icon: Newspaper,
     isCategory: true,
     subItems: [
+      { label: "News Portal", path: "/news", icon: Newspaper },
       { label: "About Torino", path: "/about-torino", icon: Info },
       { label: "Culture & Tourism", path: "/culture-tourism", icon: Palette },
       { label: "Contact & Collaboration", path: "/contact-collaboration", icon: Mail },
@@ -104,7 +110,8 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
     if (item.isCategory) {
       return (
         <div className="space-y-1">
-          <div className={categoryHeaderClasses}>
+          <div className={`${categoryHeaderClasses} flex items-center`}> {/* Added flex items-center */}
+            {item.icon && <Icon className="h-4 w-4 mr-2" />} {/* Render icon for category header */}
             {item.label}
           </div>
           {item.subItems && (
