@@ -109,8 +109,13 @@ export const useGeoJsonLayer = ({
         geoJsonLayerRef.current.addTo(geoJsonLayerGroup);
 
         // Only fit map bounds if the layer has valid bounds
+        // Defer fitBounds to allow Leaflet to fully render layers
         if (geoJsonLayerRef.current.getBounds().isValid()) {
-          map.fitBounds(geoJsonLayerRef.current.getBounds());
+          setTimeout(() => {
+            if (map && geoJsonLayerRef.current) { // Check if map and layer still exist
+              map.fitBounds(geoJsonLayerRef.current.getBounds());
+            }
+          }, 100); // A small delay, adjust if needed
         }
 
       } catch (error) {
