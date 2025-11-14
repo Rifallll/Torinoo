@@ -2,50 +2,33 @@
 
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Newspaper, ArrowLeft, Search, XCircle, Filter, AlertCircle } from 'lucide-react'; // Import AlertCircle
+import { Newspaper, ArrowLeft, Search, XCircle, AlertCircle } from 'lucide-react'; // Filter icon removed
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCombinedNews } from '@/hooks/useCombinedNews'; // Import the new hook
+// Select, SelectContent, SelectItem, SelectTrigger, SelectValue removed
+import { useCombinedNews } from '@/hooks/useCombinedNews';
 
 const NewsPortal = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffico OR incidente)'); // Updated default search term
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('it'); // Updated default language to Italian
-  const [currentQuery, setCurrentQuery] = useState<string>('Torino AND (traffico OR incidente)'); // Updated default query
-  const [currentLanguage, setCurrentLanguage] = useState<string>('it'); // Updated default language
+  const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffico OR incidente)');
+  const [currentQuery, setCurrentQuery] = useState<string>('Torino AND (traffico OR incidente)');
+  const fixedLanguage = 'it'; // Fixed language to Italian
 
-  // Fetch news based on currentQuery and currentLanguage
-  const { data: newsArticles, isLoading, error } = useCombinedNews(currentQuery, currentLanguage);
+  // Fetch news based on currentQuery and fixedLanguage
+  const { data: newsArticles, isLoading, error } = useCombinedNews(currentQuery, fixedLanguage);
 
   const handleSearch = () => {
     setCurrentQuery(searchTerm);
-    setCurrentLanguage(selectedLanguage);
+    // Language is now fixed, no need to set it here
   };
 
   const handleResetFilters = () => {
     setSearchTerm('Torino AND (traffico OR incidente)');
-    setSelectedLanguage('it');
     setCurrentQuery('Torino AND (traffico OR incidente)');
-    setCurrentLanguage('it');
+    // Language is now fixed, no need to reset it here
   };
 
-  const availableLanguages = useMemo(() => [
-    { code: 'ar', name: 'Arabic' },
-    { code: 'de', name: 'German' },
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Spanish' },
-    { code: 'fr', name: 'French' },
-    { code: 'he', name: 'Hebrew' },
-    { code: 'it', name: 'Italian' },
-    { code: 'nl', name: 'Dutch' },
-    { code: 'no', name: 'Norwegian' },
-    { code: 'pt', name: 'Portuguese' },
-    { code: 'ru', name: 'Russian' },
-    { code: 'sv', name: 'Swedish' },
-    { code: 'ud', name: 'Urdu' },
-    { code: 'zh', name: 'Chinese' },
-  ], []);
+  // availableLanguages memo removed as language filter is removed
 
   if (isLoading) {
     return (
@@ -132,26 +115,14 @@ const NewsPortal = () => {
             )}
           </div>
 
-          <Select onValueChange={setSelectedLanguage} value={selectedLanguage}>
-            <SelectTrigger className="w-full sm:w-[180px] h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500">
-              <Filter className="h-4 w-4 mr-2 text-gray-500" />
-              <SelectValue placeholder="Pilih Bahasa" />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-700 dark:text-gray-200">
-              {availableLanguages.map(lang => (
-                <SelectItem key={lang.code} value={lang.code}>
-                  {lang.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Language Select dropdown removed */}
 
           <Button onClick={handleSearch} className="flex items-center h-10 px-4 py-2 text-base">
             <Search className="h-4 w-4 mr-2" />
             Cari
           </Button>
 
-          {(searchTerm !== 'Torino AND (traffico OR incidente)' || selectedLanguage !== 'it') && (
+          {searchTerm !== 'Torino AND (traffico OR incidente)' && ( // Condition adjusted
             <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
               <XCircle className="h-4 w-4 mr-2" />
               Reset Filter
