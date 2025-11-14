@@ -27,6 +27,12 @@ export const usePublicTransportVehiclesLayer = ({
   const updateVisibilityAndMarkers = useCallback(() => {
     if (!map || !layerGroup || !gtfsRealtimeData) return;
 
+    // Ensure markerPane exists before attempting to add markers
+    if (!map.getPanes().markerPane) {
+      console.warn("Leaflet markerPane not yet available. Skipping public transport vehicle marker creation for now.");
+      return;
+    }
+
     const currentMarkers = vehicleMarkersRef.current;
     const newVehicleIds = new Set<string>();
     const isLayerCurrentlyOnMap = map.hasLayer(layerGroup);
@@ -39,8 +45,8 @@ export const usePublicTransportVehiclesLayer = ({
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
           
-          // EXTREMELY SIMPLIFIED vehicle icon HTML for debugging
-          const vehicleIconHtml = `<div>${routeId.charAt(0)}</div>`;
+          const routeIconEmoji = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (vp.trip?.route_id?.includes('TRAM') ? 0 : undefined));
+          const vehicleIconHtml = `<div style="background-color:#4f46e5; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold;">${routeIconEmoji}</div>`;
           console.log("Public Transport Icon HTML:", vehicleIconHtml);
 
           const vehicleIcon = L.divIcon({
@@ -50,13 +56,10 @@ export const usePublicTransportVehiclesLayer = ({
             iconAnchor: [15, 15],
           });
 
-          // Get the string icon from the utility function
-          const popupRouteIconString = getRouteTypeIcon(routeId);
-
           const popupContent = `
             <div class="font-sans text-sm">
               <h3 class="font-bold text-base mb-1 flex items-center">
-                <span class="mr-1">${popupRouteIconString}</span> Jalur ${routeId}
+                <span class="mr-1">${routeIconEmoji}</span> Jalur ${routeId}
               </h3>
               <p><strong>Kendaraan:</strong> ${vehicleLabel}</p>
               <p><strong>Status:</strong> ${getVehicleStatus(vp.current_status, vp.occupancy_status)}</p>
@@ -90,7 +93,6 @@ export const usePublicTransportVehiclesLayer = ({
         toast.info("Lapisan kendaraan transportasi publik diaktifkan.");
       }
     } else {
-      // If layer is disabled or conditions not met, remove all markers and the layer
       for (const id of Object.keys(currentMarkers)) {
         layerGroup.removeLayer(currentMarkers[id]);
         delete currentMarkers[id];

@@ -3,13 +3,13 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
-import { convertCoordinates } from '@/utils/coordinateConverter'; // Import convertCoordinates
+import { convertCoordinates } from '@/utils/coordinateConverter';
 
 interface SubwayStationsLayerProps {
   map: L.Map | null;
   layerGroup: L.LayerGroup | null;
   minZoom: number;
-  subwayStationsData: { name: string; x: number; y: number }[]; // Pass data here
+  subwayStationsData: { name: string; x: number; y: number }[];
 }
 
 export const useSubwayStationsLayer = ({
@@ -22,6 +22,12 @@ export const useSubwayStationsLayer = ({
 
   const updateLayerAndMarkers = useCallback(() => {
     if (!map || !layerGroup) return;
+
+    // Ensure markerPane exists before attempting to add markers
+    if (!map.getPanes().markerPane) {
+      console.warn("Leaflet markerPane not yet available. Skipping subway station marker creation for now.");
+      return;
+    }
 
     const currentMarkers = stationMarkersRef.current;
     const newStationNames = new Set<string>();
@@ -40,10 +46,8 @@ export const useSubwayStationsLayer = ({
 
         if (latitude !== 0 || longitude !== 0) {
           if (currentMarkers[station.name]) {
-            // Update existing marker (e.g., position if it could change, though static here)
             currentMarkers[station.name].setLatLng([latitude, longitude]);
           } else {
-            // Create new marker
             const marker = L.marker([latitude, longitude], {
               icon: L.divIcon({
                 className: 'subway-station-marker',
@@ -60,7 +64,6 @@ export const useSubwayStationsLayer = ({
         }
       });
 
-      // Remove markers that are no longer in the data (or if data changed)
       for (const name of Object.keys(currentMarkers)) {
         if (!newStationNames.has(name)) {
           layerGroup.removeLayer(currentMarkers[name]);
@@ -69,7 +72,6 @@ export const useSubwayStationsLayer = ({
       }
 
     } else {
-      // If layer should not be shown, remove all markers and the layer itself
       for (const name of Object.keys(currentMarkers)) {
         layerGroup.removeLayer(currentMarkers[name]);
         delete currentMarkers[name];
@@ -89,7 +91,6 @@ export const useSubwayStationsLayer = ({
 
     return () => {
       map.off('zoomend', updateLayerAndMarkers);
-      // Clean up all markers when component unmounts or layerGroup changes
       for (const name of Object.keys(stationMarkersRef.current)) {
         layerGroup.removeLayer(stationMarkersRef.current[name]);
       }

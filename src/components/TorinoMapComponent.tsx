@@ -72,6 +72,8 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   const getCustomIcon = useCallback((feature: L.GeoJSON.Feature) => {
     const properties = feature.properties;
     let iconText = '?';
+    let bgColor = '#6b7280'; // Default gray
+    let textColor = 'white';
 
     if (properties) {
       const vehicleType = properties.vehicle_type;
@@ -80,15 +82,17 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
 
       if (vehicleType) {
         iconText = vehicleType.charAt(0).toUpperCase();
+        bgColor = '#3b82f6'; // Blue for vehicles
       } else if (amenity) {
         iconText = amenity.charAt(0).toUpperCase();
+        bgColor = '#10b981'; // Green for amenities
       } else if (buildingType) {
         iconText = buildingType.charAt(0).toUpperCase();
+        bgColor = '#f59e0b'; // Amber for buildings
       }
     }
 
-    // EXTREMELY SIMPLIFIED HTML FOR DEBUGGING
-    const htmlString = `<div>${iconText}</div>`;
+    const htmlString = `<div style="background-color:${bgColor}; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:${textColor}; font-size:12px; font-weight:bold;">${iconText}</div>`;
     console.log("GeoJSON Icon HTML:", htmlString);
 
     return L.divIcon({
@@ -112,7 +116,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     zoom: defaultZoom,
     bounds: torinoBounds,
     tomtomApiKey: tomtomApiKey,
-    subwayStationsData: subwayStationsData, // Still pass data for initialization, but it won't create markers here
+    subwayStationsData: subwayStationsData,
   });
 
   // Manage GeoJSON layer
@@ -130,7 +134,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     map,
     layerGroup: subwayStationsLayerGroup,
     minZoom: minZoomForSubwayStations,
-    subwayStationsData: subwayStationsData, // Pass data to this hook for marker management
+    subwayStationsData: subwayStationsData,
   });
 
   // Manage TomTom Traffic layer
