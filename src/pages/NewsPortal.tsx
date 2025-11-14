@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useNewsApi } from '@/hooks/useNewsApi'; // Import the new hook
+import { useCombinedNews } from '@/hooks/useCombinedNews'; // Import the new hook
 
 const NewsPortal = () => {
   const [searchTerm, setSearchTerm] = useState<string>('Torino traffic');
@@ -16,7 +16,7 @@ const NewsPortal = () => {
   const [currentLanguage, setCurrentLanguage] = useState<string>('en');
 
   // Fetch news based on currentQuery and currentLanguage
-  const { data: newsArticles, isLoading, error } = useNewsApi(currentQuery, currentLanguage);
+  const { data: newsArticles, isLoading, error } = useCombinedNews(currentQuery, currentLanguage);
 
   const handleSearch = () => {
     setCurrentQuery(searchTerm);
@@ -81,7 +81,7 @@ const NewsPortal = () => {
             </CardHeader>
             <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
               <p>Gagal memuat artikel berita: {error.message}</p>
-              <p className="text-sm text-gray-500">Pastikan kunci API NewsAPI Anda benar dan koneksi internet stabil.</p>
+              <p className="text-sm text-gray-500">Pastikan kunci API NewsAPI dan GNews.io Anda benar dan koneksi internet stabil.</p>
             </CardContent>
           </Card>
         </main>
