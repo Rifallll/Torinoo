@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Cloud } from 'lucide-react'; // Speedometer dihapus, Gauge sudah ada
+import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import ProjectPlanningSection from '@/components/ProjectPlanningSection';
-import TrafficChangesInsights from '@/components/TrafficChangesInsights'; // Import the new component
-import { useTrafficData } from '@/contexts/TrafficDataContext'; // Import the new hook
+import TrafficChangesInsights from '@/components/TrafficChangesInsights';
+import { useTrafficData } from '@/contexts/TrafficDataContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 
 const DataAnalysisPage = () => {
@@ -107,7 +107,7 @@ const DataAnalysisPage = () => {
                 <Database className="h-4 w-4 mr-2" />
                 Sinkronkan Data Sekarang
               </Button>
-            </Button>
+            </div>
           </CardContent>
         </Card>
 
