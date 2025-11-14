@@ -10,10 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCombinedNews } from '@/hooks/useCombinedNews'; // Import the new hook
 
 const NewsPortal = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('Torino traffic');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
-  const [currentQuery, setCurrentQuery] = useState<string>('Torino traffic');
-  const [currentLanguage, setCurrentLanguage] = useState<string>('en');
+  const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffico OR incidente)'); // Updated default search term
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('it'); // Updated default language to Italian
+  const [currentQuery, setCurrentQuery] = useState<string>('Torino AND (traffico OR incidente)'); // Updated default query
+  const [currentLanguage, setCurrentLanguage] = useState<string>('it'); // Updated default language
 
   // Fetch news based on currentQuery and currentLanguage
   const { data: newsArticles, isLoading, error } = useCombinedNews(currentQuery, currentLanguage);
@@ -24,10 +24,10 @@ const NewsPortal = () => {
   };
 
   const handleResetFilters = () => {
-    setSearchTerm('Torino traffic');
-    setSelectedLanguage('en');
-    setCurrentQuery('Torino traffic');
-    setCurrentLanguage('en');
+    setSearchTerm('Torino AND (traffico OR incidente)');
+    setSelectedLanguage('it');
+    setCurrentQuery('Torino AND (traffico OR incidente)');
+    setCurrentLanguage('it');
   };
 
   const availableLanguages = useMemo(() => [
@@ -151,7 +151,7 @@ const NewsPortal = () => {
             Cari
           </Button>
 
-          {(searchTerm !== 'Torino traffic' || selectedLanguage !== 'en') && (
+          {(searchTerm !== 'Torino AND (traffico OR incidente)' || selectedLanguage !== 'it') && (
             <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
               <XCircle className="h-4 w-4 mr-2" />
               Reset Filter
