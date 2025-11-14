@@ -9,8 +9,8 @@ interface GeoJsonLayerProps {
   map: L.Map | null;
   geoJsonPath: string;
   minZoomForGeoJSON: number;
-  selectedVehicleType: string;
-  roadConditionFilter: string;
+  // selectedVehicleType: string; // Removed
+  // roadConditionFilter: string; // Removed
 }
 
 // Helper function to get custom icon for features (moved from TorinoMapComponent)
@@ -120,7 +120,7 @@ const getCustomIcon = (feature: L.GeoJSON.Feature) => {
   });
 };
 
-export const useGeoJsonLayer = ({ map, geoJsonPath, minZoomForGeoJSON, selectedVehicleType, roadConditionFilter }: GeoJsonLayerProps) => {
+export const useGeoJsonLayer = ({ map, geoJsonPath, minZoomForGeoJSON }: GeoJsonLayerProps) => {
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null);
 
   const updateGeoJSONVisibility = useCallback(() => {
@@ -157,14 +157,8 @@ export const useGeoJsonLayer = ({ map, geoJsonPath, minZoomForGeoJSON, selectedV
         if (geoJsonLayerGroupRef.current) {
           geoJsonLayerGroupRef.current.clearLayers();
 
-          const filteredFeatures = data.features.filter((feature: L.GeoJSON.Feature) => {
-            const properties = feature.properties;
-            const matchesVehicleType = selectedVehicleType === 'all' ||
-                                       (properties?.vehicle_type && properties.vehicle_type.toLowerCase() === selectedVehicleType.toLowerCase());
-            const matchesRoadCondition = roadConditionFilter === 'all' ||
-                                         (properties?.traffic_level && properties.traffic_level.toLowerCase() === roadConditionFilter.toLowerCase());
-            return matchesVehicleType && matchesRoadCondition;
-          });
+          // No filtering based on selectedVehicleType or roadConditionFilter
+          const filteredFeatures = data.features; 
 
           const geoJsonLayer = L.geoJSON({ ...data, features: filteredFeatures }, {
             onEachFeature: (feature, layer) => {
@@ -198,10 +192,8 @@ export const useGeoJsonLayer = ({ map, geoJsonPath, minZoomForGeoJSON, selectedV
                 weight = 2;
               }
 
-              if (roadConditionFilter !== 'all' && trafficLevel?.toLowerCase() !== roadConditionFilter.toLowerCase()) {
-                return { opacity: 0 };
-              }
-
+              // No filtering based on roadConditionFilter in style
+              
               return {
                 color: color,
                 weight: weight,
@@ -228,7 +220,7 @@ export const useGeoJsonLayer = ({ map, geoJsonPath, minZoomForGeoJSON, selectedV
         geoJsonLayerGroupRef.current = null;
       }
     };
-  }, [map, geoJsonPath, minZoomForGeoJSON, selectedVehicleType, roadConditionFilter, updateGeoJSONVisibility]);
+  }, [map, geoJsonPath, minZoomForGeoJSON, updateGeoJSONVisibility]);
 
   return geoJsonLayerGroupRef.current;
 };

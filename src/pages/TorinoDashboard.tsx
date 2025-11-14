@@ -14,7 +14,6 @@ import TorinoHeader from '@/components/TorinoHeader';
 import UploadCSVModal from '@/components/modals/UploadCSVModal';
 import TrafficAnalysisModal from '@/components/modals/TrafficAnalysisModal';
 import ExportModal from '@/components/modals/ExportModal';
-import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
 import AirQualityCard from '@/components/AirQualityCard'; // New: Import AirQualityCard
@@ -27,14 +26,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isUploadCSVModalOpen, setIsUploadCSVModalOpen] = useState(false);
+  const [isUploadCSVModalOpen, setIsUploadCSVModal] = useState(false);
   const [isTrafficAnalysisModalOpen, setIsTrafficAnalysisModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-
-  // State for filters
-  const [timeFilter, setTimeFilter] = useState<string>('all');
-  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
-  const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
 
   // Dummy data for quick actions and statistics
   const dummyStats = {
@@ -147,20 +141,13 @@ const TorinoDashboard = () => {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Torino Traffic Map</CardTitle>
                   <div className="flex space-x-2">
-                    <FilterDropdowns
-                      timeFilter={timeFilter}
-                      setTimeFilter={setTimeFilter}
-                      vehicleTypeFilter={vehicleTypeFilter}
-                      setVehicleTypeFilter={setVehicleTypeFilter}
-                      roadConditionFilter={roadConditionFilter}
-                      setRoadConditionFilter={setRoadConditionFilter}
-                    />
+                    {/* Filter dropdowns removed */}
                   </div>
                 </CardHeader>
                 <CardContent className="h-[500px] p-0">
                   <TorinoMapComponent 
-                    selectedVehicleType={vehicleTypeFilter} 
-                    roadConditionFilter={roadConditionFilter} 
+                    selectedVehicleType="all" // Default to 'all'
+                    roadConditionFilter="all" // Default to 'all'
                   />
                 </CardContent>
               </Card>
