@@ -28,6 +28,16 @@ export const useSubwayStationsLayer = ({
     if (!map || !subwayStationsLayerGroup) return;
 
     const setupSubwayStationsLayer = () => {
+      // Defensive check: Ensure map panes are ready before adding markers
+      // @ts-ignore - _panes is an internal Leaflet property
+      if (!map._panes || !map._panes.markerPane) {
+        console.warn("Map panes not ready for Subway markers, deferring creation.");
+        subwayStationsLayerGroup.clearLayers();
+        // Re-schedule this function call to run after a short delay
+        setTimeout(setupSubwayStationsLayer, 50);
+        return;
+      }
+
       // 1. Add the layer group to the map first (if not already added)
       if (!map.hasLayer(subwayStationsLayerGroup)) {
         subwayStationsLayerGroup.addTo(map);
