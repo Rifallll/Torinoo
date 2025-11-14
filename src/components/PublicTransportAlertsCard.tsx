@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrafficCone, AlertTriangle, Info, ArrowRight } from 'lucide-react'; // Import TrafficCone and ArrowRight
+import { TrafficCone, AlertTriangle, Info, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { mockTrafficChanges } from '@/components/TrafficChangesInsights'; // Import mockTrafficChanges
-import { Link } from 'react-router-dom'; // Import Link
+import { mockTrafficChanges } from '@/components/TrafficChangesInsights';
+import { Link } from 'react-router-dom';
 
 const PublicTransportAlertsCard: React.FC = React.memo(() => {
   const trafficChanges = mockTrafficChanges;
@@ -21,11 +21,11 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <TrafficCone className="h-5 w-5 mr-2 text-indigo-600" />
-            Perubahan Lalu Lintas & Pekerjaan Jalan
+            Traffic Changes & Roadworks
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Memuat perubahan lalu lintas...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Loading traffic changes...</p>
         </CardContent>
       </Card>
     );
@@ -37,11 +37,11 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
             <TrafficCone className="h-5 w-5 mr-2 text-indigo-600" />
-            Perubahan Lalu Lintas & Pekerjaan Jalan
+            Traffic Changes & Roadworks
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-red-500 text-center py-4">Gagal memuat perubahan: {error.message}</p>
+          <p className="text-red-500 text-center py-4">Failed to load changes: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -52,11 +52,11 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
           <TrafficCone className="h-5 w-5 mr-2 text-indigo-600" />
-          Perubahan Lalu Lintas & Pekerjaan Jalan
+          Traffic Changes & Roadworks
         </CardTitle>
         {trafficChanges.length > 4 && (
           <Link to="/traffic-changes" className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center">
-            Lihat Semua <ArrowRight className="ml-1 h-4 w-4" />
+            View All <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         )}
       </CardHeader>
@@ -64,7 +64,7 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
         {displayedTrafficChanges.length > 0 ? (
           <div className="space-y-2">
             <h3 className="font-semibold text-orange-600 dark:text-orange-400 flex items-center mb-2">
-              <AlertTriangle className="h-4 w-4 mr-2" /> Perubahan Aktif
+              <AlertTriangle className="h-4 w-4 mr-2" /> Active Changes
             </h3>
             {displayedTrafficChanges.map(change => (
               <div key={change.id} className="border-l-4 border-orange-500 pl-3 py-2 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-md">
@@ -72,7 +72,7 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
                 <p className="text-xs text-gray-600 dark:text-gray-400">{change.description}</p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   <Badge variant="secondary" className="text-xs flex items-center">
-                    <TrafficCone className="h-4 w-4 mr-1" /> {change.type ? change.type.charAt(0).toUpperCase() + change.type.slice(1) : 'Perubahan'}
+                    <TrafficCone className="h-4 w-4 mr-1" /> {change.type ? change.type.charAt(0).toUpperCase() + change.type.slice(1) : 'Change'}
                   </Badge>
                   {change.responsibleEntity && (
                     <Badge variant="secondary" className="text-xs flex items-center">
@@ -84,7 +84,7 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4">Tidak ada perubahan lalu lintas aktif yang dilaporkan.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4">No active traffic changes reported.</p>
         )}
       </CardContent>
     </Card>

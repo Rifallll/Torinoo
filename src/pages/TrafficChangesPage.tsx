@@ -14,12 +14,12 @@ const TrafficChangesPage: React.FC = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <TrafficCone className="h-8 w-8 mr-3 text-indigo-600" />
-          Semua Perubahan Lalu Lintas & Pekerjaan Jalan
+          All Traffic Changes & Roadworks
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </Button>
       </header>
@@ -34,7 +34,7 @@ const TrafficChangesPage: React.FC = () => {
                   {change.title}
                 </CardTitle>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {change.responsibleEntity ? `Oleh: ${change.responsibleEntity}` : 'N/A'}
+                  {change.responsibleEntity ? `By: ${change.responsibleEntity}` : 'N/A'}
                 </p>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between space-y-2">
@@ -43,29 +43,29 @@ const TrafficChangesPage: React.FC = () => {
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <Badge variant="secondary" className="text-xs flex items-center">
-                    <Info className="h-4 w-4 mr-1" /> {change.type ? change.type.charAt(0).toUpperCase() + change.type.slice(1) : 'Perubahan'}
+                    <Info className="h-4 w-4 mr-1" /> {change.type ? change.type.charAt(0).toUpperCase() + change.type.slice(1) : 'Change'}
                   </Badge>
                   {change.startDate && (
                     <Badge variant="secondary" className="text-xs flex items-center">
-                      <CalendarDays className="h-4 w-4 mr-1" /> Mulai: {change.startDate}
+                      <CalendarDays className="h-4 w-4 mr-1" /> Start: {change.startDate}
                     </Badge>
                   )}
                   {change.endDate && (
                     <Badge variant="secondary" className="text-xs flex items-center">
-                      <CalendarDays className="h-4 w-4 mr-1" /> Berakhir: {change.endDate}
+                      <CalendarDays className="h-4 w-4 mr-1" /> End: {change.endDate}
                     </Badge>
                   )}
                 </div>
                 {change.fullDescription && (
                   <Button variant="link" className="p-0 h-auto justify-start text-sm mt-2">
-                    Baca Selengkapnya
+                    Read More
                   </Button>
                 )}
               </CardContent>
             </Card>
           ))
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">Tidak ada perubahan lalu lintas yang dilaporkan.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">No traffic changes reported.</p>
         )}
       </main>
     </div>

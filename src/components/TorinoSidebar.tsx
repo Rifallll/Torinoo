@@ -33,7 +33,7 @@ interface NavItemConfig {
 const navItems: NavItemConfig[] = [
   { label: "Traffic Dashboard", path: "/torino-dashboard", icon: LayoutDashboard },
   {
-    label: "Transportations",
+    label: "Transportation",
     icon: Bike,
     isCategory: true,
     subItems: [

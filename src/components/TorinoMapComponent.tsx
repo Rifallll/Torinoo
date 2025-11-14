@@ -186,13 +186,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
         geoJsonLayerGroupRef.current.addTo(mapRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
+        toast.info("Traffic data layer displayed (zoom in for details).");
       }
     } else {
       if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
         mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
+        toast.info("Traffic data layer hidden (zoom out for performance).");
       }
     }
   };
@@ -205,13 +205,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
         subwayStationsLayerGroupRef.current.addTo(mapRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+        toast.info("Subway stations layer displayed.");
       }
     } else {
       if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
         mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
+        toast.info("Subway stations layer hidden (zoom out for performance).");
       }
     }
   };
@@ -224,13 +224,13 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (!mapRef.current.hasLayer(trafficChangesLayerGroupRef.current)) {
         trafficChangesLayerGroupRef.current.addTo(mapRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan perubahan lalu lintas ditampilkan.");
+        toast.info("Traffic changes layer displayed.");
       }
     } else {
       if (mapRef.current.hasLayer(trafficChangesLayerGroupRef.current)) {
         mapRef.current.removeLayer(trafficChangesLayerGroupRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan perubahan lalu lintas disembunyikan.");
+        toast.info("Traffic changes layer hidden.");
       }
     }
   };
@@ -252,7 +252,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (!isTomTomLayerActive) {
         tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
+        toast.info("TomTom traffic layer enabled for Torino.");
         console.log("  Adding TomTom layer to map.");
       } else {
         console.log("  TomTom layer already active.");
@@ -261,7 +261,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       if (isTomTomLayerActive) {
         mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
         // TODO: Remove or make less frequent for production
-        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
+        toast.info("TomTom traffic layer disabled (outside Torino or toggled off).");
         console.log("  Removing TomTom layer from map.");
       } else {
         console.log("  TomTom layer already inactive or not added.");
@@ -318,7 +318,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
         );
       } else {
         // TODO: Remove or make less frequent for production
-        toast.warning("Kunci API TomTom tidak ditemukan atau belum diatur. Lapisan lalu lintas TomTom tidak akan tersedia.");
+        toast.warning("TomTom API Key not found or not set. TomTom traffic layer will not be available.");
         console.warn("TomTom API Key is missing or is the placeholder. TomTom traffic layer will not be available.");
       }
 
@@ -486,7 +486,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
         }
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
-        toast.error(`Gagal memuat data GeoJSON: ${error instanceof Error ? error.message : String(error)}. Pastikan file 'export.geojson' ada di folder 'public'.`);
+        toast.error(`Failed to load GeoJSON data: ${error instanceof Error ? error.message : String(error)}. Ensure 'export.geojson' file is in the 'public' folder.`);
       }
     };
 
@@ -540,9 +540,9 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       const popupContent = `
         <b>${change.title}</b><br/>
         ${change.description}<br/>
-        ${change.startDate ? `Mulai: ${change.startDate}<br/>` : ''}
-        ${change.endDate ? `Berakhir: ${change.endDate}<br/>` : ''}
-        ${change.responsibleEntity ? `Oleh: ${change.responsibleEntity}` : ''}
+        ${change.startDate ? `Start: ${change.startDate}<br/>` : ''}
+        ${change.endDate ? `End: ${change.endDate}<br/>` : ''}
+        ${change.responsibleEntity ? `By: ${change.responsibleEntity}` : ''}
       `;
 
       L.marker([change.latitude, change.longitude], { icon: customIcon })
