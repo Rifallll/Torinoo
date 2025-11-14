@@ -76,6 +76,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     if (properties) {
       const vehicleType = properties.vehicle_type;
       const amenity = properties.amenity;
+      const buildingType = properties.building_type; // Assuming this might exist for buildings
 
       if (vehicleType) {
         switch (vehicleType.toLowerCase()) {
@@ -138,13 +139,27 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
             iconText = 'S';
             break;
           case 'building':
+          case 'apartment': // Explicitly handle 'apartment'
             iconColor = '#6b7280'; // Gray
-            iconText = 'B';
+            iconText = 'B'; // 'B' for Building, or 'A' for Apartment if preferred
+            iconShape = 'square';
             break;
-          default:
-            iconColor = '#3b82f6';
-            iconText = '?';
+          default: // For other amenities not explicitly listed
+            iconColor = '#3b82f6'; // Default blue
+            iconText = 'L'; // 'L' for Location/Landmark
+            iconSize = 20;
+            iconShape = 'circle';
         }
+      } else if (buildingType && buildingType.toLowerCase() === 'residential') { // Handle generic residential buildings
+        iconColor = '#800080'; // Purple
+        iconText = 'R';
+        iconShape = 'square';
+      } else {
+        // Fallback for any point feature without specific vehicle_type or amenity/building_type
+        iconColor = '#6b7280'; // Darker gray for generic points
+        iconText = 'P'; // 'P' for Point of Interest
+        iconSize = 20;
+        iconShape = 'circle';
       }
     }
 
@@ -343,6 +358,9 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     const fetchGeoJSON = async () => {
       try {
         const response = await fetch('/export.geojson'); // Path to the GeoJSON file in the public folder
+        if (!response.ok) {
+          throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
+        }
         const data = await response.json();
 
         if (mapRef.current && geoJsonLayerGroupRef.current) {
@@ -420,6 +438,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
         }
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
+        toast.error(`Gagal memuat data GeoJSON: ${error instanceof Error ? error.message : String(error)}. Pastikan file 'export.geojson' ada di folder 'public'.`);
       }
     };
 
