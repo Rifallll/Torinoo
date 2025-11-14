@@ -10,7 +10,7 @@ interface GeoJsonLayerProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
   minZoom: number;
-  getCustomIcon: (feature: L.GeoJSON.Feature) => L.DivIcon;
+  // Removed getCustomIcon prop as it's handled internally
   isMapLoaded: boolean; // New prop
 }
 
@@ -20,7 +20,7 @@ export const useGeoJsonLayer = ({
   selectedVehicleType,
   roadConditionFilter,
   minZoom,
-  getCustomIcon,
+  // Removed getCustomIcon prop
   isMapLoaded, // Destructure new prop
 }: GeoJsonLayerProps) => {
   const geoJsonDataRef = useRef<L.GeoJSON | null>(null);

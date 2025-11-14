@@ -70,41 +70,6 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     { name: "Bengasi", x: 1506000, y: 4996400 },
   ];
 
-  // Helper function to get custom icon for features (kept here as it's used by GeoJSON layer)
-  const getCustomIcon = useCallback((feature: L.GeoJSON.Feature) => {
-    const properties = feature.properties;
-    let iconText = '?';
-    let bgColor = '#6b7280'; // Default gray
-    let textColor = 'white';
-
-    if (properties) {
-      const vehicleType = properties.vehicle_type;
-      const amenity = properties.amenity;
-      const buildingType = properties.building_type;
-
-      if (vehicleType) {
-        iconText = vehicleType.charAt(0).toUpperCase();
-        bgColor = '#3b82f6'; // Blue for vehicles
-      } else if (amenity) {
-        iconText = amenity.charAt(0).toUpperCase();
-        bgColor = '#10b981'; // Green for amenities
-      } else if (buildingType) {
-        iconText = buildingType.charAt(0).toUpperCase();
-        bgColor = '#f59e0b'; // Amber for buildings
-      }
-    }
-
-    const htmlString = `<div style="background-color:${bgColor}; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:${textColor}; font-size:12px; font-weight:bold;">${iconText}</div>`;
-    console.log("GeoJSON Icon HTML:", htmlString);
-
-    return L.divIcon({
-      className: 'custom-poi-marker',
-      html: htmlString,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-  }, []);
-
   // Initialize the map and get layer groups
   const {
     map,
@@ -129,7 +94,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     selectedVehicleType,
     roadConditionFilter,
     minZoom: minZoomForGeoJSON,
-    getCustomIcon,
+    // Removed getCustomIcon prop as it's handled internally by useGeoJsonLayer
     isMapLoaded, // Pass the state
   });
 
@@ -163,22 +128,31 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   useEffect(() => {
     if (!map || !isMapLoaded) return;
 
+    let reactRoot: ReactDOM.Root | null = null; // To store the React root instance
+
     // Create a custom Leaflet control for the React component
     const ReactControl = L.Control.extend({
       onAdd: function(map: L.Map) {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
         // Prevent click events from propagating to the map
         L.DomEvent.disableClickPropagation(container);
-        // Render the React component into the container
-        ReactDOM.createRoot(container).render(<MapLegend />);
+        
+        // Add inline style for z-index to ensure visibility
+        container.style.zIndex = '1000'; 
+        
+        // Create and render the React component
+        reactRoot = ReactDOM.createRoot(container);
+        reactRoot.render(<MapLegend />);
+        
+        console.log("Legend control container created and React component rendered.");
         return container;
       },
       onRemove: function(map: L.Map) {
-        // Clean up React root when control is removed
-        // This is a simplified cleanup; in a more complex app, you might need to unmount
-        // ReactDOM.unmountComponentAtNode(container); // This is deprecated in React 18
-        // For React 18, you'd typically manage the root instance.
-        // For this simple case, letting the container be removed is often sufficient.
+        if (reactRoot) {
+          reactRoot.unmount(); // Proper cleanup for React 18
+          reactRoot = null;
+          console.log("Legend control React component unmounted.");
+        }
       },
     });
 
