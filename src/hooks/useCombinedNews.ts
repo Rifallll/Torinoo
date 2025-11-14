@@ -64,7 +64,7 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     const response = await fetch(url);
     if (!response.ok) {
       const errorData = await response.json();
-      console.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`);
+      console.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`, errorData);
       // Menyederhanakan pesan error untuk pengguna
       toast.error(`Gagal mengambil berita dari NewsAPI. Coba lagi nanti.`);
       return [];
@@ -83,6 +83,7 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
   const apiKey = import.meta.env.VITE_GNEWS_API_KEY;
   if (!apiKey) {
     console.warn("GNews.io API Key tidak ditemukan. Melewatkan pengambilan dari GNews.io.");
+    toast.error("Kunci API GNews.io tidak ditemukan. Harap tambahkan VITE_GNEWS_API_KEY ke file .env Anda.");
     return [];
   }
 
@@ -99,9 +100,9 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
     const response = await fetch(url);
     if (!response.ok) {
       const errorData = await response.json();
-      console.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`);
+      console.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`, errorData);
       // Menyederhanakan pesan error untuk pengguna
-      toast.error(`Gagal mengambil berita dari GNews.io. Coba lagi nanti.`);
+      toast.error(`Gagal mengambil berita dari GNews.io. Pastikan kunci API Anda valid dan coba lagi.`);
       return [];
     }
 
