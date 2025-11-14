@@ -57,6 +57,12 @@ export const useMapInitialization = ({
     });
     osmLayer.addTo(map);
 
+    // Add a permanent marker at the center of Torino
+    L.marker(center)
+      .addTo(map)
+      .bindPopup("<b>Torino Center</b><br/>Ini adalah pusat kota Torino.")
+      .openPopup();
+
     // Initialize Layer Groups
     geoJsonLayerGroupRef.current = L.layerGroup().addTo(map);
     subwayStationsLayerGroupRef.current = L.layerGroup().addTo(map); // Initialize empty layer group
