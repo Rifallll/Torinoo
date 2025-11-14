@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Newspaper, ArrowLeft, Search, XCircle, Filter } from 'lucide-react';
+import { Newspaper, ArrowLeft, Search, XCircle, Filter, AlertCircle } from 'lucide-react'; // Import AlertCircle
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
