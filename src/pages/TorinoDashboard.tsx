@@ -18,7 +18,9 @@ import FilterDropdowns from '@/components/FilterDropdowns';
 import RecentNewsSection from '@/components/RecentNewsSection';
 import WeatherCard from '@/components/WeatherCard';
 import AirQualityCard from '@/components/AirQualityCard'; // New: Import AirQualityCard
-import RealtimePublicTransport from '@/components/RealtimePublicTransport';
+import PublicTransportAlertsCard from '@/components/PublicTransportAlertsCard'; // Renamed and updated
+import VehiclePositionsCard from '@/components/VehiclePositionsCard'; // New component
+import GtfsRoutesCard from '@/components/GtfsRoutesCard'; // New component
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
 import QuickActionsCard from '@/components/QuickActionsCard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -167,8 +169,10 @@ const TorinoDashboard = () => {
 
             <div className="space-y-6">
               <WeatherCard />
-              <AirQualityCard /> {/* New: Add AirQualityCard here */}
-              <RealtimePublicTransport />
+              <AirQualityCard />
+              <PublicTransportAlertsCard /> {/* New component for alerts */}
+              <VehiclePositionsCard /> {/* New component for vehicle positions */}
+              <GtfsRoutesCard /> {/* New component for GTFS routes */}
 
               <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>

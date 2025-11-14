@@ -2,6 +2,8 @@
 
 import * as protobuf from 'protobufjs';
 import { toast } from 'sonner';
+import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock } from 'lucide-react';
+import React from 'react'; // Import React for JSX icons
 
 // Define interfaces for the parsed data based on the .proto schema
 export interface ParsedTripDescriptor {
@@ -207,7 +209,6 @@ export const formatTime = (timestamp?: number) => {
   return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 };
 
-
 export const parseGtfsRealtimeData = async (
   tripUpdateBinPath: string,
   alertBinPath: string,
@@ -303,4 +304,83 @@ export const parseGtfsRealtimeData = async (
   }
   
   return { tripUpdates, vehiclePositions, alerts };
+};
+
+// Utility functions moved from RealtimePublicTransport.tsx
+export const formatDelay = (delaySeconds: number | undefined) => {
+  if (delaySeconds === undefined || delaySeconds === 0) return 'Tepat Waktu';
+  const minutes = Math.abs(Math.round(delaySeconds / 60));
+  if (delaySeconds > 0) return `${minutes} mnt Terlambat`;
+  return `${minutes} mnt Lebih Awal`;
+};
+
+export const getDelayBadgeClass = (delaySeconds: number | undefined) => {
+  if (delaySeconds === undefined) return "bg-gray-100 text-gray-600 hover:bg-gray-100";
+  if (delaySeconds > 120) return "bg-red-100 text-red-600 hover:bg-red-100";
+  if (delaySeconds > 0) return "bg-yellow-100 text-yellow-600 hover:bg-yellow-100";
+  if (delaySeconds < 0) return "bg-green-100 text-green-600 hover:bg-green-100";
+  return "bg-gray-100 text-gray-600 hover:bg-gray-100";
+};
+
+export const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
+  // Prioritize GTFS route_type if available
+  if (routeType === 3) return <Bus className="h-4 w-4 mr-1" />; // Bus
+  if (routeType === 0) return <TramFront className="h-4 w-4 mr-1" />; // Tram
+  if (routeType === 1) return <Info className="h-4 w-4 mr-1" />; // Subway (using generic info for now)
+  
+  // Fallback to routeId parsing if routeType is not explicit
+  if (routeId) {
+    if (routeId.includes('B') || routeId === '101' || routeId === '68') return <Bus className="h-4 w-4 mr-1" />;
+    if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
+    if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
+  }
+  return <Info className="h-4 w-4 mr-1" />;
+};
+
+export const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
+  if (status && status !== 'UNKNOWN_STOP_STATUS') {
+    switch (status) {
+      case 'IN_TRANSIT_TO': return 'Dalam Perjalanan';
+      case 'STOPPED_AT_STATION': return 'Berhenti di Stasiun';
+      case 'IN_VEHICLE_BAY': return 'Di Teluk Kendaraan';
+      case 'AT_PLATFORM': return 'Di Platform';
+      default: return status.replace(/_/g, ' ');
+    }
+  }
+  if (occupancyStatus) {
+    switch (occupancyStatus) {
+      case 'EMPTY': return 'Kosong';
+      case 'MANY_SEATS_AVAILABLE': return 'Banyak Kursi Tersedia';
+      case 'FEW_SEATS_AVAILABLE': return 'Beberapa Kursi Tersedia';
+      case 'STANDING_ROOM_ONLY': return 'Hanya Berdiri';
+      case 'CRUSHED_STANDING_ROOM_ONLY': return 'Sangat Penuh';
+      case 'FULL': return 'Penuh';
+      case 'NOT_APPLICABLE': return 'Tidak Berlaku';
+      default: return occupancyStatus.replace(/_/g, ' ');
+    }
+  }
+  return 'Status Tidak Tersedia';
+};
+
+export const getCongestionBadgeClass = (congestionLevel: string | undefined) => {
+  switch (congestionLevel) {
+    case 'RUNNING_SMOOTHLY': return 'bg-green-100 text-green-600 hover:bg-green-100';
+    case 'STOP_AND_GO': return 'bg-yellow-100 text-yellow-600 hover:bg-yellow-100';
+    case 'CONGESTION': return 'bg-orange-100 text-orange-600 hover:bg-orange-100';
+    case 'SEVERE_CONGESTION': return 'bg-red-100 text-red-600 hover:bg-red-100';
+    case 'UNKNOWN_CONGESTION_LEVEL': return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
+    default: return 'bg-gray-100 text-gray-600 hover:bg-gray-100';
+  }
+};
+
+export const formatCongestionLevel = (congestionLevel: string | undefined) => {
+  if (!congestionLevel) return 'N/A';
+  switch (congestionLevel) {
+    case 'RUNNING_SMOOTHLY': return 'Lancar';
+    case 'STOP_AND_GO': return 'Berhenti & Jalan';
+    case 'CONGESTION': return 'Macet';
+    case 'SEVERE_CONGESTION': return 'Macet Parah';
+    case 'UNKNOWN_CONGESTION_LEVEL': return 'N/A';
+    default: return 'N/A';
+  }
 };
