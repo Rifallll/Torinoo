@@ -52,7 +52,7 @@ const fetchNewsFromNewsApi = async (query: string, language: string): Promise<Ne
     q: query,
     language: language,
     sortBy: 'publishedAt',
-    pageSize: '10', // Fetch 10 articles
+    pageSize: '100', // Mengubah dari '10' menjadi '100'
     apiKey: apiKey,
   });
 
@@ -86,7 +86,7 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
   const params = new URLSearchParams({
     q: query,
     lang: language,
-    max: '10', // Fetch 10 articles
+    max: '100', // Mengubah dari '10' menjadi '100'
     token: apiKey,
   });
 
