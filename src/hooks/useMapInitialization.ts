@@ -61,23 +61,6 @@ export const useMapInitialization = ({
     subwayStationsLayerGroupRef.current = L.layerGroup().addTo(map); // Initialize empty layer group
     publicTransportVehiclesLayerGroupRef.current = L.layerGroup().addTo(map);
 
-    // Removed: Subway station marker creation is moved to useSubwayStationsLayer.ts
-    // subwayStationsData.forEach(station => {
-    //   const { latitude, longitude } = convertCoordinates(station.x, station.y);
-    //   if (latitude !== 0 || longitude !== 0) {
-    //     L.marker([latitude, longitude], {
-    //       icon: L.divIcon({
-    //         className: 'subway-station-marker',
-    //         html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
-    //         iconSize: [20, 20],
-    //         iconAnchor: [10, 10]
-    //       })
-    //     })
-    //     .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
-    //     .addTo(subwayStationsLayerGroupRef.current!);
-    //   }
-    // });
-
     // Initialize TomTom Traffic Layer
     if (tomtomApiKey && tomtomApiKey !== 'YOUR_TOMTOM_API_KEY_HERE') {
       tomtomTrafficFlowLayerRef.current = L.tileLayer(
@@ -149,7 +132,10 @@ export const useMapInitialization = ({
     };
     
     // Overlay layers (initially empty, filled by other hooks)
-    const overlayLayers: { [key: string]: L.Layer } = {};
+    const overlayLayers: { [key: string]: L.Layer } = {
+      "Subway Stations": subwayStationsLayerGroupRef.current!, // Add Subway Stations layer
+      "Public Transport Vehicles": publicTransportVehiclesLayerGroupRef.current!, // Add Public Transport Vehicles layer
+    };
 
     // Add TomTom layer to control if it was successfully initialized
     if (tomtomTrafficFlowLayerRef.current) {
