@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchWeatherApi } from "openmeteo";
+// Menghapus import fetchWeatherApi dari 'openmeteo'
 
-// Define interfaces for Open-Meteo's current weather response structure
+// Mendefinisikan ulang antarmuka agar sesuai dengan respons JSON langsung dari Open-Meteo API
 interface OpenMeteoCurrentData {
-  time: Date;
+  time: string; // ISO 8601 string
   temperature_2m: number;
   weathercode: number;
   windspeed_10m: number;
@@ -13,103 +13,126 @@ interface OpenMeteoCurrentData {
 }
 
 interface OpenMeteoHourlyData {
-  time: Date[];
-  temperature_2m: Float32Array;
-  rain: Float32Array;
+  time: string[]; // Array of ISO 8601 strings
+  temperature_2m: number[];
+  rain: number[];
 }
 
-// New: Interface for daily weather data
 interface OpenMeteoDailyData {
-  time: Date[];
-  weathercode: Float32Array;
-  temperature_2m_max: Float32Array;
-  temperature_2m_min: Float32Array;
-  precipitation_sum: Float32Array;
-  windspeed_10m_max: Float32Array;
-  uv_index_max: Float32Array;
-  relativehumidity_2m_mean: Float32Array;
+  time: string[]; // Array of ISO 8601 date strings
+  weathercode: number[];
+  temperature_2m_max: number[];
+  temperature_2m_min: number[];
+  precipitation_sum: number[];
+  windspeed_10m_max: number[];
+  uv_index_max: number[];
+  relativehumidity_2m_mean: number[];
 }
 
-interface OpenMeteoParsedData {
+// Antarmuka untuk respons API mentah
+interface OpenMeteoApiResponse {
+  latitude: number;
+  longitude: number;
+  utc_offset_seconds: number;
+  timezone: string;
+  timezone_abbreviation: string;
+  elevation: number;
+  current_units: any;
   current: OpenMeteoCurrentData;
+  hourly_units: any;
   hourly: OpenMeteoHourlyData;
-  daily: OpenMeteoDailyData; // New: Add daily data
+  daily_units: any;
+  daily: OpenMeteoDailyData;
+}
+
+// Antarmuka untuk data yang sudah diurai dan siap digunakan di komponen
+interface OpenMeteoParsedData {
+  current: {
+    time: Date; // Dikonversi ke objek Date
+    temperature_2m: number;
+    weathercode: number;
+    windspeed_10m: number;
+    relativehumidity_2m: number;
+  };
+  hourly: {
+    time: Date[]; // Dikonversi ke objek Date
+    temperature_2m: number[];
+    rain: number[];
+  };
+  daily: {
+    time: Date[]; // Dikonversi ke objek Date
+    weathercode: number[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+    precipitation_sum: number[];
+    windspeed_10m_max: number[];
+    uv_index_max: number[];
+    relativehumidity_2m_mean: number[];
+  };
   city: string;
   country: string;
 }
 
 const fetchOpenMeteoWeather = async (city: string): Promise<OpenMeteoParsedData> => {
-  // For simplicity, we'll use fixed coordinates for Torino.
-  // In a real app, you might use a geocoding service to get coords from city name.
   const latitude = 45.0705;
   const longitude = 7.6868;
 
-  const params = {
-    latitude: latitude,
-    longitude: longitude,
-    hourly: ["temperature_2m", "rain"],
-    current: ["temperature_2m", "weathercode", "windspeed_10m", "relativehumidity_2m"],
-    daily: ["weathercode", "temperature_2m_max", "temperature_2m_min", "precipitation_sum", "windspeed_10m_max", "uv_index_max", "relativehumidity_2m_mean"], // New: Request daily parameters
-    past_days: 0, // Only fetch current/forecast
-    forecast_days: 7, // Fetch 7 days of daily forecast
-  };
-  const url = "https://api.open-meteo.com/v1/forecast";
+  const params = new URLSearchParams({
+    latitude: latitude.toString(),
+    longitude: longitude.toString(),
+    hourly: "temperature_2m,rain",
+    current: "temperature_2m,weathercode,windspeed_10m,relativehumidity_2m",
+    daily: "weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,uv_index_max,relativehumidity_2m_mean",
+    past_days: "0",
+    forecast_days: "7",
+    timezone: "Europe/Rome", // Secara eksplisit meminta zona waktu untuk konversi waktu yang benar
+  });
+  const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
 
-  const responses = await fetchWeatherApi(url, params);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Gagal mengambil data cuaca: ${response.statusText}`);
+  }
 
-  // Process first location
-  const response = responses[0];
+  const apiResponse: OpenMeteoApiResponse = await response.json();
 
-  // Attributes for timezone and location
-  const utcOffsetSeconds = response.utcOffsetSeconds();
-
-  const current = response.current()!;
-  const hourly = response.hourly()!;
-  const daily = response.daily()!; // New: Get daily data
-
-  // Note: The order of weather variables in the URL query and the indices below need to match!
-  const weatherData: OpenMeteoParsedData = {
+  // Mengonversi string ISO ke objek Date
+  const parsedData: OpenMeteoParsedData = {
     current: {
-      time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-      temperature_2m: current.variables(0)!.value(),
-      weathercode: current.variables(1)!.value(),
-      windspeed_10m: current.variables(2)!.value(),
-      relativehumidity_2m: current.variables(3)!.value(),
+      time: new Date(apiResponse.current.time),
+      temperature_2m: apiResponse.current.temperature_2m,
+      weathercode: apiResponse.current.weathercode,
+      windspeed_10m: apiResponse.current.windspeed_10m,
+      relativehumidity_2m: apiResponse.current.relativehumidity_2m,
     },
     hourly: {
-      time: Array.from(
-        { length: (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval() },
-        (_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
-      ),
-      temperature_2m: hourly.variables(0)!.valuesArray()!,
-      rain: hourly.variables(1)!.valuesArray()!,
+      time: apiResponse.hourly.time.map(t => new Date(t)),
+      temperature_2m: apiResponse.hourly.temperature_2m,
+      rain: apiResponse.hourly.rain,
     },
-    daily: { // New: Parse daily data
-      time: Array.from(
-        { length: (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval() },
-        (_, i) => new Date((Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) * 1000)
-      ),
-      weathercode: daily.variables(0)!.valuesArray()!,
-      temperature_2m_max: daily.variables(1)!.valuesArray()!,
-      temperature_2m_min: daily.variables(2)!.valuesArray()!,
-      precipitation_sum: daily.variables(3)!.valuesArray()!,
-      windspeed_10m_max: daily.variables(4)!.valuesArray()!,
-      uv_index_max: daily.variables(5)!.valuesArray()!,
-      relativehumidity_2m_mean: daily.variables(6)!.valuesArray()!,
+    daily: {
+      time: apiResponse.daily.time.map(t => new Date(t)),
+      weathercode: apiResponse.daily.weathercode,
+      temperature_2m_max: apiResponse.daily.temperature_2m_max,
+      temperature_2m_min: apiResponse.daily.temperature_2m_min,
+      precipitation_sum: apiResponse.daily.precipitation_sum,
+      windspeed_10m_max: apiResponse.daily.windspeed_10m_max,
+      uv_index_max: apiResponse.daily.uv_index_max,
+      relativehumidity_2m_mean: apiResponse.daily.relativehumidity_2m_mean,
     },
-    city: "Torino", // Hardcode for now, or use a reverse geocoding service
-    country: "IT", // Hardcode for now
+    city: "Torino", // Hardcode untuk saat ini
+    country: "IT", // Hardcode untuk saat ini
   };
 
-  return weatherData;
+  return parsedData;
 };
 
 export const useWeather = (city: string = "Torino", enabled: boolean = true) => {
   return useQuery<OpenMeteoParsedData, Error>({
     queryKey: ["weather", city],
     queryFn: () => fetchOpenMeteoWeather(city),
-    staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes
-    refetchOnWindowFocus: false, // Prevent refetching on window focus
-    enabled: enabled, // Only run the query if enabled is true
+    staleTime: 5 * 60 * 1000, // Data dianggap segar selama 5 menit
+    refetchOnWindowFocus: false, // Mencegah pengambilan ulang saat jendela fokus
+    enabled: enabled, // Hanya menjalankan kueri jika diaktifkan
   });
 };
