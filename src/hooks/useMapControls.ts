@@ -12,44 +12,48 @@ interface MapControlsProps {
     subwayStationsLayerGroup: L.LayerGroup;
     gtfsRoutesLayerGroup: L.LayerGroup;
   } | null;
-  tomtomTrafficFlowLayer: L.TileLayer | null;
+  tomtomTrafficFlowLayer: L.TileLayer | null; // Now receives the layer instance
+  isTomTomLayerEnabled: boolean; // New prop for TomTom layer state
+  torinoBounds: L.LatLngBoundsExpression; // New prop for TomTom layer bounds
   torinoCenter: L.LatLngExpression;
   defaultZoom: number;
 }
 
-export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom }: MapControlsProps) => {
+export const useMapControls = ({
+  map,
+  layerGroups,
+  tomtomTrafficFlowLayer,
+  isTomTomLayerEnabled,
+  torinoBounds,
+  torinoCenter,
+  defaultZoom
+}: MapControlsProps) => {
   // Use refs to store control instances for proper cleanup
   const geocoderRef = useRef<L.Control.Geocoder | null>(null);
   const fullscreenControlRef = useRef<L.Control | null>(null);
   const layerControlRef = useRef<L.Control.Layers | null>(null);
   const resetViewControlRef = useRef<L.Control | null>(null);
-  // New ref to track if controls have been added for the current map instance
   const controlsAddedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!map || !layerGroups) {
-      // If map or layerGroups are not available, ensure controlsAddedRef is false
       controlsAddedRef.current = false;
       return;
     }
 
-    // If controls have already been added for this map instance, do nothing.
     if (controlsAddedRef.current) {
       return;
     }
 
     const addControls = () => {
-      // Double check if map._controlCorners is defined before adding controls
-      // This is an extra safeguard, as map.whenReady() should ideally handle it.
       // @ts-ignore - _controlCorners is an internal Leaflet property
       if (!map._controlCorners) {
         console.warn("Leaflet map._controlCorners is not defined, delaying control addition.");
         return;
       }
 
-      // Prevent adding controls if they somehow got added between the outer check and this point
       if (geocoderRef.current && map.hasControl(geocoderRef.current)) {
-        controlsAddedRef.current = true; // Mark as added
+        controlsAddedRef.current = true;
         return;
       }
 
@@ -101,12 +105,15 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
         "GTFS Public Routes": layerGroups.gtfsRoutesLayerGroup,
       };
 
-      // Initialize layer control without TomTom layer first
       const layerControl = L.control.layers(baseLayers, overlayLayers).addTo(map);
       layerControlRef.current = layerControl;
 
-      // Only add TomTom layer to control if it exists and is a valid instance
+      // Add TomTom layer to map and control if it exists
       if (tomtomTrafficFlowLayer instanceof L.TileLayer) {
+        // Ensure TomTom layer is added to map here, if it's not already
+        if (!map.hasLayer(tomtomTrafficFlowLayer)) {
+          tomtomTrafficFlowLayer.addTo(map);
+        }
         layerControl.addOverlay(tomtomTrafficFlowLayer, "TomTom Traffic Flow");
       }
 
@@ -125,10 +132,9 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
       const resetViewControl = new ResetViewControl({ position: 'topleft' }).addTo(map);
       resetViewControlRef.current = resetViewControl;
 
-      controlsAddedRef.current = true; // Mark controls as added
+      controlsAddedRef.current = true;
     };
 
-    // Use map.whenReady to ensure the map is fully initialized
     map.whenReady(addControls);
 
     // Cleanup function for the useEffect
@@ -138,13 +144,56 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
         if (fullscreenControlRef.current) map.removeControl(fullscreenControlRef.current);
         if (layerControlRef.current) map.removeControl(layerControlRef.current);
         if (resetViewControlRef.current) map.removeControl(resetViewControlRef.current);
+        // Ensure TomTom layer is removed from map on cleanup if it was added
+        if (tomtomTrafficFlowLayer && map.hasLayer(tomtomTrafficFlowLayer)) {
+          map.removeLayer(tomtomTrafficFlowLayer);
+        }
       }
-      // Reset refs and controlsAddedRef on cleanup
       geocoderRef.current = null;
       fullscreenControlRef.current = null;
       layerControlRef.current = null;
       resetViewControlRef.current = null;
-      controlsAddedRef.current = false; // Important: reset for next map instance
+      controlsAddedRef.current = false;
     };
   }, [map, layerGroups, tomtomTrafficFlowLayer, torinoCenter, defaultZoom]);
+
+  // Effect to manage TomTom Traffic Flow layer visibility (opacity)
+  useEffect(() => {
+    if (!map || !tomtomTrafficFlowLayer) {
+      return;
+    }
+
+    const updateTomTomTrafficVisibility = () => {
+      // @ts-ignore - _loaded is an internal Leaflet property, but useful here
+      if (!map || !tomtomTrafficFlowLayer || !map._loaded) {
+        return;
+      }
+
+      const currentMapBounds = map.getBounds();
+      const isWithinTorino = L.latLngBounds(torinoBounds).intersects(currentMapBounds);
+
+      if (isTomTomLayerEnabled && isWithinTorino) {
+        tomtomTrafficFlowLayer.setOpacity(0.7); // Make visible
+        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
+      } else {
+        tomtomTrafficFlowLayer.setOpacity(0); // Hide
+        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
+      }
+    };
+
+    // Attach listeners
+    map.on('moveend', updateTomTomTrafficVisibility);
+    map.on('zoomend', updateTomTomTrafficVisibility);
+    map.on('load', updateTomTomTrafficVisibility); // Initial check after map loads
+
+    // Initial visibility update when the component mounts or dependencies change
+    updateTomTomTrafficVisibility();
+
+    return () => {
+      // Detach listeners
+      map.off('moveend', updateTomTomTrafficVisibility);
+      map.off('zoomend', updateTomTomTrafficVisibility);
+      map.off('load', updateTomTomTrafficVisibility);
+    };
+  }, [map, tomtomTrafficFlowLayer, isTomTomLayerEnabled, torinoBounds]);
 };

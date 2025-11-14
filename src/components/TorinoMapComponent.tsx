@@ -62,19 +62,19 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     zoom: defaultZoom,
   });
 
-  // 2. Initialize TomTom traffic layer
+  // 2. Initialize TomTom traffic layer (now only creates the layer instance)
   const tomtomTrafficFlowLayer = useTomTomTrafficLayer({
     map,
-    isTomTomLayerEnabled,
     tomtomApiKey,
-    torinoBounds,
   });
 
-  // 3. Add map controls
+  // 3. Add map controls and manage TomTom layer visibility
   useMapControls({
     map,
     layerGroups,
-    tomtomTrafficFlowLayer,
+    tomtomTrafficFlowLayer, // Pass the created layer instance
+    isTomTomLayerEnabled, // Pass the enabled state
+    torinoBounds, // Pass the bounds for visibility logic
     torinoCenter,
     defaultZoom,
   });
