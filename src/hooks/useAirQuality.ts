@@ -6,7 +6,7 @@ import { toast } from "sonner";
 interface AirQualityData {
   aqi: number;
   dominant_pollutant: string;
-  city: string;
+  city: { name: string; url: string; }; // FIX 1: Changed city to an object
   country: string;
   iaqi: {
     co?: { v: number };
@@ -51,7 +51,7 @@ const fetchAirQualityData = async (city: string): Promise<AirQualityData> => {
   if (result.status === "ok") {
     return {
       ...result.data,
-      city: result.data.city.name || city, // Use city name from API if available, otherwise fallback
+      city: result.data.city, // FIX 1: Use the city object directly
       country: "IT", // Hardcode country for Torino
     };
   } else {
@@ -66,8 +66,6 @@ export const useAirQuality = (city: string = "Torino", enabled: boolean = true) 
     staleTime: 10 * 60 * 1000, // Data considered fresh for 10 minutes
     refetchOnWindowFocus: false,
     enabled: enabled, // Only run the query if enabled is true
-    onError: (err) => {
-      toast.error(`Gagal memuat data kualitas udara: ${err.message}`);
-    },
+    // FIX 2: Removed onError to resolve TypeScript compile error
   });
 };
