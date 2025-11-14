@@ -1,51 +1,33 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-import 'leaflet-control-geocoder';
-import { toast } from 'sonner'; // Import toast for user feedback
-import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
+import React from 'react';
+import L from 'leaflet'; // Import L for LatLngBoundsExpression
+
+// Import custom hooks and utilities
+import { useMapInitialization } from '@/hooks/useMapInitialization';
+import { useMapControls } from '@/hooks/useMapControls';
+import { useGeoJsonLayer } from '@/hooks/useGeoJsonLayer';
+import { useSubwayStationsLayer } from '@/hooks/useSubwayStationsLayer';
+import { useGtfsRoutesLayer } from '@/hooks/useGtfsRoutesLayer';
+import { useTomTomTrafficLayer } from '@/hooks/useTomTomTrafficLayer';
 import { useSettings } from '@/contexts/SettingsContext';
-import { useGtfsData } from '@/hooks/useGtfsData'; // Import useGtfsData hook
-
-// Fix for default marker icon issue with Webpack/Vite
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
+import { convertCoordinates } from '@/utils/coordinateConverter'; // Still needed for subway data
 
 interface TorinoMapComponentProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
-  gtfsRouteTypeFilter: string; // New prop for GTFS route type filter
+  gtfsRouteTypeFilter: string;
 }
 
 const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter, gtfsRouteTypeFilter }) => {
-  const mapRef = useRef<L.Map | null>(null);
-  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
-  const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
-  const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
-  const gtfsRoutesLayerGroupRef = useRef<L.LayerGroup | null>(null); // New: Ref for GTFS routes layer group
-  const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
-
-  const { isTomTomLayerEnabled } = useSettings();
-  const { data: gtfsData, isLoading: isLoadingGtfs, error: gtfsError } = useGtfsData(); // Fetch GTFS data
-
-  const torinoCenter: [number, number] = [45.0703, 7.6869];
+  const torinoCenter: L.LatLngExpression = [45.0703, 7.6869];
   const defaultZoom = 13;
   const minZoomForGeoJSON = 15;
   const minZoomForSubwayStations = 12;
-  const minZoomForGtfsRoutes = 12; // New: Minimum zoom level for GTFS routes to appear
+  const minZoomForGtfsRoutes = 12;
 
   // Define approximate bounding box for Torino (South-West, North-East)
-  const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
+  const torinoBounds: L.LatLngBoundsExpression = [[44.95, 7.50], [45.18, 7.85]];
 
   // Dummy data for subway stations (using original EPSG:3003 coordinates)
   const subwayStationsData = [
@@ -70,494 +52,57 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     { name: "Bengasi", x: 1506000, y: 4996400 },
   ];
 
-  // Helper function to get custom icon for features
-  const getCustomIcon = (feature: L.GeoJSON.Feature) => {
-    const properties = feature.properties;
-    let iconColor = '#3b82f6'; // Default blue
-    let iconText = '?';
-    let iconSize = 24;
-    let iconShape = 'circle'; // Default shape
+  const { isTomTomLayerEnabled } = useSettings();
+  const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
 
-    if (properties) {
-      const vehicleType = properties.vehicle_type;
-      const amenity = properties.amenity;
-      const buildingType = properties.building_type; // Assuming this might exist for buildings
+  // 1. Initialize the map and get layer groups
+  const { map, layerGroups } = useMapInitialization({
+    mapContainerId: 'torino-map',
+    center: torinoCenter,
+    zoom: defaultZoom,
+  });
 
-      if (vehicleType) {
-        switch (vehicleType.toLowerCase()) {
-          case 'car':
-            iconColor = '#3b82f6'; // Blue
-            iconText = 'C';
-            break;
-          case 'motorcycle':
-            iconColor = '#f97316'; // Orange
-            iconText = 'M';
-            break;
-          case 'bus':
-            iconColor = '#22c55e'; // Green
-            iconText = 'B';
-            break;
-          case 'truck':
-            iconColor = '#ef4444'; // Red
-            iconText = 'T';
-            break;
-          case 'tram':
-            iconColor = '#a855f7'; // Purple
-            iconText = 'TR';
-            iconSize = 30;
-            iconShape = 'square';
-            break;
-          case 'subway':
-            iconColor = '#6b7280'; // Gray
-            iconText = 'S';
-            iconSize = 30;
-            iconShape = 'square';
-            break;
-          default:
-            iconColor = '#3b82f6';
-            iconText = '?';
-        }
-      } else if (amenity) {
-        switch (amenity.toLowerCase()) {
-          case 'hospital':
-            iconColor = '#ef4444'; // Red
-            iconText = '+';
-            break;
-          case 'school':
-            iconColor = '#22c55e'; // Green
-            iconText = 'S';
-            break;
-          case 'park':
-            iconColor = '#10b981'; // Teal
-            iconText = 'P';
-            break;
-          case 'restaurant':
-            iconColor = '#f97316'; // Orange
-            iconText = 'R';
-            break;
-          case 'cafe':
-            iconColor = '#a855f7'; // Purple
-            iconText = 'C';
-            break;
-          case 'shop':
-            iconColor = '#ec4899'; // Pink
-            iconText = 'S';
-            break;
-          case 'building':
-          case 'apartment': // Explicitly handle 'apartment'
-            iconColor = '#6b7280'; // Gray
-            iconText = 'B'; // 'B' for Building, or 'A' for Apartment if preferred
-            iconShape = 'square';
-            break;
-          default: // For other amenities not explicitly listed
-            iconColor = '#3b82f6'; // Default blue
-            iconText = 'L'; // 'L' for Location/Landmark
-            iconSize = 20;
-            iconShape = 'circle';
-        }
-      } else if (buildingType && buildingType.toLowerCase() === 'residential') { // Handle generic residential buildings
-        iconColor = '#800080'; // Purple
-        iconText = 'R';
-        iconShape = 'square';
-      } else {
-        // Fallback for any point feature without specific vehicle_type or amenity/building_type
-        iconColor = '#6b7280'; // Darker gray for generic points
-        iconText = 'P'; // 'P' for Point of Interest
-        iconSize = 20;
-        iconShape = 'circle';
-      }
-    }
+  // 2. Initialize TomTom traffic layer
+  const tomtomTrafficFlowLayer = useTomTomTrafficLayer({
+    map,
+    isTomTomLayerEnabled,
+    tomtomApiKey,
+    torinoBounds,
+  });
 
-    const borderRadius = iconShape === 'circle' ? '50%' : '5px';
+  // 3. Add map controls
+  useMapControls({
+    map,
+    layerGroups,
+    tomtomTrafficFlowLayer,
+    torinoCenter,
+    defaultZoom,
+  });
 
-    return L.divIcon({
-      className: 'custom-poi-marker',
-      html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:${borderRadius}; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize / 2}px; font-weight:bold;">${iconText}</div>`,
-      iconSize: [iconSize, iconSize],
-      iconAnchor: [iconSize / 2, iconSize / 2]
-    });
-  };
+  // 4. Manage GeoJSON layer
+  useGeoJsonLayer({
+    map,
+    geoJsonLayerGroup: layerGroups?.geoJsonLayerGroup || null,
+    selectedVehicleType,
+    roadConditionFilter,
+    minZoomForGeoJSON,
+  });
 
-  // Function to update GeoJSON layer visibility based on zoom
-  const updateGeoJSONVisibility = () => {
-    if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
+  // 5. Manage Subway Stations layer
+  useSubwayStationsLayer({
+    map,
+    subwayStationsLayerGroup: layerGroups?.subwayStationsLayerGroup || null,
+    subwayStationsData,
+    minZoomForSubwayStations,
+  });
 
-    if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
-      if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-        geoJsonLayerGroupRef.current.addTo(mapRef.current);
-        toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
-      }
-    } else {
-      if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-        mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
-        toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
-      }
-    }
-  };
-
-  // Function to update Subway Stations layer visibility based on zoom
-  const updateSubwayStationsVisibility = () => {
-    if (!mapRef.current || !subwayStationsLayerGroupRef.current) return;
-
-    if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
-      if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
-        subwayStationsLayerGroupRef.current.addTo(mapRef.current);
-        toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
-      }
-    } else {
-      if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
-        mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
-        toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
-      }
-    }
-  };
-
-  // New: Function to update GTFS Routes layer visibility based on zoom
-  const updateGtfsRoutesVisibility = () => {
-    if (!mapRef.current || !gtfsRoutesLayerGroupRef.current) return;
-
-    if (mapRef.current.getZoom() >= minZoomForGtfsRoutes) {
-      if (!mapRef.current.hasLayer(gtfsRoutesLayerGroupRef.current)) {
-        gtfsRoutesLayerGroupRef.current.addTo(mapRef.current);
-        toast.info("Lapisan rute transportasi publik ditampilkan.");
-      }
-    } else {
-      if (mapRef.current.hasLayer(gtfsRoutesLayerGroupRef.current)) {
-        mapRef.current.removeLayer(gtfsRoutesLayerGroupRef.current);
-        toast.info("Lapisan rute transportasi publik disembunyikan (perkecil untuk performa).");
-      }
-    }
-  };
-
-  // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
-  const updateTomTomTrafficVisibility = () => {
-    if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
-
-    const currentMapBounds = mapRef.current.getBounds();
-    const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
-    const isWithinTorino = currentMapBounds.intersects(torinoBounds);
-
-    if (isTomTomLayerEnabled && isWithinTorino) {
-      if (!isTomTomLayerActive) {
-        tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
-        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
-      }
-    } else {
-      if (isTomTomLayerActive) {
-        mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
-        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (!mapRef.current) {
-      // Initialize map with preferCanvas: true for better performance with complex vector data
-      mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
-
-      // Add OpenStreetMap tile layer
-      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-      });
-      osmLayer.addTo(mapRef.current);
-
-      // Initialize Layer Groups
-      geoJsonLayerGroupRef.current = L.layerGroup();
-      subwayStationsLayerGroupRef.current = L.layerGroup();
-      gtfsRoutesLayerGroupRef.current = L.layerGroup(); // New: Initialize GTFS routes layer group
-
-      // Add subway stations to their layer group
-      subwayStationsData.forEach(station => {
-        const { latitude, longitude } = convertCoordinates(station.x, station.y);
-        if (latitude !== 0 || longitude !== 0) { // Check for valid conversion
-          L.marker([latitude, longitude], {
-            icon: L.divIcon({
-              className: 'subway-station-marker',
-              html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
-              iconSize: [20, 20],
-              iconAnchor: [10, 10]
-            })
-          })
-          .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
-          .addTo(subwayStationsLayerGroupRef.current!);
-        }
-      });
-
-      // Get TomTom API Key from environment variables
-      const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
-      
-      if (tomtomApiKey) {
-        tomtomTrafficFlowLayerRef.current = L.tileLayer(
-          `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
-          {
-            attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
-            maxZoom: 19,
-            opacity: 0.7, // Make it slightly transparent to see base map
-          }
-        );
-      } else {
-        toast.warning("Kunci API TomTom tidak ditemukan. Lapisan lalu lintas TomTom tidak akan tersedia.");
-      }
-
-      // Add Geocoder control
-      L.Control.geocoder({
-        defaultMarkGeocode: false,
-      })
-      .on('markgeocode', function(e: any) {
-        const bbox = e.geocode.bbox;
-        const poly = L.polygon([
-          [bbox.getSouthEast().lat, bbox.getSouthEast().lng],
-          [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
-          [bbox.getNorthWest().lat, bbox.getNorthWest().lng],
-          [bbox.getSouthWest().lat, bbox.getSouthWest().lng]
-        ]).addTo(mapRef.current!);
-        mapRef.current!.fitBounds(poly.getBounds());
-      })
-      .addTo(mapRef.current!);
-
-      // Add Fullscreen control (simple custom button)
-      const FullscreenControl = L.Control.extend({
-        onAdd: function(map: L.Map) {
-          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-          container.innerHTML = '<button title="Toggle Fullscreen" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x26F6;</button>';
-          container.onclick = () => {
-            if (document.fullscreenElement) {
-              document.exitFullscreen();
-            } else {
-              map.getContainer().requestFullscreen();
-            }
-          };
-          return container;
-        },
-        onRemove: function(map: L.Map) {},
-      });
-      new FullscreenControl({ position: 'topleft' }).addTo(mapRef.current);
-
-      // Add Layer control
-      const baseLayers = {
-        "OpenStreetMap": osmLayer,
-        "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
-        "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
-      };
-      const overlayLayers: { [key: string]: L.Layer } = {
-        "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
-        "Subway Stations": subwayStationsLayerGroupRef.current,
-        "GTFS Public Routes": gtfsRoutesLayerGroupRef.current, // New: Add GTFS routes to layer control
-      };
-
-      // Only add TomTom layer to control if it was successfully initialized
-      if (tomtomTrafficFlowLayerRef.current) {
-        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayerRef.current;
-      }
-
-      L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
-
-      // Reset view control
-      const ResetViewControl = L.Control.extend({
-        onAdd: function(map: L.Map) {
-          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-          container.innerHTML = '<button title="Reset View" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x21BA;</button>';
-          container.onclick = () => {
-            map.setView(torinoCenter, defaultZoom);
-          };
-          return container;
-        },
-        onRemove: function(map: L.Map) {},
-      });
-      new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
-
-      // Add event listeners for zoom and move changes
-      mapRef.current.on('zoomend', updateGeoJSONVisibility);
-      mapRef.current.on('zoomend', updateSubwayStationsVisibility);
-      mapRef.current.on('zoomend', updateGtfsRoutesVisibility); // New: Add listener for GTFS routes
-      mapRef.current.on('moveend', updateTomTomTrafficVisibility);
-      mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
-
-      // Initial check for visibility
-      updateGeoJSONVisibility();
-      updateSubwayStationsVisibility();
-      updateGtfsRoutesVisibility(); // New: Initial check for GTFS routes
-    }
-
-    // Fetch and add GeoJSON data
-    const fetchGeoJSON = async () => {
-      try {
-        const response = await fetch('/export.geojson'); // Path to the GeoJSON file in the public folder
-        if (!response.ok) {
-          throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
-        }
-        const data = await response.json();
-
-        if (mapRef.current && geoJsonLayerGroupRef.current) {
-          // Clear existing GeoJSON layer from the group
-          geoJsonLayerGroupRef.current.clearLayers();
-
-          // Filter features based on selectedVehicleType and roadConditionFilter
-          const filteredFeatures = data.features.filter((feature: L.GeoJSON.Feature) => {
-            const properties = feature.properties;
-            const matchesVehicleType = selectedVehicleType === 'all' || 
-                                       (properties?.vehicle_type && properties.vehicle_type.toLowerCase() === selectedVehicleType.toLowerCase());
-            const matchesRoadCondition = roadConditionFilter === 'all' || 
-                                         (properties?.traffic_level && properties.traffic_level.toLowerCase() === roadConditionFilter.toLowerCase());
-            return matchesVehicleType && matchesRoadCondition;
-          });
-
-          geoJsonLayerRef.current = L.geoJSON({ ...data, features: filteredFeatures }, {
-            onEachFeature: (feature, layer) => {
-              // Bind popup with all properties
-              if (feature.properties) {
-                let popupContent = "<table>";
-                for (const key in feature.properties) {
-                  popupContent += `<tr><td><b>${key}:</b></td><td>${feature.properties[key]}</td></tr>`;
-                }
-                popupContent += "</table>";
-                layer.bindPopup(popupContent);
-              }
-            },
-            pointToLayer: (feature, latlng) => {
-              // Custom marker for points based on 'vehicle_type' or 'amenity' property
-              return L.marker(latlng, { icon: getCustomIcon(feature) });
-            },
-            style: (feature) => {
-              // Custom style for lines/polygons based on properties
-              const trafficLevel = feature?.properties?.traffic_level;
-              let color = '#6b7280'; // Changed default to a darker gray
-              let weight = 3;
-
-              if (trafficLevel === 'high') {
-                color = 'red';
-                weight = 4;
-              } else if (trafficLevel === 'moderate') {
-                color = 'orange';
-                weight = 3;
-              } else if (trafficLevel === 'low') {
-                color = 'green';
-                weight = 2;
-              }
-
-              // Apply roadConditionFilter to line styles as well
-              if (roadConditionFilter !== 'all' && trafficLevel?.toLowerCase() !== roadConditionFilter.toLowerCase()) {
-                return { opacity: 0 }; // Hide if it doesn't match the filter
-              }
-
-              return {
-                color: color,
-                weight: weight,
-                opacity: 0.4 // Mengurangi opasitas menjadi 0.4 untuk membuatnya lebih transparan
-              };
-            }
-          });
-          geoJsonLayerRef.current.addTo(geoJsonLayerGroupRef.current); // Add to the layer group
-
-          // Update visibility after loading new data
-          if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
-            if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
-              mapRef.current.addLayer(geoJsonLayerGroupRef.current);
-            }
-          }
-
-          // Optionally, fit map bounds to the GeoJSON layer if it's valid
-          if (geoJsonLayerRef.current.getBounds().isValid()) {
-            mapRef.current.fitBounds(geoJsonLayerRef.current.getBounds());
-          }
-        }
-      } catch (error) {
-        console.error("Error loading GeoJSON data:", error);
-        toast.error(`Gagal memuat data GeoJSON: ${error instanceof Error ? error.message : String(error)}. Pastikan file 'export.geojson' ada di folder 'public'.`);
-      }
-    };
-
-    fetchGeoJSON();
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.off('zoomend', updateGeoJSONVisibility);
-        mapRef.current.off('zoomend', updateSubwayStationsVisibility);
-        mapRef.current.off('zoomend', updateGtfsRoutesVisibility);
-        mapRef.current.off('moveend', updateTomTomTrafficVisibility);
-        mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, [selectedVehicleType, roadConditionFilter]); // Re-run when filters change
-
-  // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
-  useEffect(() => {
-    updateTomTomTrafficVisibility();
-  }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
-
-  // New: useEffect to handle GTFS routes display and filtering
-  useEffect(() => {
-    if (!mapRef.current || !gtfsRoutesLayerGroupRef.current || isLoadingGtfs || gtfsError || !gtfsData) {
-      return;
-    }
-
-    gtfsRoutesLayerGroupRef.current.clearLayers(); // Clear existing routes
-
-    const { routes, shapes, agencies } = gtfsData;
-
-    // Create a map for efficient shape lookup
-    const shapesByShapeId = new Map<string, L.LatLng[]>();
-    shapes.forEach(shapePoint => {
-      if (!shapesByShapeId.has(shapePoint.shape_id)) {
-        shapesByShapeId.set(shapePoint.shape_id, []);
-      }
-      shapesByShapeId.get(shapePoint.shape_id)?.push(L.latLng(shapePoint.shape_pt_lat, shapePoint.shape_pt_lon));
-    });
-
-    const filteredRoutes = routes.filter(route => {
-      const matchesType = gtfsRouteTypeFilter === 'all' || String(route.route_type) === gtfsRouteTypeFilter;
-      return matchesType;
-    });
-
-    filteredRoutes.forEach(route => {
-      if (route.shape_id && shapesByShapeId.has(route.shape_id)) {
-        const routeShape = shapesByShapeId.get(route.shape_id);
-        if (routeShape && routeShape.length > 1) {
-          let lineColor = '#3388ff'; // Default blue
-          let lineWeight = 3;
-
-          switch (route.route_type) {
-            case 0: // Tram
-              lineColor = '#a855f7'; // Purple
-              lineWeight = 4;
-              break;
-            case 1: // Subway
-              lineColor = '#6b7280'; // Gray
-              lineWeight = 5;
-              break;
-            case 3: // Bus
-              lineColor = '#22c55e'; // Green
-              lineWeight = 3;
-              break;
-            // Add more cases for other route_types if needed
-          }
-
-          const polyline = L.polyline(routeShape, {
-            color: lineColor,
-            weight: lineWeight,
-            opacity: 0.7,
-          });
-
-          const agency = agencies.find(a => a.agency_id === route.agency_id);
-          const popupContent = `
-            <b>${route.route_short_name || route.route_long_name || 'N/A'}</b><br/>
-            Tipe: ${route.route_type === 0 ? 'Tram' : route.route_type === 1 ? 'Subway' : route.route_type === 3 ? 'Bus' : 'Lainnya'}<br/>
-            Nama Panjang: ${route.route_long_name || 'N/A'}<br/>
-            Operator: ${agency?.agency_name || 'N/A'}<br/>
-            Deskripsi: ${route.route_desc || 'N/A'}
-          `;
-          polyline.bindPopup(popupContent);
-
-          polyline.addTo(gtfsRoutesLayerGroupRef.current!);
-        }
-      }
-    });
-
-    updateGtfsRoutesVisibility(); // Update visibility after drawing routes
-  }, [gtfsData, gtfsRouteTypeFilter, isLoadingGtfs, gtfsError]); // Re-run when GTFS data or filter changes
+  // 6. Manage GTFS Routes layer
+  useGtfsRoutesLayer({
+    map,
+    gtfsRoutesLayerGroup: layerGroups?.gtfsRoutesLayerGroup || null,
+    gtfsRouteTypeFilter,
+    minZoomForGtfsRoutes,
+  });
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
