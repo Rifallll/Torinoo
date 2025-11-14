@@ -22,6 +22,7 @@ declare module 'leaflet' {
 interface ImportMetaEnv {
   readonly VITE_OPENWEATHER_API_KEY: string;
   readonly VITE_TOMTOM_API_KEY: string;
+  readonly VITE_AQICN_API_KEY: string; // New: AQICN API Key
   // more env variables...
 }
 
