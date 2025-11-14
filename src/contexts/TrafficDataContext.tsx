@@ -3,7 +3,7 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { toast } from 'sonner';
 
-interface TrafficDataRow {
+export interface TrafficDataRow {
   day: string;
   interval: string;
   detid: string;
