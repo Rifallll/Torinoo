@@ -155,7 +155,10 @@ const TorinoDashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="h-[500px] p-0">
-                  <TorinoMapComponent selectedVehicleType={vehicleTypeFilter} />
+                  <TorinoMapComponent 
+                    selectedVehicleType={vehicleTypeFilter} 
+                    roadConditionFilter={roadConditionFilter} 
+                  />
                 </CardContent>
               </Card>
               <TrafficSpeedDistributionChart />

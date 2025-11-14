@@ -20,7 +20,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const TorinoMapComponent: React.FC = () => {
+interface TorinoMapComponentProps {
+  selectedVehicleType: string;
+  roadConditionFilter: string;
+}
+
+const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter }) => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
@@ -59,6 +64,99 @@ const TorinoMapComponent: React.FC = () => {
     { name: "Italia 61 - Regione Piemonte", x: 1505500, y: 4996100 },
     { name: "Bengasi", x: 1506000, y: 4996400 },
   ];
+
+  // Helper function to get custom icon for features
+  const getCustomIcon = (feature: L.GeoJSON.Feature) => {
+    const properties = feature.properties;
+    let iconColor = '#3b82f6'; // Default blue
+    let iconText = '?';
+    let iconSize = 24;
+    let iconShape = 'circle'; // Default shape
+
+    if (properties) {
+      const vehicleType = properties.vehicle_type;
+      const amenity = properties.amenity;
+
+      if (vehicleType) {
+        switch (vehicleType.toLowerCase()) {
+          case 'car':
+            iconColor = '#3b82f6'; // Blue
+            iconText = 'C';
+            break;
+          case 'motorcycle':
+            iconColor = '#f97316'; // Orange
+            iconText = 'M';
+            break;
+          case 'bus':
+            iconColor = '#22c55e'; // Green
+            iconText = 'B';
+            break;
+          case 'truck':
+            iconColor = '#ef4444'; // Red
+            iconText = 'T';
+            break;
+          case 'tram':
+            iconColor = '#a855f7'; // Purple
+            iconText = 'TR';
+            iconSize = 30;
+            iconShape = 'square';
+            break;
+          case 'subway':
+            iconColor = '#6b7280'; // Gray
+            iconText = 'S';
+            iconSize = 30;
+            iconShape = 'square';
+            break;
+          default:
+            iconColor = '#3b82f6';
+            iconText = '?';
+        }
+      } else if (amenity) {
+        switch (amenity.toLowerCase()) {
+          case 'hospital':
+            iconColor = '#ef4444'; // Red
+            iconText = '+';
+            break;
+          case 'school':
+            iconColor = '#22c55e'; // Green
+            iconText = 'S';
+            break;
+          case 'park':
+            iconColor = '#10b981'; // Teal
+            iconText = 'P';
+            break;
+          case 'restaurant':
+            iconColor = '#f97316'; // Orange
+            iconText = 'R';
+            break;
+          case 'cafe':
+            iconColor = '#a855f7'; // Purple
+            iconText = 'C';
+            break;
+          case 'shop':
+            iconColor = '#ec4899'; // Pink
+            iconText = 'S';
+            break;
+          case 'building':
+            iconColor = '#6b7280'; // Gray
+            iconText = 'B';
+            break;
+          default:
+            iconColor = '#3b82f6';
+            iconText = '?';
+        }
+      }
+    }
+
+    const borderRadius = iconShape === 'circle' ? '50%' : '5px';
+
+    return L.divIcon({
+      className: 'custom-poi-marker',
+      html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:${borderRadius}; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize / 2}px; font-weight:bold;">${iconText}</div>`,
+      iconSize: [iconSize, iconSize],
+      iconAnchor: [iconSize / 2, iconSize / 2]
+    });
+  };
 
   // Function to update GeoJSON layer visibility based on zoom
   const updateGeoJSONVisibility = () => {
@@ -130,6 +228,23 @@ const TorinoMapComponent: React.FC = () => {
       // Initialize Layer Groups
       geoJsonLayerGroupRef.current = L.layerGroup();
       subwayStationsLayerGroupRef.current = L.layerGroup();
+
+      // Add subway stations to their layer group
+      subwayStationsData.forEach(station => {
+        const { latitude, longitude } = convertCoordinates(station.x, station.y);
+        if (latitude !== 0 || longitude !== 0) { // Check for valid conversion
+          L.marker([latitude, longitude], {
+            icon: L.divIcon({
+              className: 'subway-station-marker',
+              html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            })
+          })
+          .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
+          .addTo(subwayStationsLayerGroupRef.current!);
+        }
+      });
 
       // Get TomTom API Key from environment variables
       const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
@@ -234,7 +349,17 @@ const TorinoMapComponent: React.FC = () => {
           // Clear existing GeoJSON layer from the group
           geoJsonLayerGroupRef.current.clearLayers();
 
-          geoJsonLayerRef.current = L.geoJSON(data, {
+          // Filter features based on selectedVehicleType and roadConditionFilter
+          const filteredFeatures = data.features.filter((feature: L.GeoJSON.Feature) => {
+            const properties = feature.properties;
+            const matchesVehicleType = selectedVehicleType === 'all' || 
+                                       (properties?.vehicle_type && properties.vehicle_type.toLowerCase() === selectedVehicleType.toLowerCase());
+            const matchesRoadCondition = roadConditionFilter === 'all' || 
+                                         (properties?.traffic_level && properties.traffic_level.toLowerCase() === roadConditionFilter.toLowerCase());
+            return matchesVehicleType && matchesRoadCondition;
+          });
+
+          geoJsonLayerRef.current = L.geoJSON({ ...data, features: filteredFeatures }, {
             onEachFeature: (feature, layer) => {
               // Bind popup with all properties
               if (feature.properties) {
@@ -247,59 +372,8 @@ const TorinoMapComponent: React.FC = () => {
               }
             },
             pointToLayer: (feature, latlng) => {
-              // Custom marker for points based on 'amenity' property
-              if (feature.properties && feature.properties.amenity) {
-                const amenity = feature.properties.amenity;
-                let iconColor = '#3b82f6'; // Default blue
-                let iconText = '';
-                let iconSize = 24;
-
-                switch (amenity) {
-                  case 'hospital':
-                    iconColor = '#ef4444'; // Red
-                    iconText = '+';
-                    break;
-                  case 'school':
-                    iconColor = '#22c55e'; // Green
-                    iconText = 'S';
-                    break;
-                  case 'park':
-                    iconColor = '#10b981'; // Teal
-                    iconText = 'P';
-                    break;
-                  case 'building': // Generic building
-                    iconColor = '#6b7280'; // Gray
-                    iconText = 'B';
-                    break;
-                  case 'restaurant':
-                    iconColor = '#f97316'; // Orange
-                    iconText = 'R';
-                    break;
-                  case 'cafe':
-                    iconColor = '#a855f7'; // Purple
-                    iconText = 'C';
-                    break;
-                  case 'shop':
-                    iconColor = '#ec4899'; // Pink
-                    iconText = 'S';
-                    break;
-                  // Add more cases as needed for other amenities
-                  default:
-                    iconColor = '#3b82f6'; // Default blue
-                    iconText = '?';
-                }
-
-                return L.marker(latlng, {
-                  icon: L.divIcon({
-                    className: 'custom-poi-marker',
-                    html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize/2}px; font-weight:bold;">${iconText}</div>`,
-                    iconSize: [iconSize, iconSize],
-                    iconAnchor: [iconSize / 2, iconSize / 2]
-                  })
-                });
-              }
-              // For other point features without amenity, use a default Leaflet marker
-              return L.marker(latlng);
+              // Custom marker for points based on 'vehicle_type' or 'amenity' property
+              return L.marker(latlng, { icon: getCustomIcon(feature) });
             },
             style: (feature) => {
               // Custom style for lines/polygons based on properties
@@ -316,6 +390,11 @@ const TorinoMapComponent: React.FC = () => {
               } else if (trafficLevel === 'low') {
                 color = 'green';
                 weight = 2;
+              }
+
+              // Apply roadConditionFilter to line styles as well
+              if (roadConditionFilter !== 'all' && trafficLevel?.toLowerCase() !== roadConditionFilter.toLowerCase()) {
+                return { opacity: 0 }; // Hide if it doesn't match the filter
               }
 
               return {
@@ -356,7 +435,7 @@ const TorinoMapComponent: React.FC = () => {
         mapRef.current = null;
       }
     };
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, [selectedVehicleType, roadConditionFilter]); // Re-run when filters change
 
   // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
   useEffect(() => {
