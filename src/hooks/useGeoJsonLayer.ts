@@ -116,11 +116,24 @@ export const useGeoJsonLayer = ({
         geoJsonDataRef.current = L.geoJSON({ ...data, features: filteredFeatures }, {
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
-              let popupContent = "<table>";
-              for (const key in feature.properties) {
-                popupContent += `<tr><td><b>${key}:</b></td><td>${feature.properties[key]}</td></tr>`;
+              let popupContent = `<div class="font-sans text-sm p-2">`;
+              
+              // Determine a title for the feature, prioritizing OSM ID if available
+              const featureId = feature.id || feature.properties.osm_id || 'N/A';
+              popupContent += `<h3 class="font-bold text-base mb-1">Way ${featureId}</h3>`;
+              
+              const propertyKeys = Object.keys(feature.properties);
+              popupContent += `<p class="text-xs text-gray-600 mb-2">Tags ${propertyKeys.length}</p>`;
+              
+              popupContent += `<div class="space-y-1">`;
+              for (const key of propertyKeys) {
+                // Exclude internal Leaflet properties or other non-relevant ones if needed
+                if (!key.startsWith('_') && key !== 'id' && key !== 'osm_id') { // Exclude id/osm_id if already used in title
+                  popupContent += `<p><strong>${key}:</strong> ${feature.properties[key]}</p>`;
+                }
               }
-              popupContent += "</table>";
+              popupContent += `</div>`;
+              popupContent += `</div>`;
               layer.bindPopup(popupContent);
             }
           },
