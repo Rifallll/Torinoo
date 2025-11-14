@@ -8,10 +8,8 @@ interface SettingsContextType {
   toggleTomTomLayer: () => void;
   isWeatherFeatureEnabled: boolean;
   toggleWeatherFeature: () => void;
-  isAirQualityFeatureEnabled: boolean;
-  toggleAirQualityFeature: () => void;
-  isTorinoPathsLayerEnabled: boolean; // New: State for Torino paths layer
-  toggleTorinoPathsLayer: () => void; // New: Toggle function for Torino paths layer
+  isAirQualityFeatureEnabled: boolean; // New: State for air quality feature
+  toggleAirQualityFeature: () => void; // New: Toggle function for air quality feature
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -42,14 +40,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     return true;
   });
 
-  const [isTorinoPathsLayerEnabled, setIsTorinoPathsLayerEnabled] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('isTorinoPathsLayerEnabled');
-      return saved ? JSON.parse(saved) : true; // Default to true
-    }
-    return true;
-  });
-
   // Persist state to localStorage whenever it changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -68,12 +58,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       localStorage.setItem('isAirQualityFeatureEnabled', JSON.stringify(isAirQualityFeatureEnabled));
     }
   }, [isAirQualityFeatureEnabled]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('isTorinoPathsLayerEnabled', JSON.stringify(isTorinoPathsLayerEnabled));
-    }
-  }, [isTorinoPathsLayerEnabled]);
 
   const toggleTomTomLayer = useCallback(() => {
     setIsTomTomLayerEnabled(prev => {
@@ -99,14 +83,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
   }, []);
 
-  const toggleTorinoPathsLayer = useCallback(() => {
-    setIsTorinoPathsLayerEnabled(prev => {
-      const newState = !prev;
-      toast.info(`Torino paths layer ${newState ? 'enabled' : 'disabled'}.`);
-      return newState;
-    });
-  }, []);
-
   return (
     <SettingsContext.Provider value={{ 
       isTomTomLayerEnabled, 
@@ -114,9 +90,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       isWeatherFeatureEnabled, 
       toggleWeatherFeature,
       isAirQualityFeatureEnabled,
-      toggleAirQualityFeature,
-      isTorinoPathsLayerEnabled, // New: Provide to context
-      toggleTorinoPathsLayer // New: Provide to context
+      toggleAirQualityFeature
     }}>
       {children}
     </SettingsContext.Provider>

@@ -42,7 +42,6 @@ import {
   Clock, // For All Trip Updates
   Leaf, // For Air Quality
   TrafficCone, // New: Import TrafficCone for Traffic Changes
-  Bike // New: Import Bike icon for Torino Paths
 } from "lucide-react";
 
 // Define searchable items
@@ -61,11 +60,12 @@ const searchableItems = [
       { label: "Culture, Cuisine & Tourism", value: "culture cuisine tourism", path: "/culture-tourism", icon: Palette },
       { label: "Contact & Collaboration", value: "contact collaboration", path: "/contact-collaboration", icon: Mail },
       { label: "Torino Weather Forecast", value: "torino weather forecast", path: "/weather", icon: CloudSun },
-      { label: "Detailed Weather Forecast", value: "detailed weather forecast", path: "/detailed-weather", icon: CloudSun },
+      { label: "Detailed Weather Forecast", value: "detailed weather forecast", path: "/detailed-weather", icon: CloudSun }, // New
       { label: "All Vehicle Positions", value: "all vehicle positions", path: "/all-vehicle-positions", icon: Car },
+      // { label: "All Trip Updates", value: "all trip updates", path: "/all-trip-updates", icon: Clock }, // Removed
       { label: "All GTFS Routes", value: "all gtfs routes", path: "/all-gtfs-routes", icon: RouteIcon },
-      { label: "Detailed Air Quality", value: "detailed air quality", path: "/detailed-air-quality", icon: Leaf },
-      { label: "Traffic Changes & Roadworks", value: "traffic changes roadworks", path: "/traffic-changes", icon: TrafficCone },
+      { label: "Detailed Air Quality", value: "detailed air quality", path: "/detailed-air-quality", icon: Leaf }, // New
+      { label: "Traffic Changes & Roadworks", value: "traffic changes roadworks", path: "/traffic-changes", icon: TrafficCone }, // New
       { label: "Settings", value: "settings", path: "/settings", icon: Settings },
     ],
   },
@@ -85,13 +85,6 @@ const searchableItems = [
       { label: "Visual Gallery", value: "visual gallery", path: "/about-torino#visual-gallery", icon: ImageIcon },
       { label: "Education & Research", value: "education research", path: "/about-torino#education-research", icon: GraduationCap },
       { label: "Cuisine", value: "cuisine", path: "/about-torino#cuisine", icon: Utensils },
-    ],
-  },
-  {
-    group: "Map Layers", // New group for map layers
-    items: [
-      { label: "Toggle TomTom Traffic Layer", value: "toggle tomtom traffic layer", path: "/settings", icon: TrafficCone },
-      { label: "Toggle Torino Paths Layer", value: "toggle torino paths layer", path: "/settings", icon: Bike }, // New
     ],
   },
 ];
