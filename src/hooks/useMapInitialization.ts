@@ -46,6 +46,9 @@ export const useMapInitialization = ({
     const map = L.map(mapContainerId, { preferCanvas: true }).setView(center, zoom);
     mapRef.current = map;
 
+    // Log map panes to check for markerPane
+    console.log("Leaflet Map Panes:", map.getPanes());
+
     // Add OpenStreetMap tile layer
     const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',

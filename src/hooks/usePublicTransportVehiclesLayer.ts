@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-// Removed: import React from 'react'; // No longer needed
 
 interface PublicTransportVehiclesLayerProps {
   map: L.Map | null;
@@ -40,9 +39,9 @@ export const usePublicTransportVehiclesLayer = ({
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
           
-          // SUPER SIMPLIFIED vehicle icon HTML for debugging
-          const vehicleIconHtml = `<div style="background-color:indigo; color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">${routeId.charAt(0)}</div>`;
-          console.log("Generated vehicle icon HTML:", vehicleIconHtml); // Log the HTML string
+          // EXTREMELY SIMPLIFIED vehicle icon HTML for debugging
+          const vehicleIconHtml = `<div>${routeId.charAt(0)}</div>`;
+          console.log("Public Transport Icon HTML:", vehicleIconHtml);
 
           const vehicleIcon = L.divIcon({
             className: 'custom-vehicle-marker',

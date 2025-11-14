@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-// import { renderToString } from 'react-dom/server'; // No longer needed
 import { convertCoordinates } from '../utils/coordinateConverter';
 
 // Import new modular hooks
@@ -72,10 +71,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   // Helper function to get custom icon for features (kept here as it's used by GeoJSON layer)
   const getCustomIcon = useCallback((feature: L.GeoJSON.Feature) => {
     const properties = feature.properties;
-    let iconColor = '#3b82f6'; // Default blue
     let iconText = '?';
-    let iconSize = 24;
-    let iconShape = 'circle'; // Default shape
 
     if (properties) {
       const vehicleType = properties.vehicle_type;
@@ -83,98 +79,23 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
       const buildingType = properties.building_type;
 
       if (vehicleType) {
-        switch (vehicleType.toLowerCase()) {
-          case 'car':
-            iconColor = '#3b82f6'; // Blue
-            iconText = 'C';
-            break;
-          case 'motorcycle':
-            iconColor = '#f97316'; // Orange
-            iconText = 'M';
-            break;
-          case 'bus':
-            iconColor = '#22c55e'; // Green
-            iconText = 'B';
-            break;
-          case 'truck':
-            iconColor = '#ef4444'; // Red
-            iconText = 'T';
-            break;
-          case 'tram':
-            iconColor = '#a855f7'; // Purple
-            iconText = 'TR';
-            iconSize = 30;
-            iconShape = 'square';
-            break;
-          case 'subway':
-            iconColor = '#6b7280'; // Gray
-            iconText = 'S';
-            iconSize = 30;
-            iconShape = 'square';
-            break;
-          default:
-            iconColor = '#3b82f6';
-            iconText = '?';
-        }
+        iconText = vehicleType.charAt(0).toUpperCase();
       } else if (amenity) {
-        switch (amenity.toLowerCase()) {
-          case 'hospital':
-            iconColor = '#ef4444'; // Red
-            iconText = '+';
-            break;
-          case 'school':
-            iconColor = '#22c55e'; // Green
-            iconText = 'S';
-            break;
-          case 'park':
-            iconColor = '#10b981'; // Teal
-            iconText = 'P';
-            break;
-          case 'restaurant':
-            iconColor = '#f97316'; // Orange
-            iconText = 'R';
-            break;
-          case 'cafe':
-            iconColor = '#a855f7'; // Purple
-            iconText = 'C';
-            break;
-          case 'shop':
-            iconColor = '#ec4899'; // Pink
-            iconText = 'S';
-            break;
-          case 'building':
-          case 'apartment':
-            iconColor = '#6b7280'; // Gray
-            iconText = 'B';
-            iconShape = 'square';
-            break;
-          default:
-            iconColor = '#3b82f6';
-            iconText = 'L';
-            iconSize = 20;
-            iconShape = 'circle';
-        }
-      } else if (buildingType && buildingType.toLowerCase() === 'residential') {
-        iconColor = '#800080'; // Purple
-        iconText = 'R';
-        iconShape = 'square';
-      } else {
-        iconColor = '#6b7280';
-        iconText = 'P';
-        iconSize = 20;
-        iconShape = 'circle';
+        iconText = amenity.charAt(0).toUpperCase();
+      } else if (buildingType) {
+        iconText = buildingType.charAt(0).toUpperCase();
       }
     }
 
-    // SUPER SIMPLIFIED HTML FOR DEBUGGING
-    const htmlString = `<div style="background-color:${iconColor}; color:white; width:${iconSize}px; height:${iconSize}px; border-radius:${iconShape === 'circle' ? '50%' : '5px'}; display:flex; align-items:center; justify-content:center; font-size:${iconSize / 2}px;">${iconText}</div>`;
-    console.log("Generated custom icon HTML:", htmlString); // Log the HTML string
+    // EXTREMELY SIMPLIFIED HTML FOR DEBUGGING
+    const htmlString = `<div>${iconText}</div>`;
+    console.log("GeoJSON Icon HTML:", htmlString);
 
     return L.divIcon({
       className: 'custom-poi-marker',
       html: htmlString,
-      iconSize: [iconSize, iconSize],
-      iconAnchor: [iconSize / 2, iconSize / 2]
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
     });
   }, []);
 
