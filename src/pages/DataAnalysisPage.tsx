@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Speedometer, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import ProjectPlanningSection from '@/components/ProjectPlanningSection';
 import { useTrafficData } from '@/contexts/TrafficDataContext'; // Import the new hook
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 
 const DataAnalysisPage = () => {
   const { uploadedData, analysisStatus, analysisProgress, analysisResults, startAnalysis, resetAnalysis } = useTrafficData();
@@ -110,32 +111,143 @@ const DataAnalysisPage = () => {
         </Card>
 
         {analysisStatus === 'completed' && analysisResults && (
-          <Card className="lg:col-span-2 flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold flex items-center">
-                <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" /> Hasil Analisis Simulasi
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-              <div className="space-y-2">
-                <p><strong>Total Catatan:</strong> {analysisResults.totalRecords}</p>
-                <p><strong>Lokasi Unik:</strong> {analysisResults.uniqueLocations}</p>
-                <p><strong>Kecepatan Rata-rata:</strong> {analysisResults.averageSpeed}</p>
-                <p><strong>Segmen Kemacetan Tinggi:</strong> {analysisResults.highCongestionSegments}</p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold text-lg mb-2">Wawasan Tambahan (Simulasi):</h3>
-                <ul className="list-disc list-inside pl-4">
-                  <li>Puncak kemacetan terdeteksi pada jam 07:00-09:00 dan 17:00-19:00.</li>
-                  <li>Via Roma dan Piazza Castello menunjukkan tingkat kemacetan tertinggi.</li>
-                  <li>Rekomendasi: Optimalkan lampu lalu lintas di persimpangan utama.</li>
-                </ul>
-              </div>
-              <p className="lg:col-span-2 text-sm text-gray-500 mt-4">
-                *Ini adalah hasil analisis simulasi. Sistem backend Python yang sebenarnya akan memberikan wawasan yang lebih mendalam.
-              </p>
-            </CardContent>
-          </Card>
+          <>
+            <Card className="lg:col-span-2 flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold flex items-center">
+                  <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" /> Hasil Analisis Data Lalu Lintas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div className="space-y-2">
+                  <p><strong>Total Catatan:</strong> {analysisResults.totalRecords}</p>
+                  <p><strong>Detektor Unik:</strong> {analysisResults.uniqueDetectors}</p>
+                  <p><strong>Kecepatan Rata-rata:</strong> {analysisResults.averageSpeed}</p>
+                  <p><strong>Aliran Rata-rata:</strong> {analysisResults.averageFlow}</p>
+                  <p><strong>Okupansi Rata-rata:</strong> {analysisResults.averageOccupancy}</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-lg mb-2">Wawasan Tambahan (Simulasi):</h3>
+                  <ul className="list-disc list-inside pl-4">
+                    <li>Puncak kemacetan terdeteksi pada jam 07:00-09:00 dan 17:00-19:00.</li>
+                    <li>Via Roma dan Piazza Castello menunjukkan tingkat kemacetan tertinggi.</li>
+                    <li>Rekomendasi: Optimalkan lampu lalu lintas di persimpangan utama.</li>
+                  </ul>
+                </div>
+                <p className="lg:col-span-2 text-sm text-gray-500 mt-4">
+                  *Ini adalah hasil analisis simulasi. Sistem backend Python yang sebenarnya akan memberikan wawasan yang lebih mendalam.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* New Card for Daily Speed Averages Chart */}
+            {analysisResults.dailySpeedAverages.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Speedometer className="h-5 w-5 mr-2 text-blue-600" /> Tren Kecepatan Rata-rata Harian
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={analysisResults.dailySpeedAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="day" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Kecepatan (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Line type="monotone" dataKey="averageSpeed" stroke="#8884d8" activeDot={{ r: 8 }} name="Kecepatan Rata-rata" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* New Card for Daily Flow Averages Chart */}
+            {analysisResults.dailyFlowAverages.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Cloud className="h-5 w-5 mr-2 text-green-600" /> Tren Aliran Lalu Lintas Harian
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={analysisResults.dailyFlowAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="day" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Aliran', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Line type="monotone" dataKey="averageFlow" stroke="#82ca9d" activeDot={{ r: 8 }} name="Aliran Rata-rata" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* New Card for Hourly Speed Averages Chart */}
+            {analysisResults.hourlySpeedAverages.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Speedometer className="h-5 w-5 mr-2 text-purple-600" /> Tren Kecepatan Rata-rata Per Jam
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={analysisResults.hourlySpeedAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="hour" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Kecepatan (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Line type="monotone" dataKey="averageSpeed" stroke="#a855f7" activeDot={{ r: 8 }} name="Kecepatan Rata-rata" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* New Card for Hourly Flow Averages Chart */}
+            {analysisResults.hourlyFlowAverages.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Cloud className="h-5 w-5 mr-2 text-orange-600" /> Tren Aliran Lalu Lintas Per Jam
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={analysisResults.hourlyFlowAverages} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="hour" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Aliran', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Line type="monotone" dataKey="averageFlow" stroke="#f97316" activeDot={{ r: 8 }} name="Aliran Rata-rata" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
 
         <Card className="lg:col-span-2 flex flex-col">

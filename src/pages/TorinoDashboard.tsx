@@ -21,9 +21,9 @@ import AirQualityCard from '@/components/AirQualityCard'; // New: Import AirQual
 import PublicTransportAlertsCard from '@/components/PublicTransportAlertsCard'; // Renamed and updated
 import VehiclePositionsCard from '@/components/VehiclePositionsCard'; // New component
 import GtfsRoutesCard from '@/components/GtfsRoutesCard'; // New component
-import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
+// import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart'; // Removed
 import QuickActionsCard from '@/components/QuickActionsCard';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Removed chart imports
 
 const TorinoDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,52 +35,6 @@ const TorinoDashboard = () => {
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
-
-  // Dummy data for quick actions and statistics - REMOVED as per user request
-  // const dummyStats = {
-  //   totalIncidents: 124,
-  //   resolvedIncidents: 89,
-  //   pendingIncidents: 22,
-  //   activeSensors: 12,
-  // };
-
-  // Adjusted dummy data for traffic flow prediction to be suitable for a chart
-  const trafficFlowPredictionData = [
-    { name: "Via Roma", "Low Congestion": 80, "Moderate Congestion": 15, "High Congestion": 5 },
-    { name: "Piazza Castello", "Low Congestion": 60, "Moderate Congestion": 30, "High Congestion": 10 },
-    { name: "Corso Vittorio Emanuele II", "Low Congestion": 40, "Moderate Congestion": 40, "High Congestion": 20 },
-    { name: "Main Street", "Low Congestion": 70, "Moderate Congestion": 20, "High Congestion": 10 },
-    { name: "Oak Avenue", "Low Congestion": 50, "Moderate Congestion": 35, "High Congestion": 15 },
-    { name: "Pine Road", "Low Congestion": 30, "Moderate Congestion": 45, "High Congestion": 25 },
-  ];
-
-  // Dummy data for Traffic Volume Trends (Last 24 Hours)
-  const trafficVolumeData = [
-    { hour: '00:00', volume: 120 },
-    { hour: '01:00', volume: 90 },
-    { hour: '02:00', volume: 70 },
-    { hour: '03:00', volume: 60 },
-    { hour: '04:00', volume: 80 },
-    { hour: '05:00', volume: 150 },
-    { hour: '06:00', volume: 280 },
-    { hour: '07:00', volume: 450 },
-    { hour: '08:00', volume: 520 },
-    { hour: '09:00', volume: 480 },
-    { hour: '10:00', volume: 350 },
-    { hour: '11:00', volume: 300 },
-    { hour: '12:00', volume: 380 },
-    { hour: '13:00', volume: 400 },
-    { hour: '14:00', volume: 370 },
-    { hour: '15:00', volume: 420 },
-    { hour: '16:00', volume: 500 },
-    { hour: '17:00', volume: 600 },
-    { hour: '18:00', volume: 550 },
-    { hour: '19:00', volume: 400 },
-    { hour: '20:00', volume: 300 },
-    { hour: '21:00', volume: 250 },
-    { hour: '22:00', volume: 200 },
-    { hour: '23:00', volume: 160 },
-  ];
 
   // Memoize callback functions for QuickActionsCard
   const handleUploadCSVClick = useCallback(() => {
@@ -165,7 +119,7 @@ const TorinoDashboard = () => {
                   />
                 </CardContent>
               </Card>
-              <TrafficSpeedDistributionChart />
+              {/* <TrafficSpeedDistributionChart /> */} {/* Removed */}
             </div>
 
             <div className="space-y-6">
@@ -175,7 +129,8 @@ const TorinoDashboard = () => {
               <VehiclePositionsCard /> {/* New component for vehicle positions */}
               <GtfsRoutesCard /> {/* New component for GTFS routes */}
 
-              <Card className="bg-white dark:bg-gray-800 shadow-lg">
+              {/* Removed: Traffic Flow Prediction Chart */}
+              {/* <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Flow Prediction</CardTitle>
                 </CardHeader>
@@ -205,9 +160,10 @@ const TorinoDashboard = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
-              </Card>
+              </Card> */}
 
-              <Card className="bg-white dark:bg-gray-800 shadow-lg">
+              {/* Removed: Traffic Volume Trends (Last 24 Hours) Chart */}
+              {/* <Card className="bg-white dark:bg-gray-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">Traffic Volume Trends (Last 24 Hours)</CardTitle>
                 </CardHeader>
@@ -235,7 +191,7 @@ const TorinoDashboard = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
-              </Card>
+              </Card> */}
 
               {/* Menggunakan komponen QuickActionsCard yang baru */}
               <QuickActionsCard
