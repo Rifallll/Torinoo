@@ -61,7 +61,7 @@ const searchableItems = [
       { label: "Torino Weather Forecast", value: "torino weather forecast", path: "/weather", icon: CloudSun },
       { label: "Detailed Weather Forecast", value: "detailed weather forecast", path: "/detailed-weather", icon: CloudSun }, // New
       { label: "All Vehicle Positions", value: "all vehicle positions", path: "/all-vehicle-positions", icon: Car },
-      { label: "All Trip Updates", value: "all trip updates", path: "/all-trip-updates", icon: Clock },
+      // { label: "All Trip Updates", value: "all trip updates", path: "/all-trip-updates", icon: Clock }, // Removed
       { label: "All GTFS Routes", value: "all gtfs routes", path: "/all-gtfs-routes", icon: RouteIcon },
       { label: "Detailed Air Quality", value: "detailed air quality", path: "/detailed-air-quality", icon: Leaf }, // New
       { label: "Settings", value: "settings", path: "/settings", icon: Settings },

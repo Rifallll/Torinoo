@@ -41,7 +41,7 @@ const navItems: NavItemConfig[] = [
       { label: "Incidents", path: "/incidents", icon: AlertTriangle },
       // { label: "Reports", path: "/reports", icon: BarChart2 }, // Removed: Uses dummy data
       { label: "All Vehicle Positions", path: "/all-vehicle-positions", icon: Car },
-      { label: "All Trip Updates", path: "/all-trip-updates", icon: Clock },
+      // { label: "All Trip Updates", path: "/all-trip-updates", icon: Clock }, // Removed
       { label: "All GTFS Routes", path: "/all-gtfs-routes", icon: Route },
     ],
   },

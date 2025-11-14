@@ -24,7 +24,7 @@ const ContactCollaborationPage = React.lazy(() => import("./pages/ContactCollabo
 const WeatherPage = React.lazy(() => import("./pages/WeatherPage"));
 const DetailedWeatherPage = React.lazy(() => import("./pages/DetailedWeatherPage")); // New: Import DetailedWeatherPage
 const AllVehiclePositionsPage = React.lazy(() => import("./pages/AllVehiclePositionsPage"));
-const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage"));
+// const AllTripUpdatesPage = React.lazy(() => import("./pages/AllTripUpdatesPage")); // Removed
 const AllGtfsRoutesPage = React.lazy(() => import("./pages/AllGtfsRoutesPage"));
 const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
 const DetailedAirQualityPage = React.lazy(() => import("./pages/DetailedAirQualityPage")); // New: Import DetailedAirQualityPage
@@ -59,7 +59,7 @@ const App = () => (
                       <Route path="/weather" element={<WeatherPage />} />
                       <Route path="/detailed-weather" element={<DetailedWeatherPage />} /> {/* New route */}
                       <Route path="/all-vehicle-positions" element={<AllVehiclePositionsPage />} />
-                      <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} />
+                      {/* <Route path="/all-trip-updates" element={<AllTripUpdatesPage />} /> */}
                       <Route path="/all-gtfs-routes" element={<AllGtfsRoutesPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
                       <Route path="/detailed-air-quality" element={<DetailedAirQualityPage />} /> {/* New route */}
