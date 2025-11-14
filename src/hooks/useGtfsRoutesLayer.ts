@@ -21,13 +21,17 @@ export const useGtfsRoutesLayer = ({
 }: UseGtfsRoutesLayerProps) => {
   const { data: gtfsData, isLoading: isLoadingGtfs, error: gtfsError } = useGtfsData();
 
-  // Effect for fetching and rendering GTFS routes
   useEffect(() => {
     if (!map || !gtfsRoutesLayerGroup || isLoadingGtfs || gtfsError || !gtfsData) {
       return;
     }
 
-    const renderGtfsRoutes = () => {
+    const setupGtfsRoutesLayer = () => {
+      // 1. Add the layer group to the map first (if not already added)
+      if (!map.hasLayer(gtfsRoutesLayerGroup)) {
+        gtfsRoutesLayerGroup.addTo(map);
+      }
+
       gtfsRoutesLayerGroup.clearLayers(); // Clear existing routes
 
       const { routes, shapes, trips, agencies } = gtfsData; // Destructure trips as well
@@ -87,42 +91,42 @@ export const useGtfsRoutesLayer = ({
           }
         });
       });
+
+      // Effect for managing visibility based on zoom
+      const updateVisibility = () => {
+        if (map.getZoom() >= minZoomForGtfsRoutes) {
+          if (!map.hasLayer(gtfsRoutesLayerGroup)) {
+            gtfsRoutesLayerGroup.addTo(map);
+            toast.info("Lapisan rute transportasi publik ditampilkan.");
+          }
+        } else {
+          if (map.hasLayer(gtfsRoutesLayerGroup)) {
+            map.removeLayer(gtfsRoutesLayerGroup);
+            toast.info("Lapisan rute transportasi publik disembunyikan (perkecil untuk performa).");
+          }
+        }
+      };
+
+      map.on('zoomend', updateVisibility);
+      updateVisibility(); // Initial check
+
+      return () => {
+        map.off('zoomend', updateVisibility);
+        if (map.hasLayer(gtfsRoutesLayerGroup)) {
+          map.removeLayer(gtfsRoutesLayerGroup);
+        }
+      };
     };
 
-    map.whenReady(renderGtfsRoutes); // Render routes when map is ready
+    map.whenReady(setupGtfsRoutesLayer); // Render routes when map is ready
 
     // Cleanup function
     return () => {
       gtfsRoutesLayerGroup.clearLayers();
-    };
-  }, [map, gtfsRoutesLayerGroup, gtfsData, gtfsRouteTypeFilter, isLoadingGtfs, gtfsError]);
-
-  // Effect for managing visibility based on zoom
-  useEffect(() => {
-    if (!map || !gtfsRoutesLayerGroup) return;
-
-    const updateVisibility = () => {
-      if (map.getZoom() >= minZoomForGtfsRoutes) {
-        if (!map.hasLayer(gtfsRoutesLayerGroup)) {
-          gtfsRoutesLayerGroup.addTo(map);
-          toast.info("Lapisan rute transportasi publik ditampilkan.");
-        }
-      } else {
-        if (map.hasLayer(gtfsRoutesLayerGroup)) {
-          map.removeLayer(gtfsRoutesLayerGroup);
-          toast.info("Lapisan rute transportasi publik disembunyikan (perkecil untuk performa).");
-        }
-      }
-    };
-
-    map.on('zoomend', updateVisibility);
-    map.whenReady(updateVisibility); // Initial check after map is ready
-
-    return () => {
-      map.off('zoomend', updateVisibility);
-      if (map.hasLayer(gtfsRoutesLayerGroup)) { // Ensure layer is removed on unmount
+      // Ensure the layer group is removed from the map on unmount
+      if (map.hasLayer(gtfsRoutesLayerGroup)) {
         map.removeLayer(gtfsRoutesLayerGroup);
       }
     };
-  }, [map, gtfsRoutesLayerGroup, minZoomForGtfsRoutes]);
+  }, [map, gtfsRoutesLayerGroup, gtfsData, gtfsRouteTypeFilter, isLoadingGtfs, gtfsError, minZoomForGtfsRoutes]);
 };

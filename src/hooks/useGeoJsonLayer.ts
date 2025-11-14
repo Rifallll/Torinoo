@@ -22,11 +22,16 @@ export const useGeoJsonLayer = ({
 }: UseGeoJsonLayerProps) => {
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
 
-  // Effect for fetching and rendering GeoJSON data
   useEffect(() => {
     if (!map || !geoJsonLayerGroup) return;
 
-    const fetchAndRenderGeoJSON = async () => {
+    const setupGeoJsonLayer = async () => {
+      // 1. Add the layer group to the map first (if not already added)
+      // This ensures the layer group's internal DOM structures are ready
+      if (!map.hasLayer(geoJsonLayerGroup)) {
+        geoJsonLayerGroup.addTo(map);
+      }
+
       try {
         const response = await fetch('/export.geojson');
         if (!response.ok) {
@@ -90,9 +95,8 @@ export const useGeoJsonLayer = ({
         });
         geoJsonLayerRef.current.addTo(geoJsonLayerGroup);
 
-        // Only fit map bounds if the layer group is currently on the map
-        // and the map is ready. This prevents the _leaflet_pos error.
-        if (map.hasLayer(geoJsonLayerGroup) && geoJsonLayerRef.current.getBounds().isValid()) {
+        // Only fit map bounds if the layer has valid bounds
+        if (geoJsonLayerRef.current.getBounds().isValid()) {
           map.fitBounds(geoJsonLayerRef.current.getBounds());
         }
 
@@ -100,47 +104,46 @@ export const useGeoJsonLayer = ({
         console.error("Error loading GeoJSON data:", error);
         toast.error(`Gagal memuat data GeoJSON: ${error instanceof Error ? error.message : String(error)}. Pastikan file 'export.geojson' ada di folder 'public'.`);
       }
+
+      // Effect for managing visibility based on zoom
+      const updateVisibility = () => {
+        if (map.getZoom() >= minZoomForGeoJSON) {
+          if (!map.hasLayer(geoJsonLayerGroup)) {
+            geoJsonLayerGroup.addTo(map);
+            toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
+          }
+        } else {
+          if (map.hasLayer(geoJsonLayerGroup)) {
+            map.removeLayer(geoJsonLayerGroup);
+            toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
+          }
+        }
+      };
+
+      map.on('zoomend', updateVisibility);
+      updateVisibility(); // Initial check
+
+      return () => {
+        map.off('zoomend', updateVisibility);
+        if (map.hasLayer(geoJsonLayerGroup)) {
+          map.removeLayer(geoJsonLayerGroup);
+        }
+      };
     };
 
-    // Call fetch and render when map is ready
-    map.whenReady(fetchAndRenderGeoJSON);
+    // Call setup function when map is ready
+    map.whenReady(setupGeoJsonLayer);
 
-    // Cleanup function
+    // Cleanup function for the useEffect
     return () => {
       if (geoJsonLayerRef.current) {
         geoJsonLayerGroup.removeLayer(geoJsonLayerRef.current);
         geoJsonLayerRef.current = null;
       }
-    };
-  }, [map, geoJsonLayerGroup, selectedVehicleType, roadConditionFilter]); // Dependencies for re-fetching/re-rendering
-
-  // Effect for managing visibility based on zoom
-  useEffect(() => {
-    if (!map || !geoJsonLayerGroup) return;
-
-    const updateVisibility = () => {
-      if (map.getZoom() >= minZoomForGeoJSON) {
-        if (!map.hasLayer(geoJsonLayerGroup)) {
-          geoJsonLayerGroup.addTo(map);
-          toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
-        }
-      } else {
-        if (map.hasLayer(geoJsonLayerGroup)) {
-          map.removeLayer(geoJsonLayerGroup);
-          toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
-        }
-      }
-    };
-
-    map.on('zoomend', updateVisibility);
-    map.whenReady(updateVisibility); // Initial check after map is ready
-
-    return () => {
-      map.off('zoomend', updateVisibility);
-      if (map.hasLayer(geoJsonLayerGroup)) { // Ensure layer is removed on unmount
+      // Ensure the layer group is removed from the map on unmount
+      if (map.hasLayer(geoJsonLayerGroup)) {
         map.removeLayer(geoJsonLayerGroup);
       }
     };
-  }, [map, geoJsonLayerGroup, minZoomForGeoJSON]); // Dependencies for visibility management
-
+  }, [map, geoJsonLayerGroup, selectedVehicleType, roadConditionFilter, minZoomForGeoJSON]);
 };

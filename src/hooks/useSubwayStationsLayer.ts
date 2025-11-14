@@ -27,7 +27,12 @@ export const useSubwayStationsLayer = ({
   useEffect(() => {
     if (!map || !subwayStationsLayerGroup) return;
 
-    const renderSubwayStations = () => {
+    const setupSubwayStationsLayer = () => {
+      // 1. Add the layer group to the map first (if not already added)
+      if (!map.hasLayer(subwayStationsLayerGroup)) {
+        subwayStationsLayerGroup.addTo(map);
+      }
+
       // Clear existing markers
       subwayStationsLayerGroup.clearLayers();
 
@@ -47,35 +52,41 @@ export const useSubwayStationsLayer = ({
           .addTo(subwayStationsLayerGroup);
         }
       });
-    };
 
-    // Render stations when map is ready
-    map.whenReady(renderSubwayStations);
-
-    // Effect for managing visibility based on zoom
-    const updateVisibility = () => {
-      if (map.getZoom() >= minZoomForSubwayStations) {
-        if (!map.hasLayer(subwayStationsLayerGroup)) {
-          subwayStationsLayerGroup.addTo(map);
-          toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+      // Effect for managing visibility based on zoom
+      const updateVisibility = () => {
+        if (map.getZoom() >= minZoomForSubwayStations) {
+          if (!map.hasLayer(subwayStationsLayerGroup)) {
+            subwayStationsLayerGroup.addTo(map);
+            toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+          }
+        } else {
+          if (map.hasLayer(subwayStationsLayerGroup)) {
+            map.removeLayer(subwayStationsLayerGroup);
+            toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
+          }
         }
-      } else {
+      };
+
+      map.on('zoomend', updateVisibility);
+      updateVisibility(); // Initial check
+
+      return () => {
+        map.off('zoomend', updateVisibility);
         if (map.hasLayer(subwayStationsLayerGroup)) {
           map.removeLayer(subwayStationsLayerGroup);
-          toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
         }
-      }
+      };
     };
 
-    map.on('zoomend', updateVisibility);
-    map.whenReady(updateVisibility); // Initial check after map is ready
+    map.whenReady(setupSubwayStationsLayer);
 
     return () => {
-      map.off('zoomend', updateVisibility);
-      if (map.hasLayer(subwayStationsLayerGroup)) { // Ensure layer is removed on unmount
+      subwayStationsLayerGroup.clearLayers(); // Clear all layers on unmount
+      // Ensure the layer group is removed from the map on unmount
+      if (map.hasLayer(subwayStationsLayerGroup)) {
         map.removeLayer(subwayStationsLayerGroup);
       }
-      subwayStationsLayerGroup.clearLayers(); // Clear all layers on unmount
     };
   }, [map, subwayStationsLayerGroup, subwayStationsData, minZoomForSubwayStations]);
 };
