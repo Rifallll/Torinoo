@@ -36,13 +36,13 @@ const TorinoDashboard = () => {
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
 
-  // Dummy data for quick actions and statistics
-  const dummyStats = {
-    totalIncidents: 124,
-    resolvedIncidents: 89,
-    pendingIncidents: 22,
-    activeSensors: 12,
-  };
+  // Dummy data for quick actions and statistics - REMOVED as per user request
+  // const dummyStats = {
+  //   totalIncidents: 124,
+  //   resolvedIncidents: 89,
+  //   pendingIncidents: 22,
+  //   activeSensors: 12,
+  // };
 
   // Adjusted dummy data for traffic flow prediction to be suitable for a chart
   const trafficFlowPredictionData = [
@@ -99,7 +99,8 @@ const TorinoDashboard = () => {
         <TorinoHeader setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* Removed: Dummy statistic cards */}
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Incidents</CardTitle>
@@ -148,7 +149,7 @@ const TorinoDashboard = () => {
                 </p>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -244,10 +245,10 @@ const TorinoDashboard = () => {
             </div>
           </div>
 
-          {/* New section for Recent News */}
-          <div className="mt-6">
+          {/* Removed: RecentNewsSection as it uses dummy data */}
+          {/* <div className="mt-6">
             <RecentNewsSection />
-          </div>
+          </div> */}
         </main>
       </div>
 
