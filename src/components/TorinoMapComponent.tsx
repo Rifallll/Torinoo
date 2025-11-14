@@ -1,28 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
-import 'leaflet-draw/dist/leaflet.draw.css'; // Import Leaflet.draw CSS
-import 'leaflet-draw'; // Import Leaflet.draw JS
-import { toast } from 'sonner';
-import ReactDOM from 'react-dom/client'; // Import ReactDOM for rendering React component into Leaflet control
-
-// Import custom hooks and utilities
-import { useSettings } from '@/contexts/SettingsContext';
-import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
-import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-import { convertCoordinates } from '../utils/coordinateConverter';
-
-// Import new modular hooks
-import { useMapInitialization } from '@/hooks/useMapInitialization';
-import { useGeoJsonLayer } from '@/hooks/useGeoJsonLayer';
-import { useSubwayStationsLayer } from '@/hooks/useSubwayStationsLayer';
-import { useTomTomTrafficLayer } from '@/hooks/useTomTomTrafficLayer';
-import { usePublicTransportVehiclesLayer } from '@/hooks/usePublicTransportVehiclesLayer';
-import MapLegend from './MapLegend'; // Import the new MapLegend component
+import { toast } from 'sonner'; // Import toast for user feedback
+import { convertCoordinates } from '../utils/coordinateConverter'; // Import the coordinate converter
+import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -38,19 +23,26 @@ L.Icon.Default.mergeOptions({
 interface TorinoMapComponentProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
-  onFeatureClick: (properties: { [key: string]: any }) => void; // Add this prop
 }
 
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter, onFeatureClick }) => {
+const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter }) => {
+  const mapRef = useRef<L.Map | null>(null);
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
+  const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
+  const subwayStationsLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for subway stations layer group
+  const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null); // Ref for TomTom layer
+
+  const { isTomTomLayerEnabled } = useSettings(); // Use the setting
+
   const torinoCenter: [number, number] = [45.0703, 7.6869];
   const defaultZoom = 13;
-  const minZoomForGeoJSON = 15;
-  const minZoomForSubwayStations = 12;
-  const minZoomForPublicTransport = 12;
-  const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
-  const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+  const minZoomForGeoJSON = 15; // Increased from 14 to 15 to reduce clutter at lower zoom levels
+  const minZoomForSubwayStations = 12; // Changed: Minimum zoom level for subway stations to appear (was 14)
 
-  // Subway Stations Static Data (moved here to be passed to useMapInitialization)
+  // Define approximate bounding box for Torino (South-West, North-East)
+  const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
+
+  // Dummy data for subway stations (using original EPSG:3003 coordinates)
   const subwayStationsData = [
     { name: "Fermi", x: 1494000, y: 4990000 },
     { name: "Paradiso", x: 1495000, y: 4990500 },
@@ -73,171 +65,415 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     { name: "Bengasi", x: 1506000, y: 4996400 },
   ];
 
-  // Initialize the map and get layer groups
-  const {
-    map,
-    geoJsonLayerGroup,
-    subwayStationsLayerGroup,
-    tomtomTrafficFlowLayer,
-    publicTransportVehiclesLayerGroup,
-    isMapLoaded, // Receive the new state
-  } = useMapInitialization({
-    mapContainerId: 'torino-map',
-    center: torinoCenter,
-    zoom: defaultZoom,
-    bounds: torinoBounds,
-    tomtomApiKey: tomtomApiKey,
-    subwayStationsData: subwayStationsData,
-  });
+  // Helper function to get custom icon for features
+  const getCustomIcon = (feature: L.GeoJSON.Feature) => {
+    const properties = feature.properties;
+    let iconColor = '#3b82f6'; // Default blue
+    let iconText = '?';
+    let iconSize = 24;
+    let iconShape = 'circle'; // Default shape
 
-  // Manage GeoJSON layer
-  useGeoJsonLayer({
-    map,
-    layerGroup: geoJsonLayerGroup,
-    selectedVehicleType,
-    roadConditionFilter,
-    minZoom: minZoomForGeoJSON,
-    isMapLoaded, // Pass the state
-    onFeatureClick, // Pass the handler here
-  });
+    if (properties) {
+      const vehicleType = properties.vehicle_type;
+      const amenity = properties.amenity;
+      const buildingType = properties.building_type; // Assuming this might exist for buildings
 
-  // Manage Subway Stations layer
-  useSubwayStationsLayer({
-    map,
-    layerGroup: subwayStationsLayerGroup,
-    minZoom: minZoomForSubwayStations,
-    subwayStationsData: subwayStationsData,
-    isMapLoaded, // Pass the state
-  });
-
-  // Manage TomTom Traffic layer
-  useTomTomTrafficLayer({
-    map,
-    layer: tomtomTrafficFlowLayer,
-    bounds: torinoBounds,
-    isMapLoaded, // Pass the state
-  });
-
-  // Manage Public Transport Vehicles layer
-  usePublicTransportVehiclesLayer({
-    map,
-    layerGroup: publicTransportVehiclesLayerGroup,
-    minZoom: minZoomForPublicTransport,
-    bounds: torinoBounds,
-    isMapLoaded, // Pass the state
-  });
-
-  // Effect to add the React-based legend control
-  useEffect(() => {
-    if (!map || !isMapLoaded) return;
-
-    let reactRoot: ReactDOM.Root | null = null; // To store the React root instance
-
-    // Create a custom Leaflet control for the React component
-    const ReactControl = L.Control.extend({
-      onAdd: function(map: L.Map) {
-        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        // Prevent click events from propagating to the map
-        L.DomEvent.disableClickPropagation(container);
-        
-        // Add inline style for z-index to ensure visibility
-        container.style.zIndex = '1000'; 
-        
-        // Create and render the React component
-        reactRoot = ReactDOM.createRoot(container);
-        reactRoot.render(<MapLegend />);
-        
-        console.log("Legend control container created and React component rendered.");
-        return container;
-      },
-      onRemove: function(map: L.Map) {
-        if (reactRoot) {
-          reactRoot.unmount(); // Proper cleanup for React 18
-          reactRoot = null;
-          console.log("Legend control React component unmounted.");
+      if (vehicleType) {
+        switch (vehicleType.toLowerCase()) {
+          case 'car':
+            iconColor = '#3b82f6'; // Blue
+            iconText = 'C';
+            break;
+          case 'motorcycle':
+            iconColor = '#f97316'; // Orange
+            iconText = 'M';
+            break;
+          case 'bus':
+            iconColor = '#22c55e'; // Green
+            iconText = 'B';
+            break;
+          case 'truck':
+            iconColor = '#ef4444'; // Red
+            iconText = 'T';
+            break;
+          case 'tram':
+            iconColor = '#a855f7'; // Purple
+            iconText = 'TR';
+            iconSize = 30;
+            iconShape = 'square';
+            break;
+          case 'subway':
+            iconColor = '#6b7280'; // Gray
+            iconText = 'S';
+            iconSize = 30;
+            iconShape = 'square';
+            break;
+          default:
+            iconColor = '#3b82f6';
+            iconText = '?';
         }
-      },
+      } else if (amenity) {
+        switch (amenity.toLowerCase()) {
+          case 'hospital':
+            iconColor = '#ef4444'; // Red
+            iconText = '+';
+            break;
+          case 'school':
+            iconColor = '#22c55e'; // Green
+            iconText = 'S';
+            break;
+          case 'park':
+            iconColor = '#10b981'; // Teal
+            iconText = 'P';
+            break;
+          case 'restaurant':
+            iconColor = '#f97316'; // Orange
+            iconText = 'R';
+            break;
+          case 'cafe':
+            iconColor = '#a855f7'; // Purple
+            iconText = 'C';
+            break;
+          case 'shop':
+            iconColor = '#ec4899'; // Pink
+            iconText = 'S';
+            break;
+          case 'building':
+          case 'apartment': // Explicitly handle 'apartment'
+            iconColor = '#6b7280'; // Gray
+            iconText = 'B'; // 'B' for Building, or 'A' for Apartment if preferred
+            iconShape = 'square';
+            break;
+          default: // For other amenities not explicitly listed
+            iconColor = '#3b82f6'; // Default blue
+            iconText = 'L'; // 'L' for Location/Landmark
+            iconSize = 20;
+            iconShape = 'circle';
+        }
+      } else if (buildingType && buildingType.toLowerCase() === 'residential') { // Handle generic residential buildings
+        iconColor = '#800080'; // Purple
+        iconText = 'R';
+        iconShape = 'square';
+      } else {
+        // Fallback for any point feature without specific vehicle_type or amenity/building_type
+        iconColor = '#6b7280'; // Darker gray for generic points
+        iconText = 'P'; // 'P' for Point of Interest
+        iconSize = 20;
+        iconShape = 'circle';
+      }
+    }
+
+    const borderRadius = iconShape === 'circle' ? '50%' : '5px';
+
+    return L.divIcon({
+      className: 'custom-poi-marker',
+      html: `<div style="background-color:${iconColor}; width:${iconSize}px; height:${iconSize}px; border-radius:${borderRadius}; display:flex; align-items:center; justify-content:center; color:white; font-size:${iconSize / 2}px; font-weight:bold; opacity:0.1;">${iconText}</div>`,
+      iconSize: [iconSize, iconSize],
+      iconAnchor: [iconSize / 2, iconSize / 2]
     });
+  };
 
-    const legendControl = new ReactControl({ position: 'bottomright' });
-    legendControl.addTo(map);
+  // Function to update GeoJSON layer visibility based on zoom
+  const updateGeoJSONVisibility = () => {
+    if (!mapRef.current || !geoJsonLayerGroupRef.current) return;
 
-    return () => {
-      if (map.hasControl(legendControl)) {
-        map.removeControl(legendControl);
+    if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
+      if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+        geoJsonLayerGroupRef.current.addTo(mapRef.current);
+        toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
+      }
+    } else {
+      if (mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+        mapRef.current.removeLayer(geoJsonLayerGroupRef.current);
+        toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
+      }
+    }
+  };
+
+  // Function to update Subway Stations layer visibility based on zoom
+  const updateSubwayStationsVisibility = () => {
+    if (!mapRef.current || !subwayStationsLayerGroupRef.current) return;
+
+    if (mapRef.current.getZoom() >= minZoomForSubwayStations) {
+      if (!mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
+        subwayStationsLayerGroupRef.current.addTo(mapRef.current);
+        toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
+      }
+    } else {
+      if (mapRef.current.hasLayer(subwayStationsLayerGroupRef.current)) {
+        mapRef.current.removeLayer(subwayStationsLayerGroupRef.current);
+        toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
+      }
+    }
+  };
+
+  // Function to manage TomTom Traffic Flow layer visibility based on map bounds AND toggle state
+  const updateTomTomTrafficVisibility = () => {
+    if (!mapRef.current || !tomtomTrafficFlowLayerRef.current) return;
+
+    const currentMapBounds = mapRef.current.getBounds();
+    const isTomTomLayerActive = mapRef.current.hasLayer(tomtomTrafficFlowLayerRef.current);
+    const isWithinTorino = currentMapBounds.intersects(torinoBounds);
+
+    console.log("TomTom Visibility Check:");
+    console.log("  isTomTomLayerEnabled:", isTomTomLayerEnabled);
+    console.log("  isWithinTorinoBounds:", isWithinTorino);
+    console.log("  isTomTomLayerCurrentlyActive:", isTomTomLayerActive);
+
+    if (isTomTomLayerEnabled && isWithinTorino) {
+      if (!isTomTomLayerActive) {
+        tomtomTrafficFlowLayerRef.current.addTo(mapRef.current);
+        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
+        console.log("  Adding TomTom layer to map.");
+      } else {
+        console.log("  TomTom layer already active.");
+      }
+    } else {
+      if (isTomTomLayerActive) {
+        mapRef.current.removeLayer(tomtomTrafficFlowLayerRef.current);
+        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
+        console.log("  Removing TomTom layer from map.");
+      } else {
+        console.log("  TomTom layer already inactive or not added.");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!mapRef.current) {
+      // Initialize map with preferCanvas: true for better performance with complex vector data
+      mapRef.current = L.map('torino-map', { preferCanvas: true }).setView(torinoCenter, defaultZoom);
+
+      // Add OpenStreetMap tile layer
+      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      });
+      osmLayer.addTo(mapRef.current);
+
+      // Initialize Layer Groups
+      geoJsonLayerGroupRef.current = L.layerGroup();
+      subwayStationsLayerGroupRef.current = L.layerGroup();
+
+      // Add subway stations to their layer group
+      subwayStationsData.forEach(station => {
+        const { latitude, longitude } = convertCoordinates(station.x, station.y);
+        if (latitude !== 0 || longitude !== 0) { // Check for valid conversion
+          L.marker([latitude, longitude], {
+            icon: L.divIcon({
+              className: 'subway-station-marker',
+              html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            })
+          })
+          .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
+          .addTo(subwayStationsLayerGroupRef.current!);
+        }
+      });
+
+      // Get TomTom API Key from environment variables
+      const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
+      console.log("TomTom API Key (masked):", tomtomApiKey ? tomtomApiKey.substring(0, 5) + '...' + tomtomApiKey.substring(tomtomApiKey.length - 5) : 'NOT_SET');
+      
+      if (tomtomApiKey && tomtomApiKey !== 'YOUR_TOMTOM_API_KEY_HERE') {
+        tomtomTrafficFlowLayerRef.current = L.tileLayer(
+          `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
+          {
+            attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
+            maxZoom: 19,
+            opacity: 1.0, // Mengubah opasitas menjadi 1.0
+          }
+        );
+      } else {
+        toast.warning("Kunci API TomTom tidak ditemukan atau belum diatur. Lapisan lalu lintas TomTom tidak akan tersedia.");
+        console.warn("TomTom API Key is missing or is the placeholder. TomTom traffic layer will not be available.");
+      }
+
+      // Add Geocoder control
+      L.Control.geocoder({
+        defaultMarkGeocode: false,
+      })
+      .on('markgeocode', function(e: any) {
+        const bbox = e.geocode.bbox;
+        const poly = L.polygon([
+          [bbox.getSouthEast().lat, bbox.getSouthEast().lng],
+          [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
+          [bbox.getNorthWest().lat, bbox.getNorthWest().lng],
+          [bbox.getSouthWest().lat, bbox.getSouthWest().lng]
+        ]).addTo(mapRef.current!);
+        mapRef.current!.fitBounds(poly.getBounds());
+      })
+      .addTo(mapRef.current!);
+
+      // Add Fullscreen control (simple custom button)
+      const FullscreenControl = L.Control.extend({
+        onAdd: function(map: L.Map) {
+          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+          container.innerHTML = '<button title="Toggle Fullscreen" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x26F6;</button>';
+          container.onclick = () => {
+            if (document.fullscreenElement) {
+              document.exitFullscreen();
+            } else {
+              map.getContainer().requestFullscreen();
+            }
+          };
+          return container;
+        },
+        onRemove: function(map: L.Map) {},
+      });
+      new FullscreenControl({ position: 'topleft' }).addTo(mapRef.current);
+
+      // Add Layer control
+      const baseLayers = {
+        "OpenStreetMap": osmLayer,
+        "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
+        "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
+      };
+      const overlayLayers: { [key: string]: L.Layer } = {
+        "Traffic Data (GeoJSON)": geoJsonLayerGroupRef.current,
+        "Subway Stations": subwayStationsLayerGroupRef.current,
+      };
+
+      // Only add TomTom layer to control if it was successfully initialized
+      if (tomtomTrafficFlowLayerRef.current) {
+        overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayerRef.current;
+      }
+
+      L.control.layers(baseLayers, overlayLayers).addTo(mapRef.current);
+
+      // Reset view control
+      const ResetViewControl = L.Control.extend({
+        onAdd: function(map: L.Map) {
+          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+          container.innerHTML = '<button title="Reset View" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x21BA;</button>';
+          container.onclick = () => {
+            map.setView(torinoCenter, defaultZoom);
+          };
+          return container;
+        },
+        onRemove: function(map: L.Map) {},
+      });
+      new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
+
+      // Add event listeners for zoom and move changes
+      mapRef.current.on('zoomend', updateGeoJSONVisibility);
+      mapRef.current.on('zoomend', updateSubwayStationsVisibility);
+      mapRef.current.on('moveend', updateTomTomTrafficVisibility);
+      mapRef.current.on('zoomend', updateTomTomTrafficVisibility);
+
+      // Initial check for visibility
+      updateGeoJSONVisibility();
+      updateSubwayStationsVisibility();
+    }
+
+    // Fetch and add GeoJSON data
+    const fetchGeoJSON = async () => {
+      try {
+        const response = await fetch('/export.geojson'); // Path to the GeoJSON file in the public folder
+        if (!response.ok) {
+          throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
+        }
+        const data = await response.json();
+
+        if (mapRef.current && geoJsonLayerGroupRef.current) {
+          // Clear existing GeoJSON layer from the group
+          geoJsonLayerGroupRef.current.clearLayers();
+
+          // Filter features based on selectedVehicleType and roadConditionFilter
+          const filteredFeatures = data.features.filter((feature: L.GeoJSON.Feature) => {
+            const properties = feature.properties;
+            const matchesVehicleType = selectedVehicleType === 'all' || 
+                                       (properties?.vehicle_type && properties.vehicle_type.toLowerCase() === selectedVehicleType.toLowerCase());
+            const matchesRoadCondition = roadConditionFilter === 'all' || 
+                                         (properties?.traffic_level && properties.traffic_level.toLowerCase() === roadConditionFilter.toLowerCase());
+            return matchesVehicleType && matchesRoadCondition;
+          });
+
+          geoJsonLayerRef.current = L.geoJSON({ ...data, features: filteredFeatures }, {
+            onEachFeature: (feature, layer) => {
+              // Bind popup with all properties
+              if (feature.properties) {
+                let popupContent = "<table>";
+                for (const key in feature.properties) {
+                  popupContent += `<tr><td><b>${key}:</b></td><td>${feature.properties[key]}</td></tr>`;
+                }
+                popupContent += "</table>";
+                layer.bindPopup(popupContent);
+              }
+            },
+            pointToLayer: (feature, latlng) => {
+              // Custom marker for points based on 'vehicle_type' or 'amenity' property
+              return L.marker(latlng, { icon: getCustomIcon(feature) });
+            },
+            style: (feature) => {
+              // Custom style for lines/polygons based on properties
+              const trafficLevel = feature?.properties?.traffic_level;
+              let color = '#6b7280'; // Changed default to a darker gray
+              let weight = 3;
+
+              if (trafficLevel === 'high') {
+                color = 'red';
+                weight = 4;
+              } else if (trafficLevel === 'moderate') {
+                color = 'orange';
+                weight = 3;
+              } else if (trafficLevel === 'low') {
+                color = 'green';
+                weight = 2;
+              }
+
+              // Apply roadConditionFilter to line styles as well
+              if (roadConditionFilter !== 'all' && trafficLevel?.toLowerCase() !== roadConditionFilter.toLowerCase()) {
+                return { opacity: 0 }; // Hide if it doesn't match the filter
+              }
+
+              return {
+                color: color,
+                weight: weight,
+                opacity: 0.1 // Mengurangi opasitas menjadi 0.1 untuk membuatnya sangat transparan
+              };
+            }
+          });
+          geoJsonLayerRef.current.addTo(geoJsonLayerGroupRef.current); // Add to the layer group
+
+          // Update visibility after loading new data
+          if (mapRef.current.getZoom() >= minZoomForGeoJSON) {
+            if (!mapRef.current.hasLayer(geoJsonLayerGroupRef.current)) {
+              mapRef.current.addLayer(geoJsonLayerGroupRef.current);
+            }
+          }
+
+          // Optionally, fit map bounds to the GeoJSON layer if it's valid
+          if (geoJsonLayerRef.current.getBounds().isValid()) {
+            mapRef.current.fitBounds(geoJsonLayerRef.current.getBounds());
+          }
+        }
+      } catch (error) {
+        console.error("Error loading GeoJSON data:", error);
+        toast.error(`Gagal memuat data GeoJSON: ${error instanceof Error ? error.message : String(error)}. Pastikan file 'export.geojson' ada di folder 'public'.`);
       }
     };
-  }, [map, isMapLoaded]); // Re-run when map or isMapLoaded changes
 
-  // Effect to add Leaflet.draw controls
-  useEffect(() => {
-    if (!map || !isMapLoaded) return;
-
-    // Initialize a FeatureGroup for drawn items
-    const drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
-
-    // Initialize the draw control and pass it the FeatureGroup of drawn items
-    const drawControl = new (L.Control as any).Draw({
-      edit: {
-        featureGroup: drawnItems,
-        poly: {
-          allowIntersection: false
-        }
-      },
-      draw: {
-        polygon: {
-          allowIntersection: false,
-          showArea: true
-        },
-        polyline: {
-          metric: true
-        },
-        circlemarker: false, // Disable circlemarker
-        rectangle: {
-          showArea: true
-        },
-        circle: {
-          showRadius: true
-        },
-        marker: true
-      }
-    });
-    map.addControl(drawControl);
-
-    // Event listeners for when shapes are drawn
-    map.on((L.Draw as any).Event.CREATED, function (event: any) {
-      const layer = event.layer;
-      drawnItems.addLayer(layer);
-      toast.success(`Bentuk ${event.layerType} digambar!`);
-      console.log("Drawn shape GeoJSON:", layer.toGeoJSON());
-    });
-
-    map.on((L.Draw as any).Event.EDITED, function (event: any) {
-      const layers = event.layers;
-      layers.eachLayer(function (layer: any) {
-        toast.info(`Bentuk diedit!`);
-        console.log("Edited shape GeoJSON:", layer.toGeoJSON());
-      });
-    });
-
-    map.on((L.Draw as any).Event.DELETED, function (event: any) {
-      const layers = event.layers;
-      layers.eachLayer(function (layer: any) {
-        toast.warning(`Bentuk dihapus!`);
-        console.log("Deleted shape GeoJSON:", layer.toGeoJSON());
-      });
-    });
+    fetchGeoJSON();
 
     return () => {
-      // Clean up draw control and layers when component unmounts
-      map.removeControl(drawControl);
-      map.removeLayer(drawnItems);
-      map.off((L.Draw as any).Event.CREATED);
-      map.off((L.Draw as any).Event.EDITED);
-      map.off((L.Draw as any).Event.DELETED);
+      if (mapRef.current) {
+        mapRef.current.off('zoomend', updateGeoJSONVisibility);
+        mapRef.current.off('zoomend', updateSubwayStationsVisibility);
+        mapRef.current.off('moveend', updateTomTomTrafficVisibility);
+        mapRef.current.off('zoomend', updateTomTomTrafficVisibility);
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [map, isMapLoaded]);
+  }, [selectedVehicleType, roadConditionFilter]); // Re-run when filters change
+
+  // This useEffect specifically handles the TomTom layer based on `isTomTomLayerEnabled`
+  useEffect(() => {
+    console.log("TomTom layer enabled state changed:", isTomTomLayerEnabled);
+    updateTomTomTrafficVisibility();
+  }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
