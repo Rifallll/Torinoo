@@ -88,6 +88,11 @@ export const useGeoJsonLayer = ({
             }
           },
           pointToLayer: (feature, latlng) => {
+            // Explicitly check for markerPane before creating marker with divIcon
+            if (!map?.getPanes().markerPane) {
+              console.warn("Leaflet markerPane not yet available. Skipping GeoJSON marker creation for now.");
+              return L.marker(latlng); // Fallback to default marker if pane not ready
+            }
             return L.marker(latlng, { icon: getCustomIcon(feature) });
           },
           style: (feature) => {
