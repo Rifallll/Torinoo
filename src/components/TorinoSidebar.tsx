@@ -157,12 +157,12 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
   return (
     <div
       id="sidebar"
-      className={`sidebar bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
+      className={`sidebar bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition duration-200 ease-in-out z-30 shadow-lg overflow-y-auto flex flex-col`}
+      } transition duration-200 ease-in-out z-30 shadow-xl overflow-y-auto flex flex-col`}
     >
       <div className="flex items-center justify-between px-4 mb-6">
-        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Torino Traffic</h1>
+        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-50">Torino Traffic</h1>
         <Button
           variant="ghost"
           size="icon"
