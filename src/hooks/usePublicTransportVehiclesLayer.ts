@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
-import { renderToString } from 'react-dom/server';
+import { renderToString } from 'react-dom/server'; // Still needed for popup content, but not for the main icon
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
@@ -41,13 +41,10 @@ export const usePublicTransportVehiclesLayer = ({
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
           
-          // Render the inner icon element (JSX) to a string
-          const innerVehicleTypeIconHtml = renderToString(getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined)));
-
-          // Construct the outer div HTML string for the marker icon
+          // Simplified vehicle icon HTML to avoid renderToString for the main icon
           const vehicleIconHtml = `
-            <div class="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style="width: 30px; height: 30px;">
-              ${innerVehicleTypeIconHtml}
+            <div class="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style="width: 30px; height: 30px; font-size: 14px; font-weight: bold;">
+              ${routeId.charAt(0)}
             </div>
           `;
 
@@ -59,6 +56,7 @@ export const usePublicTransportVehiclesLayer = ({
           });
 
           // Render the popup route icon element (JSX) to a string
+          // This still uses renderToString, but for a smaller, isolated piece of JSX
           const popupRouteIconHtml = renderToString(getRouteTypeIcon(routeId));
 
           const popupContent = `
@@ -103,7 +101,7 @@ export const usePublicTransportVehiclesLayer = ({
         layerGroup.removeLayer(currentMarkers[id]);
         delete currentMarkers[id];
       }
-      if (isLayerCurrentlyOnMap) { // Use the variable defined earlier
+      if (isLayerCurrentlyOnMap) {
         map.removeLayer(layerGroup);
         toast.info("Lapisan kendaraan transportasi publik dinonaktifkan.");
       }
