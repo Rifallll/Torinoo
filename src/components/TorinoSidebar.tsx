@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { MadeWithDyad } from './made-with-dyad'; // Import MadeWithDyad component
+// import { MadeWithDyad } from './made-with-dyad'; // Import MadeWithDyad component - REMOVED
 // import TomTomLayerToggle from './TomTomLayerToggle'; // Removed: Toggle is now on SettingsPage
 
 interface TorinoSidebarProps {
@@ -195,9 +195,10 @@ const TorinoSidebar: React.FC<TorinoSidebarProps> = ({ isSidebarOpen, setIsSideb
         <TomTomLayerToggle />
       </div> */}
 
-      <div className="mt-auto">
+      {/* Removed MadeWithDyad component */}
+      {/* <div className="mt-auto">
         <MadeWithDyad />
-      </div>
+      </div> */}
     </div>
   );
 };
