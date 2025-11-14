@@ -2,7 +2,7 @@
 
 import * as protobuf from 'protobufjs';
 import { toast } from 'sonner';
-import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock } from 'lucide-react';
+import { Bus, TramFront, Info, TrafficCone, CheckCircle2, Clock, AlertTriangle } from 'lucide-react'; // Import AlertTriangle
 import React from 'react'; // Import React for JSX icons
 
 // Define interfaces for the parsed data based on the .proto schema
@@ -331,18 +331,8 @@ export const getDelayBadgeClass = (delaySeconds: number | undefined) => {
 };
 
 export const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
-  // Prioritize GTFS route_type if available
-  if (routeType === 3) return (<Bus className="h-4 w-4 mr-1" />); // Bus
-  if (routeType === 0) return (<TramFront className="h-4 w-4 mr-1" />); // Tram
-  if (routeType === 1) return (<Info className="h-4 w-4 mr-1" />); // Subway (using generic info for now)
-  
-  // Fallback to routeId parsing if routeType is not explicit
-  if (routeId) {
-    if (routeId.includes('B') || routeId === '101' || routeId === '68') return (<Bus className="h-4 w-4 mr-1" />);
-    if (routeId.includes('T') || routeId === '4' || routeId === '15') return (<TramFront className="h-4 w-4 mr-1" />);
-    if (routeId.endsWith('U')) return (<Bus className="h-4 w-4 mr-1" />);
-  }
-  return (<Info className="h-4 w-4 mr-1" />);
+  // Always return a generic AlertTriangle icon for alerts
+  return (<AlertTriangle className="h-4 w-4 mr-1" />);
 };
 
 export const getVehicleStatus = (status: string | undefined, occupancyStatus: string | undefined) => {
