@@ -184,14 +184,7 @@ export const useMapControls = ({
       const targetOpacity = (isTomTomLayerEnabled && isWithinTorino) ? 0.7 : 0;
       tomtomTrafficFlowLayer.setOpacity(targetOpacity);
 
-      // Provide feedback only when the state actually changes
-      // This check prevents toast from firing on every map move/zoom if opacity doesn't change
-      const currentOpacity = tomtomTrafficFlowLayer.getOpacity();
-      if (targetOpacity > 0 && currentOpacity === 0) { // If it was hidden and now should be visible
-        toast.info("Lapisan lalu lintas TomTom diaktifkan untuk Torino.");
-      } else if (targetOpacity === 0 && currentOpacity > 0) { // If it was visible and now should be hidden
-        toast.info("Lapisan lalu lintas TomTom dinonaktifkan (di luar Torino atau dimatikan).");
-      }
+      // Removed toast.info calls to prevent potential re-render issues
     };
 
     // Attach listeners
