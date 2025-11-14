@@ -58,7 +58,7 @@ export const useTomTomTrafficLayer = ({
 
     map.on('moveend', updateVisibility);
     map.on('zoomend', updateVisibility);
-    updateVisibility(); // Initial check, might run before 'load' event
+    // Removed: updateVisibility(); // Removed immediate call to prevent premature execution
 
     return () => {
       map.off('load', onMapLoad);
