@@ -15,7 +15,7 @@ interface FilterDropdownsProps {
   setRoadConditionFilter: (filter: string) => void;
 }
 
-const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
+const FilterDropdowns: React.FC<FilterDropdownsProps> = React.memo(({
   timeFilter,
   setTimeFilter,
   vehicleTypeFilter,
@@ -83,6 +83,6 @@ const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
       </DropdownMenu>
     </div>
   );
-};
+});
 
 export default FilterDropdowns;

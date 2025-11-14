@@ -8,7 +8,7 @@ import { useWeather } from '@/hooks/useWeather';
 import { useSettings } from '@/contexts/SettingsContext'; // New: Import useSettings
 import { Link } from 'react-router-dom'; // Import Link
 
-const WeatherCard: React.FC = () => {
+const WeatherCard: React.FC = React.memo(() => {
   const { isWeatherFeatureEnabled } = useSettings(); // New: Get weather feature status
 
   // Only fetch weather data if the feature is enabled
@@ -147,6 +147,6 @@ const WeatherCard: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default WeatherCard;

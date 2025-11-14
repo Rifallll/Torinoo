@@ -11,7 +11,7 @@ interface QuickActionsCardProps {
   onExportClick: () => void;
 }
 
-const QuickActionsCard: React.FC<QuickActionsCardProps> = ({ onUploadCSVClick, onExportClick }) => {
+const QuickActionsCard: React.FC<QuickActionsCardProps> = React.memo(({ onUploadCSVClick, onExportClick }) => {
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
       <CardHeader>
@@ -71,6 +71,6 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({ onUploadCSVClick, o
       </CardContent>
     </Card>
   );
-};
+});
 
 export default QuickActionsCard;

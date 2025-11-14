@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon } from '@/utils/gtfsRealtimeParser';
 
-const PublicTransportAlertsCard: React.FC = () => {
+const PublicTransportAlertsCard: React.FC = React.memo(() => {
   const { data, isLoading, error } = useGtfsRealtimeData();
   const alerts = data.alerts;
 
@@ -79,6 +79,6 @@ const PublicTransportAlertsCard: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default PublicTransportAlertsCard;

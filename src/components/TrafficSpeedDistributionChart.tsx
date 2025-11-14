@@ -14,7 +14,7 @@ const speedDistributionData = [
   { speedRange: '50+ km/h', count: 20, percentage: 2 },
 ];
 
-const TrafficSpeedDistributionChart: React.FC = () => {
+const TrafficSpeedDistributionChart: React.FC = React.memo(() => {
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-lg">
       <CardHeader>
@@ -48,6 +48,6 @@ const TrafficSpeedDistributionChart: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default TrafficSpeedDistributionChart;

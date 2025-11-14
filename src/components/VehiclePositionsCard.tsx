@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { formatRelativeTime, getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel } from '@/utils/gtfsRealtimeParser';
 
-const VehiclePositionsCard: React.FC = () => {
+const VehiclePositionsCard: React.FC = React.memo(() => {
   const { data, isLoading, error } = useGtfsRealtimeData();
   const vehiclePositions = data.vehiclePositions;
 
@@ -110,6 +110,6 @@ const VehiclePositionsCard: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default VehiclePositionsCard;

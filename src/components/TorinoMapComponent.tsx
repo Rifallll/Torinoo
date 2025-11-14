@@ -25,7 +25,7 @@ interface TorinoMapComponentProps {
   roadConditionFilter: string;
 }
 
-const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicleType, roadConditionFilter }) => {
+const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ selectedVehicleType, roadConditionFilter }) => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Ref for GeoJSON data itself
   const geoJsonLayerGroupRef = useRef<L.LayerGroup | null>(null); // Ref for the layer group to manage visibility
@@ -476,6 +476,6 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   }, [isTomTomLayerEnabled]); // Re-run when the toggle state changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
-};
+});
 
 export default TorinoMapComponent;

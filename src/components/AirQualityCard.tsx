@@ -9,7 +9,7 @@ import { useAirQuality } from '@/hooks/useAirQuality';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Link } from 'react-router-dom'; // Import Link
 
-const AirQualityCard: React.FC = () => {
+const AirQualityCard: React.FC = React.memo(() => {
   const { isAirQualityFeatureEnabled } = useSettings();
   const { data, isLoading, error } = useAirQuality("Torino", isAirQualityFeatureEnabled);
 
@@ -157,6 +157,6 @@ const AirQualityCard: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default AirQualityCard;

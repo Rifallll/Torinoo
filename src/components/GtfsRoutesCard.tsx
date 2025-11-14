@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { useGtfsData } from '@/hooks/useGtfsData';
 import { getRouteTypeIcon } from '@/utils/gtfsRealtimeParser'; // Re-use the utility icon function
 
-const GtfsRoutesCard: React.FC = () => {
+const GtfsRoutesCard: React.FC = React.memo(() => {
   const { data: gtfsData, isLoading, error } = useGtfsData();
   const transitlandRoutes = gtfsData?.routes || [];
   const agencies = gtfsData?.agencies || [];
@@ -102,6 +102,6 @@ const GtfsRoutesCard: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default GtfsRoutesCard;
