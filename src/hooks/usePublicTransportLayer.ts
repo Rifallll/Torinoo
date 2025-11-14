@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
 import { renderToString } from 'react-dom/server';
@@ -75,21 +75,26 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
           const vehicleLabel = vp.vehicle?.label || vp.id;
           const vehicleTypeIcon = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined));
 
+          // Render JSX to string for the icon
+          const vehicleIconHtmlString = renderToString(
+            <div className="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style={{ width: '30px', height: '30px' }}>
+              {vehicleTypeIcon}
+            </div>
+          );
+
           const vehicleIcon = L.divIcon({
             className: 'custom-vehicle-marker',
-            html: renderToString(
-              <div className="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style={{ width: '30px', height: '30px' }}>
-                {vehicleTypeIcon}
-              </div>
-            ),
+            html: vehicleIconHtmlString,
             iconSize: [30, 30],
             iconAnchor: [15, 15],
           });
 
+          // Render JSX to string for the popup content
+          const popupVehicleTypeIconString = renderToString(getRouteTypeIcon(routeId));
           const popupContent = `
             <div class="font-sans text-sm">
               <h3 class="font-bold text-base mb-1 flex items-center">
-                ${renderToString(getRouteTypeIcon(routeId))} Jalur ${routeId}
+                ${popupVehicleTypeIconString} Jalur ${routeId}
               </h3>
               <p><strong>Kendaraan:</strong> ${vehicleLabel}</p>
               <p><strong>Status:</strong> ${getVehicleStatus(vp.current_status, vp.occupancy_status)}</p>
@@ -130,7 +135,7 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
         map.removeLayer(publicTransportVehiclesLayerGroupRef.current);
       }
     }
-  }, [map, gtfsRealtimeData, isPublicTransportLayerEnabled, minZoomForPublicTransport]);
+  }, [map, gtfsRealtimeData, isPublicTransportLayerEnabled, minZoomForPublicTransport, torinoBounds]); // Added torinoBounds to dependencies
 
   return publicTransportVehiclesLayerGroupRef.current;
 };

@@ -36,9 +36,16 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   const torinoBounds = L.latLngBounds([44.95, 7.50], [45.18, 7.85]);
   const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
 
-  // Initialize all layer groups first, so they can be passed to useMapInitialization
+  // Initialize the map and get base layers
+  const { mapInstance: map, baseLayers } = useMapInitialization({
+    mapContainerId: 'torino-map',
+    center: torinoCenter,
+    zoom: defaultZoom,
+  });
+
+  // Conditionally call layer hooks only if map is initialized
   const geoJsonLayerGroup = useGeoJsonLayer({
-    map: null, // Will be set after map initialization
+    map, // Pass the actual map instance
     geoJsonPath: '/export.geojson',
     minZoomForGeoJSON,
     selectedVehicleType,
@@ -46,56 +53,39 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
   });
 
   const subwayStationsLayerGroup = useSubwayStationsLayer({
-    map: null, // Will be set after map initialization
+    map, // Pass the actual map instance
     minZoomForSubwayStations,
   });
 
   const tomtomTrafficLayer = useTomTomTrafficLayer({
-    map: null, // Will be set after map initialization
+    map, // Pass the actual map instance
     tomtomApiKey,
     torinoBounds,
   });
 
   const publicTransportVehiclesLayerGroup = usePublicTransportLayer({
-    map: null, // Will be set after map initialization
+    map, // Pass the actual map instance
     minZoomForPublicTransport,
     torinoBounds,
   });
 
-  // Collect all overlay layers for the map initialization hook
-  const overlayLayers: { [key: string]: L.Layer } = {};
-  if (geoJsonLayerGroup) overlayLayers["Traffic Data (GeoJSON)"] = geoJsonLayerGroup;
-  if (subwayStationsLayerGroup) overlayLayers["Subway Stations"] = subwayStationsLayerGroup;
-  if (publicTransportVehiclesLayerGroup) overlayLayers["Public Transport Vehicles"] = publicTransportVehiclesLayerGroup;
-  if (tomtomTrafficLayer) overlayLayers["TomTom Traffic Flow"] = tomtomTrafficLayer;
-
-  // Initialize the map
-  const map = useMapInitialization({
-    mapContainerId: 'torino-map',
-    center: torinoCenter,
-    zoom: defaultZoom,
-    torinoBounds,
-    overlayLayers,
-  });
-
-  // Pass the initialized map instance to each layer hook
+  // Effect to add Layer Control once map and all overlay layers are ready
   useEffect(() => {
-    if (map) {
-      // Re-initialize layers with the actual map instance
-      // This is a bit of a workaround for hooks that need the map instance
-      // but are called before the map is fully initialized.
-      // In a more complex scenario, you might pass a setter function or use context.
-      // For now, we'll rely on the internal logic of each hook to handle `map` changing from null to L.Map.
-    }
-  }, [map]);
+    if (map && Object.keys(baseLayers).length > 0) { // Ensure baseLayers are also loaded
+      const overlayLayers: { [key: string]: L.Layer } = {};
+      if (geoJsonLayerGroup) overlayLayers["Traffic Data (GeoJSON)"] = geoJsonLayerGroup;
+      if (subwayStationsLayerGroup) overlayLayers["Subway Stations"] = subwayStationsLayerGroup;
+      if (publicTransportVehiclesLayerGroup) overlayLayers["Public Transport Vehicles"] = publicTransportVehiclesLayerGroup;
+      if (tomtomTrafficLayer) overlayLayers["TomTom Traffic Flow"] = tomtomTrafficLayer;
 
-  // Manually trigger updates for layers that depend on map instance
-  // This is necessary because the map instance is initially null and then becomes L.Map
-  // The hooks themselves handle the internal logic for map.on('zoomend') etc.
-  useGeoJsonLayer({ map, geoJsonPath: '/export.geojson', minZoomForGeoJSON, selectedVehicleType, roadConditionFilter });
-  useSubwayStationsLayer({ map, minZoomForSubwayStations });
-  useTomTomTrafficLayer({ map, tomtomApiKey, torinoBounds });
-  usePublicTransportLayer({ map, minZoomForPublicTransport, torinoBounds });
+      const layerControl = L.control.layers(baseLayers, overlayLayers).addTo(map);
+
+      return () => {
+        map.removeControl(layerControl);
+      };
+    }
+  }, [map, baseLayers, geoJsonLayerGroup, subwayStationsLayerGroup, publicTransportVehiclesLayerGroup, tomtomTrafficLayer]);
+
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };

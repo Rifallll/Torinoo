@@ -4,19 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
-import { toast } from 'sonner';
 
 interface MapInitializationProps {
   mapContainerId: string;
   center: [number, number];
   zoom: number;
-  torinoBounds: L.LatLngBoundsExpression;
-  overlayLayers: { [key: string]: L.Layer };
 }
 
-export const useMapInitialization = ({ mapContainerId, center, zoom, torinoBounds, overlayLayers }: MapInitializationProps) => {
+export const useMapInitialization = ({ mapContainerId, center, zoom }: MapInitializationProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  const [baseLayers, setBaseLayers] = useState<Record<string, L.TileLayer>>({});
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -24,18 +22,22 @@ export const useMapInitialization = ({ mapContainerId, center, zoom, torinoBound
       mapRef.current = map;
       setMapInstance(map);
 
-      // Add OpenStreetMap tile layer
       const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       });
       osmLayer.addTo(map);
 
-      // Add Geocoder control
-      L.Control.geocoder({
-        defaultMarkGeocode: false,
-      })
-      .on('markgeocode', function(e: any) {
+      const darkLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' });
+      const terrainLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' });
+
+      setBaseLayers({
+        "OpenStreetMap": osmLayer,
+        "Dark Mode": darkLayer,
+        "Terrain": terrainLayer,
+      });
+
+      L.Control.geocoder({ defaultMarkGeocode: false }).on('markgeocode', function(e: any) {
         const bbox = e.geocode.bbox;
         const poly = L.polygon([
           [bbox.getSouthEast().lat, bbox.getSouthEast().lng],
@@ -44,10 +46,8 @@ export const useMapInitialization = ({ mapContainerId, center, zoom, torinoBound
           [bbox.getSouthWest().lat, bbox.getSouthWest().lng]
         ]).addTo(map);
         map.fitBounds(poly.getBounds());
-      })
-      .addTo(map);
+      }).addTo(map);
 
-      // Add Fullscreen control (simple custom button)
       const FullscreenControl = L.Control.extend({
         onAdd: function(map: L.Map) {
           const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -65,7 +65,6 @@ export const useMapInitialization = ({ mapContainerId, center, zoom, torinoBound
       });
       new FullscreenControl({ position: 'topleft' }).addTo(map);
 
-      // Reset view control
       const ResetViewControl = L.Control.extend({
         onAdd: function(map: L.Map) {
           const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -78,16 +77,6 @@ export const useMapInitialization = ({ mapContainerId, center, zoom, torinoBound
         onRemove: function(map: L.Map) {},
       });
       new ResetViewControl({ position: 'topleft' }).addTo(map);
-
-      // Base layers for the layer control
-      const baseLayers = {
-        "OpenStreetMap": osmLayer,
-        "Dark Mode": L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
-        "Terrain": L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors' }),
-      };
-      
-      // Add Layer control
-      L.control.layers(baseLayers, overlayLayers).addTo(map);
     }
 
     return () => {
@@ -95,9 +84,10 @@ export const useMapInitialization = ({ mapContainerId, center, zoom, torinoBound
         mapRef.current.remove();
         mapRef.current = null;
         setMapInstance(null);
+        setBaseLayers({});
       }
     };
-  }, [mapContainerId, center, zoom, torinoBounds, overlayLayers]);
+  }, [mapContainerId, center, zoom]);
 
-  return mapInstance;
+  return { mapInstance, baseLayers };
 };
