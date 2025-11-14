@@ -24,28 +24,33 @@ export const useTomTomTrafficLayer = ({
   useEffect(() => {
     if (!map) return;
 
-    if (tomtomApiKey && !tomtomTrafficFlowLayerRef.current) {
-      tomtomTrafficFlowLayerRef.current = L.tileLayer(
-        `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
-        {
-          attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
-          maxZoom: 19,
-          opacity: 0, // Start with 0 opacity (hidden)
+    const addTomTomLayerWhenReady = () => {
+      if (tomtomApiKey && !tomtomTrafficFlowLayerRef.current) {
+        tomtomTrafficFlowLayerRef.current = L.tileLayer(
+          `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
+          {
+            attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
+            maxZoom: 19,
+            opacity: 0, // Start with 0 opacity (hidden)
+          }
+        );
+        // Add the layer to the map immediately, but keep it hidden
+        tomtomTrafficFlowLayerRef.current.addTo(map);
+        isLayerAddedToMapRef.current = true;
+        console.log("TomTom Traffic Flow layer initialized and added to map (hidden).");
+      } else if (!tomtomApiKey && tomtomTrafficFlowLayerRef.current) {
+        // If API key is removed, clean up the layer
+        if (map.hasLayer(tomtomTrafficFlowLayerRef.current)) {
+          map.removeLayer(tomtomTrafficFlowLayerRef.current);
         }
-      );
-      // Add the layer to the map immediately, but keep it hidden
-      tomtomTrafficFlowLayerRef.current.addTo(map);
-      isLayerAddedToMapRef.current = true;
-      console.log("TomTom Traffic Flow layer initialized and added to map (hidden).");
-    } else if (!tomtomApiKey && tomtomTrafficFlowLayerRef.current) {
-      // If API key is removed, clean up the layer
-      if (map.hasLayer(tomtomTrafficFlowLayerRef.current)) {
-        map.removeLayer(tomtomTrafficFlowLayerRef.current);
+        tomtomTrafficFlowLayerRef.current = null;
+        isLayerAddedToMapRef.current = false;
+        toast.warning("Kunci API TomTom tidak ditemukan. Lapisan lalu lintas TomTom tidak akan tersedia.");
       }
-      tomtomTrafficFlowLayerRef.current = null;
-      isLayerAddedToMapRef.current = false;
-      toast.warning("Kunci API TomTom tidak ditemukan. Lapisan lalu lintas TomTom tidak akan tersedia.");
-    }
+    };
+
+    // Call the function to add the TomTom layer only when the map is fully ready
+    map.whenReady(addTomTomLayerWhenReady);
 
     // Cleanup for this effect: remove layer if component unmounts or API key changes to null
     return () => {
