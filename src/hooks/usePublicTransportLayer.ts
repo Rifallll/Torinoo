@@ -76,11 +76,12 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
           const vehicleTypeIcon = getRouteTypeIcon(routeId, vp.trip?.route_id?.includes('BUS') ? 3 : (routeId.includes('TRAM') ? 0 : undefined));
 
           // Render JSX to string for the icon
-          const vehicleIconHtmlString = renderToString(
+          const vehicleIconElement = (
             <div className="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style={{ width: '30px', height: '30px' }}>
               {vehicleTypeIcon}
             </div>
           );
+          const vehicleIconHtmlString = renderToString(vehicleIconElement);
 
           const vehicleIcon = L.divIcon({
             className: 'custom-vehicle-marker',
@@ -135,7 +136,7 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
         map.removeLayer(publicTransportVehiclesLayerGroupRef.current);
       }
     }
-  }, [map, gtfsRealtimeData, isPublicTransportLayerEnabled, minZoomForPublicTransport, torinoBounds]); // Added torinoBounds to dependencies
+  }, [map, gtfsRealtimeData, isPublicTransportLayerEnabled, minZoomForPublicTransport, torinoBounds]);
 
   return publicTransportVehiclesLayerGroupRef.current;
 };
