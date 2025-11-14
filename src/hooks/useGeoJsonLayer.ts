@@ -39,11 +39,8 @@ export const useGeoJsonLayer = ({
         return;
       }
 
-      // 1. Add the layer group to the map first (if not already added)
-      // This ensures the layer group's internal DOM structures are ready
-      if (!map.hasLayer(geoJsonLayerGroup)) {
-        geoJsonLayerGroup.addTo(map);
-      }
+      // The layer group is now assumed to be already on the map from useMapInitialization.
+      // No need for geoJsonLayerGroup.addTo(map) here.
 
       try {
         const response = await fetch('/export.geojson');
@@ -126,15 +123,19 @@ export const useGeoJsonLayer = ({
       // Effect for managing visibility based on zoom
       const updateVisibility = () => {
         if (map.getZoom() >= minZoomForGeoJSON) {
-          if (!map.hasLayer(geoJsonLayerGroup)) {
-            geoJsonLayerGroup.addTo(map);
-            toast.info("Lapisan data lalu lintas ditampilkan (perbesar untuk detail).");
-          }
+          // Layer group is already on the map, just ensure its contents are visible
+          geoJsonLayerGroup.eachLayer(layer => {
+            if (layer instanceof L.Path || layer instanceof L.Marker) {
+              layer.setOpacity(1); // Or whatever default opacity you want for visible features
+            }
+          });
         } else {
-          if (map.hasLayer(geoJsonLayerGroup)) {
-            map.removeLayer(geoJsonLayerGroup);
-            toast.info("Lapisan data lalu lintas disembunyikan (perkecil untuk performa).");
-          }
+          // Hide contents by setting opacity to 0
+          geoJsonLayerGroup.eachLayer(layer => {
+            if (layer instanceof L.Path || layer instanceof L.Marker) {
+              layer.setOpacity(0);
+            }
+          });
         }
       };
 
@@ -143,9 +144,8 @@ export const useGeoJsonLayer = ({
 
       return () => {
         map.off('zoomend', updateVisibility);
-        if (map.hasLayer(geoJsonLayerGroup)) {
-          map.removeLayer(geoJsonLayerGroup);
-        }
+        // On cleanup, clear layers but keep the layer group on the map
+        geoJsonLayerGroup.clearLayers();
       };
     };
 
@@ -158,10 +158,7 @@ export const useGeoJsonLayer = ({
         geoJsonLayerGroup.removeLayer(geoJsonLayerRef.current);
         geoJsonLayerRef.current = null;
       }
-      // Ensure the layer group is removed from the map on unmount
-      if (map.hasLayer(geoJsonLayerGroup)) {
-        map.removeLayer(geoJsonLayerGroup);
-      }
+      // The layer group itself remains on the map, only its contents are cleared.
     };
   }, [map, geoJsonLayerGroup, selectedVehicleType, roadConditionFilter, minZoomForGeoJSON]);
 };

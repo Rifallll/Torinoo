@@ -27,10 +27,8 @@ export const useGtfsRoutesLayer = ({
     }
 
     const setupGtfsRoutesLayer = () => {
-      // 1. Add the layer group to the map first (if not already added)
-      if (!map.hasLayer(gtfsRoutesLayerGroup)) {
-        gtfsRoutesLayerGroup.addTo(map);
-      }
+      // The layer group is now assumed to be already on the map from useMapInitialization.
+      // No need for gtfsRoutesLayerGroup.addTo(map) here.
 
       gtfsRoutesLayerGroup.clearLayers(); // Clear existing routes
 
@@ -95,15 +93,17 @@ export const useGtfsRoutesLayer = ({
       // Effect for managing visibility based on zoom
       const updateVisibility = () => {
         if (map.getZoom() >= minZoomForGtfsRoutes) {
-          if (!map.hasLayer(gtfsRoutesLayerGroup)) {
-            gtfsRoutesLayerGroup.addTo(map);
-            toast.info("Lapisan rute transportasi publik ditampilkan.");
-          }
+          gtfsRoutesLayerGroup.eachLayer(layer => {
+            if (layer instanceof L.Path) { // Polylines are L.Path
+              layer.setOpacity(0.7); // Default opacity for visible routes
+            }
+          });
         } else {
-          if (map.hasLayer(gtfsRoutesLayerGroup)) {
-            map.removeLayer(gtfsRoutesLayerGroup);
-            toast.info("Lapisan rute transportasi publik disembunyikan (perkecil untuk performa).");
-          }
+          gtfsRoutesLayerGroup.eachLayer(layer => {
+            if (layer instanceof L.Path) {
+              layer.setOpacity(0); // Hide by setting opacity to 0
+            }
+          });
         }
       };
 
@@ -112,9 +112,8 @@ export const useGtfsRoutesLayer = ({
 
       return () => {
         map.off('zoomend', updateVisibility);
-        if (map.hasLayer(gtfsRoutesLayerGroup)) {
-          map.removeLayer(gtfsRoutesLayerGroup);
-        }
+        gtfsRoutesLayerGroup.clearLayers();
+        // The layer group itself remains on the map.
       };
     };
 
@@ -123,10 +122,7 @@ export const useGtfsRoutesLayer = ({
     // Cleanup function
     return () => {
       gtfsRoutesLayerGroup.clearLayers();
-      // Ensure the layer group is removed from the map on unmount
-      if (map.hasLayer(gtfsRoutesLayerGroup)) {
-        map.removeLayer(gtfsRoutesLayerGroup);
-      }
+      // The layer group itself remains on the map.
     };
   }, [map, gtfsRoutesLayerGroup, gtfsData, gtfsRouteTypeFilter, isLoadingGtfs, gtfsError, minZoomForGtfsRoutes]);
 };

@@ -38,10 +38,8 @@ export const useSubwayStationsLayer = ({
         return;
       }
 
-      // 1. Add the layer group to the map first (if not already added)
-      if (!map.hasLayer(subwayStationsLayerGroup)) {
-        subwayStationsLayerGroup.addTo(map);
-      }
+      // The layer group is now assumed to be already on the map from useMapInitialization.
+      // No need for subwayStationsLayerGroup.addTo(map) here.
 
       // Clear existing markers
       subwayStationsLayerGroup.clearLayers();
@@ -66,15 +64,17 @@ export const useSubwayStationsLayer = ({
       // Effect for managing visibility based on zoom
       const updateVisibility = () => {
         if (map.getZoom() >= minZoomForSubwayStations) {
-          if (!map.hasLayer(subwayStationsLayerGroup)) {
-            subwayStationsLayerGroup.addTo(map);
-            toast.info("Lapisan halte kereta bawah tanah ditampilkan.");
-          }
+          subwayStationsLayerGroup.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+              layer.setOpacity(1);
+            }
+          });
         } else {
-          if (map.hasLayer(subwayStationsLayerGroup)) {
-            map.removeLayer(subwayStationsLayerGroup);
-            toast.info("Lapisan halte kereta bawah tanah disembunyikan (perkecil untuk performa).");
-          }
+          subwayStationsLayerGroup.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+              layer.setOpacity(0);
+            }
+          });
         }
       };
 
@@ -83,9 +83,8 @@ export const useSubwayStationsLayer = ({
 
       return () => {
         map.off('zoomend', updateVisibility);
-        if (map.hasLayer(subwayStationsLayerGroup)) {
-          map.removeLayer(subwayStationsLayerGroup);
-        }
+        subwayStationsLayerGroup.clearLayers();
+        // The layer group itself remains on the map.
       };
     };
 
@@ -93,10 +92,7 @@ export const useSubwayStationsLayer = ({
 
     return () => {
       subwayStationsLayerGroup.clearLayers(); // Clear all layers on unmount
-      // Ensure the layer group is removed from the map on unmount
-      if (map.hasLayer(subwayStationsLayerGroup)) {
-        map.removeLayer(subwayStationsLayerGroup);
-      }
+      // The layer group itself remains on the map.
     };
   }, [map, subwayStationsLayerGroup, subwayStationsData, minZoomForSubwayStations]);
 };
