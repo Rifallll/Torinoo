@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'; // Import Alert components
 import { AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner'; // Import toast for warnings
 
 // Define validation schema using Zod
 const contactFormSchema = z.object({
@@ -40,6 +41,7 @@ const ContactCollaborationPage: React.FC = () => {
     alert('Pesan Anda telah terkirim! Kami akan menghubungi Anda segera.');
     form.reset(); // Reset form after successful submission
     // In a real application, you would send this data to a backend.
+    toast.warning("Penting: Pastikan Anda menerapkan validasi dan sanitasi sisi server yang kuat untuk data formulir ini!");
   };
 
   return (

@@ -63,13 +63,16 @@ const isTrafficRelated = (article: NewsArticle): boolean => {
 };
 
 export const fetchNewsFromBackend = async (query: string, language: string): Promise<NewsArticle[]> => {
-  const newsApiKey = import.meta.env.VITE_NEWSAPI_KEY; // Still accessed here for simulation
-  const gnewsApiKey = import.meta.env.VITE_GNEWS_API_KEY; // Still accessed here for simulation
+  // IMPORTANT: In a real application, these API keys should be loaded securely
+  // from a backend server (e.g., environment variables in a serverless function)
+  // and not exposed client-side.
+  const newsApiKey = "YOUR_NEWSAPI_KEY_HERE"; // Placeholder for client-side simulation
+  const gnewsApiKey = "YOUR_GNEWS_API_KEY_HERE"; // Placeholder for client-side simulation
 
   const [newsApiResult, gNewsResult] = await Promise.allSettled([
     (async () => {
-      if (!newsApiKey) {
-        console.warn("NewsAPI Key tidak ditemukan. Melewatkan pengambilan dari NewsAPI.");
+      if (!newsApiKey || newsApiKey === "YOUR_NEWSAPI_KEY_HERE") {
+        console.warn("NewsAPI Key tidak ditemukan atau belum diatur. Melewatkan pengambilan dari NewsAPI.");
         return [];
       }
       const params = new URLSearchParams({
@@ -84,15 +87,14 @@ export const fetchNewsFromBackend = async (query: string, language: string): Pro
       if (!response.ok) {
         const errorData = await response.json();
         console.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`);
-        // toast.error(`Gagal mengambil berita dari NewsAPI: ${errorData.message || response.statusText}`); // Removed toast to avoid spam
         return [];
       }
       const result: NewsApiResponse = await response.json();
       return result.articles;
     })(),
     (async () => {
-      if (!gnewsApiKey) {
-        console.warn("GNews.io API Key tidak ditemukan. Melewatkan pengambilan dari GNews.io.");
+      if (!gnewsApiKey || gnewsApiKey === "YOUR_GNEWS_API_KEY_HERE") {
+        console.warn("GNews.io API Key tidak ditemukan atau belum diatur. Melewatkan pengambilan dari GNews.io.");
         return [];
       }
       const params = new URLSearchParams({
@@ -106,7 +108,6 @@ export const fetchNewsFromBackend = async (query: string, language: string): Pro
       if (!response.ok) {
         const errorData = await response.json();
         console.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`);
-        // toast.error(`Gagal mengambil berita dari GNews.io: ${errorData.errors?.[0] || response.statusText}`); // Removed toast to avoid spam
         return [];
       }
       const result: GNewsApiResponse = await response.json();

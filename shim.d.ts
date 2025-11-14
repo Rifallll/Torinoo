@@ -20,10 +20,14 @@ declare module 'leaflet' {
 
 // Extend Window interface for Vite environment variables
 interface ImportMetaEnv {
+  // IMPORTANT: In a production application, VITE_TOMTOM_API_KEY and VITE_AQICN_API_KEY
+  // should also be proxied through a backend to prevent client-side exposure.
+  // For this demo, they remain client-side for simplicity, but be aware of the risk.
   readonly VITE_TOMTOM_API_KEY: string;
   readonly VITE_AQICN_API_KEY: string;
-  // VITE_NEWSAPI_KEY and VITE_GNEWS_API_KEY are removed from client-side exposure
-  // In a real application, these would be accessed securely on a backend server.
+  // VITE_NEWSAPI_KEY and VITE_GNEWS_API_KEY are removed from client-side exposure.
+  // In a real application, these would be accessed securely on a backend server
+  // (e.g., via a Supabase Edge Function or a custom Node.js backend).
   // more env variables...
 }
 

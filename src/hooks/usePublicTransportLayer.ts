@@ -7,6 +7,7 @@ import { renderToString } from 'react-dom/server';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
+import DOMPurify from 'dompurify'; // Import DOMPurify
 
 interface PublicTransportLayerProps {
   map: L.Map | null;
@@ -92,7 +93,7 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
 
           // Render JSX to string for the popup content
           const popupVehicleTypeIconString = renderToString(getRouteTypeIcon(routeId));
-          const popupContent = `
+          const rawPopupContent = `
             <div class="font-sans text-sm">
               <h3 class="font-bold text-base mb-1 flex items-center">
                 ${popupVehicleTypeIconString} Jalur ${routeId}
@@ -104,13 +105,15 @@ export const usePublicTransportLayer = ({ map, minZoomForPublicTransport, torino
               <p><strong>Terakhir Diperbarui:</strong> ${formatRelativeTime(vp.timestamp)}</p>
             </div>
           `;
+          const sanitizedPopupContent = DOMPurify.sanitize(rawPopupContent);
+
 
           if (currentMarkers[vp.id]) {
             currentMarkers[vp.id].setLatLng(latlng);
-            currentMarkers[vp.id].setPopupContent(popupContent);
+            currentMarkers[vp.id].setPopupContent(sanitizedPopupContent);
           } else {
             const marker = L.marker(latlng, { icon: vehicleIcon })
-              .bindPopup(popupContent);
+              .bindPopup(sanitizedPopupContent);
             marker.addTo(publicTransportVehiclesLayerGroupRef.current);
             currentMarkers[vp.id] = marker;
           }

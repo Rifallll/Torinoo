@@ -14,6 +14,7 @@ interface TomTomTrafficLayerProps {
 export const useTomTomTrafficLayer = ({ map, tomtomApiKey, torinoBounds }: TomTomTrafficLayerProps) => {
   const tomtomTrafficFlowLayerRef = useRef<L.TileLayer | null>(null);
   const { isTomTomLayerEnabled } = useSettings();
+  const hasWarnedAboutApiKey = useRef(false); // To prevent repeated toasts
 
   const updateTomTomTrafficVisibility = useCallback(() => {
     if (!map || !tomtomTrafficFlowLayerRef.current) return;
@@ -47,11 +48,10 @@ export const useTomTomTrafficLayer = ({ map, tomtomApiKey, torinoBounds }: TomTo
           opacity: 1.0,
         }
       );
-    } else if (!tomtomApiKey || tomtomApiKey === 'YOUR_TOMTOM_API_KEY_HERE') {
-      if (!tomtomTrafficFlowLayerRef.current) { // Only show warning once
-        toast.warning("Kunci API TomTom tidak ditemukan atau belum diatur. Lapisan lalu lintas TomTom tidak akan tersedia.");
-        console.warn("TomTom API Key is missing or is the placeholder. TomTom traffic layer will not be available.");
-      }
+    } else if ((!tomtomApiKey || tomtomApiKey === 'YOUR_TOMTOM_API_KEY_HERE') && !hasWarnedAboutApiKey.current) {
+      toast.warning("Kunci API TomTom tidak ditemukan atau belum diatur. Lapisan lalu lintas TomTom tidak akan tersedia.");
+      console.warn("TomTom API Key is missing or is the placeholder. TomTom traffic layer will not be available.");
+      hasWarnedAboutApiKey.current = true;
     }
 
     map.on('moveend', updateTomTomTrafficVisibility);

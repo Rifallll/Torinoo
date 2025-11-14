@@ -31,6 +31,11 @@ const UploadCSVModal: React.FC<UploadCSVModalProps> = ({ isOpen, onClose }) => {
     if (selectedFile) {
       toast.info(`Mengunggah dan memulai analisis simulasi untuk file '${selectedFile.name}'...`);
       
+      // IMPORTANT: In a real application, this file upload would be sent to a backend
+      // for secure processing, including robust server-side validation and sanitization
+      // of the CSV content to prevent various attacks (e.g., injection, DoS).
+      toast.warning("Penting: Pastikan Anda menerapkan validasi dan sanitasi sisi server yang kuat untuk file CSV yang diunggah!");
+
       Papa.parse(selectedFile, {
         header: true,
         skipEmptyLines: true,
