@@ -31,11 +31,9 @@ export const usePublicTransportVehiclesLayer = ({
 
     const currentMarkers = vehicleMarkersRef.current;
     const newVehicleIds = new Set<string>();
+    const isLayerCurrentlyOnMap = map.hasLayer(layerGroup); // Define here for broader scope
 
-    const isPublicTransportLayerActive = map.hasLayer(layerGroup);
-    const isWithinBounds = map.getBounds().intersects(bounds);
-
-    if (isPublicTransportLayerEnabled && isWithinBounds && map.getZoom() >= minZoom) {
+    if (isPublicTransportLayerEnabled && map.getZoom() >= minZoom && map.getBounds().intersects(bounds)) {
       gtfsRealtimeData.vehiclePositions.forEach(vp => {
         if (vp.position?.latitude && vp.position?.longitude) {
           newVehicleIds.add(vp.id);
@@ -89,23 +87,24 @@ export const usePublicTransportVehiclesLayer = ({
         }
       });
 
-      for (const id of Object.keys(currentMarkers)) { // Fixed: Use Object.keys for safer iteration
+      for (const id of Object.keys(currentMarkers)) {
         if (!newVehicleIds.has(id)) {
           layerGroup.removeLayer(currentMarkers[id]);
           delete currentMarkers[id];
         }
       }
 
-      if (!isPublicTransportLayerActive) {
+      if (!isLayerCurrentlyOnMap) {
         layerGroup.addTo(map);
         toast.info("Lapisan kendaraan transportasi publik diaktifkan.");
       }
     } else {
-      for (const id of Object.keys(currentMarkers)) { // Fixed: Use Object.keys for safer iteration
+      // If layer is disabled or conditions not met, remove all markers and the layer
+      for (const id of Object.keys(currentMarkers)) {
         layerGroup.removeLayer(currentMarkers[id]);
         delete currentMarkers[id];
       }
-      if (isPublicTransportLayerActive) {
+      if (isLayerCurrentlyOnMap) { // Use the variable defined earlier
         map.removeLayer(layerGroup);
         toast.info("Lapisan kendaraan transportasi publik dinonaktifkan.");
       }
@@ -122,7 +121,7 @@ export const usePublicTransportVehiclesLayer = ({
     return () => {
       map.off('zoomend', updateVisibilityAndMarkers);
       map.off('moveend', updateVisibilityAndMarkers);
-      for (const id of Object.keys(vehicleMarkersRef.current)) { // Fixed: Use Object.keys for safer iteration
+      for (const id of Object.keys(vehicleMarkersRef.current)) {
         layerGroup.removeLayer(vehicleMarkersRef.current[id]);
       }
       vehicleMarkersRef.current = {};
