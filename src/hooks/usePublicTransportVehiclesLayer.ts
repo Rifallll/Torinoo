@@ -3,11 +3,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import { toast } from 'sonner';
-import { renderToString } from 'react-dom/server'; // Still needed for popup content, but not for the main icon
+// import { renderToString } from 'react-dom/server'; // No longer needed
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGtfsRealtimeData } from '@/hooks/useGtfsRealtimeData';
 import { getRouteTypeIcon, getVehicleStatus, getCongestionBadgeClass, formatCongestionLevel, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
-import React from 'react'; // Import React for JSX rendering
+import React from 'react'; // Import React for JSX rendering (still needed for getRouteTypeIcon if it returns JSX, but not for rendering to string here)
 
 interface PublicTransportVehiclesLayerProps {
   map: L.Map | null;
@@ -41,7 +41,7 @@ export const usePublicTransportVehiclesLayer = ({
           const routeId = vp.trip?.route_id || 'N/A';
           const vehicleLabel = vp.vehicle?.label || vp.id;
           
-          // Simplified vehicle icon HTML to avoid renderToString for the main icon
+          // Simplified vehicle icon HTML for the marker
           const vehicleIconHtml = `
             <div class="flex items-center justify-center p-1 rounded-full bg-indigo-600 text-white shadow-md" style="width: 30px; height: 30px; font-size: 14px; font-weight: bold;">
               ${routeId.charAt(0)}
@@ -55,14 +55,13 @@ export const usePublicTransportVehiclesLayer = ({
             iconAnchor: [15, 15],
           });
 
-          // Render the popup route icon element (JSX) to a string
-          // This still uses renderToString, but for a smaller, isolated piece of JSX
-          const popupRouteIconHtml = renderToString(getRouteTypeIcon(routeId));
+          // Directly use text for the popup icon, avoiding renderToString
+          const popupRouteIconText = routeId.charAt(0); // Or a more descriptive text if needed
 
           const popupContent = `
             <div class="font-sans text-sm">
               <h3 class="font-bold text-base mb-1 flex items-center">
-                ${popupRouteIconHtml} Jalur ${routeId}
+                <span class="mr-1">${popupRouteIconText}</span> Jalur ${routeId}
               </h3>
               <p><strong>Kendaraan:</strong> ${vehicleLabel}</p>
               <p><strong>Status:</strong> ${getVehicleStatus(vp.current_status, vp.occupancy_status)}</p>
