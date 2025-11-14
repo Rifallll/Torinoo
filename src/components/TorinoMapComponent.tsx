@@ -112,7 +112,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     zoom: defaultZoom,
     bounds: torinoBounds,
     tomtomApiKey: tomtomApiKey,
-    subwayStationsData: subwayStationsData,
+    subwayStationsData: subwayStationsData, // Still pass data for initialization, but it won't create markers here
   });
 
   // Manage GeoJSON layer
@@ -130,6 +130,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     map,
     layerGroup: subwayStationsLayerGroup,
     minZoom: minZoomForSubwayStations,
+    subwayStationsData: subwayStationsData, // Pass data to this hook for marker management
   });
 
   // Manage TomTom Traffic layer
