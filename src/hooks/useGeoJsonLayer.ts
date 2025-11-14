@@ -10,8 +10,8 @@ interface GeoJsonLayerProps {
   selectedVehicleType: string;
   roadConditionFilter: string;
   minZoom: number;
-  // Removed getCustomIcon prop as it's handled internally
-  isMapLoaded: boolean; // New prop
+  isMapLoaded: boolean;
+  onFeatureClick: (properties: { [key: string]: any }) => void; // New prop for click handler
 }
 
 export const useGeoJsonLayer = ({
@@ -20,8 +20,8 @@ export const useGeoJsonLayer = ({
   selectedVehicleType,
   roadConditionFilter,
   minZoom,
-  // Removed getCustomIcon prop
-  isMapLoaded, // Destructure new prop
+  isMapLoaded,
+  onFeatureClick, // Destructure new prop
 }: GeoJsonLayerProps) => {
   const geoJsonDataRef = useRef<L.GeoJSON | null>(null);
 
@@ -116,25 +116,26 @@ export const useGeoJsonLayer = ({
         geoJsonDataRef.current = L.geoJSON({ ...data, features: filteredFeatures }, {
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
+              // Bind popup (existing functionality)
               let popupContent = `<div class="font-sans text-sm p-2">`;
-              
-              // Determine a title for the feature, prioritizing OSM ID if available
               const featureId = feature.id || feature.properties.osm_id || 'N/A';
               popupContent += `<h3 class="font-bold text-base mb-1">Way ${featureId}</h3>`;
-              
               const propertyKeys = Object.keys(feature.properties);
               popupContent += `<p class="text-xs text-gray-600 mb-2">Tags ${propertyKeys.length}</p>`;
-              
               popupContent += `<div class="space-y-1">`;
               for (const key of propertyKeys) {
-                // Exclude internal Leaflet properties or other non-relevant ones if needed
-                if (!key.startsWith('_') && key !== 'id' && key !== 'osm_id') { // Exclude id/osm_id if already used in title
+                if (!key.startsWith('_') && key !== 'id' && key !== 'osm_id') {
                   popupContent += `<p><strong>${key}:</strong> ${feature.properties[key]}</p>`;
                 }
               }
               popupContent += `</div>`;
               popupContent += `</div>`;
               layer.bindPopup(popupContent);
+
+              // Add click listener to open the info panel
+              layer.on('click', () => {
+                onFeatureClick(feature.properties);
+              });
             }
           },
           pointToLayer: (feature, latlng) => {
@@ -181,7 +182,7 @@ export const useGeoJsonLayer = ({
     };
 
     fetchGeoJSON();
-  }, [map, layerGroup, selectedVehicleType, roadConditionFilter, getCustomIconInternal, updateVisibility, isMapLoaded]); // Add isMapLoaded to dependencies
+  }, [map, layerGroup, selectedVehicleType, roadConditionFilter, getCustomIconInternal, updateVisibility, isMapLoaded, onFeatureClick]); // Add onFeatureClick to dependencies
 
   return layerGroup;
 };

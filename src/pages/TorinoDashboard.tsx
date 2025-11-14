@@ -23,6 +23,7 @@ import VehiclePositionsCard from '@/components/VehiclePositionsCard'; // New com
 import GtfsRoutesCard from '@/components/GtfsRoutesCard'; // New component
 import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart';
 import QuickActionsCard from '@/components/QuickActionsCard';
+import MapFeatureInfoPanel from '@/components/MapFeatureInfoPanel'; // New: Import MapFeatureInfoPanel
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const TorinoDashboard = () => {
@@ -31,10 +32,20 @@ const TorinoDashboard = () => {
   const [isTrafficAnalysisModalOpen, setIsTrafficAnalysisModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
+  // State for map feature info panel
+  const [isFeatureInfoPanelOpen, setIsFeatureInfoPanelOpen] = useState(false);
+  const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<{ [key: string]: any } | null>(null);
+
   // State for filters
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
+
+  // Handler for map feature click
+  const handleMapFeatureClick = (properties: { [key: string]: any }) => {
+    setSelectedFeatureProperties(properties);
+    setIsFeatureInfoPanelOpen(true);
+  };
 
   // Dummy data for quick actions and statistics
   const dummyStats = {
@@ -161,6 +172,7 @@ const TorinoDashboard = () => {
                   <TorinoMapComponent 
                     selectedVehicleType={vehicleTypeFilter} 
                     roadConditionFilter={roadConditionFilter} 
+                    onFeatureClick={handleMapFeatureClick} // Pass the handler
                   />
                 </CardContent>
               </Card>
@@ -255,6 +267,13 @@ const TorinoDashboard = () => {
       <UploadCSVModal isOpen={isUploadCSVModalOpen} onClose={() => setIsUploadCSVModalOpen(false)} />
       <TrafficAnalysisModal isOpen={isTrafficAnalysisModalOpen} onClose={() => setIsTrafficAnalysisModalOpen(false)} />
       <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
+      
+      {/* Map Feature Info Panel */}
+      <MapFeatureInfoPanel
+        isOpen={isFeatureInfoPanelOpen}
+        onClose={() => setIsFeatureInfoPanelOpen(false)}
+        featureProperties={selectedFeatureProperties}
+      />
     </div>
   );
 };
