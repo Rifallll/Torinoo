@@ -101,6 +101,7 @@ export const useMapControls = ({ map, layerGroups, tomtomTrafficFlowLayer, torin
         "GTFS Public Routes": layerGroups.gtfsRoutesLayerGroup,
       };
 
+      // Only add TomTom layer to control if it exists
       if (tomtomTrafficFlowLayer) {
         overlayLayers["TomTom Traffic Flow"] = tomtomTrafficFlowLayer;
       }

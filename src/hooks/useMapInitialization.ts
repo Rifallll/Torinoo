@@ -45,16 +45,24 @@ export const useMapInitialization = ({ mapContainerId, center, zoom }: MapInitia
       maxZoom: 19,
     }).addTo(map);
 
-    // Initialize Layer Groups
+    // Initialize Layer Groups (DO NOT add to map yet)
+    const geoJsonLayerGroup = L.layerGroup();
+    const subwayStationsLayerGroup = L.layerGroup();
+    const gtfsRoutesLayerGroup = L.layerGroup();
+
     layerGroupsRef.current = {
-      geoJsonLayerGroup: L.layerGroup().addTo(map), // Add to map initially, visibility managed by hook
-      subwayStationsLayerGroup: L.layerGroup().addTo(map), // Add to map initially, visibility managed by hook
-      gtfsRoutesLayerGroup: L.layerGroup().addTo(map), // Add to map initially, visibility managed by hook
+      geoJsonLayerGroup,
+      subwayStationsLayerGroup,
+      gtfsRoutesLayerGroup,
     };
 
-    // Set mapInstance ONLY after the map is fully loaded and its internal structures are ready
+    // Set mapInstance AND add layer groups to map ONLY after the map is fully loaded and its internal structures are ready
     map.whenReady(() => {
       setMapInstance(map);
+      // Now it's safe to add layer groups to the map
+      geoJsonLayerGroup.addTo(map);
+      subwayStationsLayerGroup.addTo(map);
+      gtfsRoutesLayerGroup.addTo(map);
     });
 
     return () => {
