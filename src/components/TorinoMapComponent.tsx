@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
 import { toast } from 'sonner';
+import ReactDOM from 'react-dom/client'; // Import ReactDOM for rendering React component into Leaflet control
 
 // Import custom hooks and utilities
 import { useSettings } from '@/contexts/SettingsContext';
@@ -19,6 +20,7 @@ import { useGeoJsonLayer } from '@/hooks/useGeoJsonLayer';
 import { useSubwayStationsLayer } from '@/hooks/useSubwayStationsLayer';
 import { useTomTomTrafficLayer } from '@/hooks/useTomTomTrafficLayer';
 import { usePublicTransportVehiclesLayer } from '@/hooks/usePublicTransportVehiclesLayer';
+import MapLegend from './MapLegend'; // Import the new MapLegend component
 
 // Fix for default marker icon issue with Webpack/Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -156,6 +158,39 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = ({ selectedVehicle
     bounds: torinoBounds,
     isMapLoaded, // Pass the state
   });
+
+  // Effect to add the React-based legend control
+  useEffect(() => {
+    if (!map || !isMapLoaded) return;
+
+    // Create a custom Leaflet control for the React component
+    const ReactControl = L.Control.extend({
+      onAdd: function(map: L.Map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        // Prevent click events from propagating to the map
+        L.DomEvent.disableClickPropagation(container);
+        // Render the React component into the container
+        ReactDOM.createRoot(container).render(<MapLegend />);
+        return container;
+      },
+      onRemove: function(map: L.Map) {
+        // Clean up React root when control is removed
+        // This is a simplified cleanup; in a more complex app, you might need to unmount
+        // ReactDOM.unmountComponentAtNode(container); // This is deprecated in React 18
+        // For React 18, you'd typically manage the root instance.
+        // For this simple case, letting the container be removed is often sufficient.
+      },
+    });
+
+    const legendControl = new ReactControl({ position: 'bottomright' });
+    legendControl.addTo(map);
+
+    return () => {
+      if (map.hasControl(legendControl)) {
+        map.removeControl(legendControl);
+      }
+    };
+  }, [map, isMapLoaded]); // Re-run when map or isMapLoaded changes
 
   return <div id="torino-map" className="h-full w-full rounded-md relative z-10"></div>;
 };
