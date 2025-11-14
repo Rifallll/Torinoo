@@ -123,11 +123,28 @@ const fetchNewsFromGNewsApi = async (query: string, language: string): Promise<N
 };
 
 // Helper to normalize a string for comparison (e.g., for titles)
-const normalizeTitle = (title: string | null | undefined) => {
-  if (!title) return '';
+const normalizeText = (text: string | null | undefined) => {
+  if (!text) return '';
   // Convert to lowercase, remove punctuation, and extra spaces
-  // Using \p{L} for Unicode letters, \p{N} for Unicode numbers
-  return title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  return text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+};
+
+// Helper to check if an article is traffic-related
+const isTrafficRelated = (article: NewsArticle): boolean => {
+  const trafficKeywords = [
+    "traffic", "congestion", "road", "incident", "accident", "delay", "route", "vehicle", "mobility", "transport", "transit",
+    "traffico", "congestione", "strada", "incidente", "ritardo", "percorso", "veicolo", "mobilità", "trasporto", "circolazione"
+  ];
+
+  const title = normalizeText(article.title);
+  const description = normalizeText(article.description);
+  const content = normalizeText(article.content);
+
+  return trafficKeywords.some(keyword => 
+    title.includes(keyword) || 
+    description.includes(keyword) || 
+    content.includes(keyword)
+  );
 };
 
 const fetchCombinedNews = async (query: string, language: string): Promise<NewsArticle[]> => {
@@ -149,7 +166,7 @@ const fetchCombinedNews = async (query: string, language: string): Promise<NewsA
 
   for (const article of allArticles) {
     // Use URL as primary key, fallback to normalized title if URL is missing or generic
-    const key = article.url || normalizeTitle(article.title); 
+    const key = article.url || normalizeText(article.title); 
 
     if (!key) continue; // Skip articles without a valid key
 
@@ -192,7 +209,10 @@ const fetchCombinedNews = async (query: string, language: string): Promise<NewsA
     }
   }
 
-  const finalArticles = Array.from(deduplicatedArticles.values());
+  let finalArticles = Array.from(deduplicatedArticles.values());
+
+  // Apply the traffic-related filter
+  finalArticles = finalArticles.filter(isTrafficRelated);
 
   // Sort by publishedAt in descending order
   finalArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
