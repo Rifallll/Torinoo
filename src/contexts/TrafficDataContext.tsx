@@ -10,8 +10,8 @@ export interface TrafficDataRow {
   interval: number;
   hour: number;
   minute: number;
-  time: string;
-  time_of_day: string;
+  time: string; // e.g., "08:30"
+  time_of_day: string; // e.g., "pagi", "siang"
   flow: number;
   speed: number;
   occ: number;

@@ -2,15 +2,23 @@
 
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input, Button, Card, CardContent, CardHeader, CardTitle, Search, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'; // Corrected import
+import { Input } from '@/components/ui/input'; // Corrected import
+import { Button } from '@/components/ui/button'; // Corrected import
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Corrected import
 import { useTrafficData, TrafficDataRow } from '@/contexts/TrafficDataContext';
 
 const ITEMS_PER_PAGE = 20; // Number of rows per page
 
 const TrafficDataTablePage: React.FC = () => {
-  const { uploadedData, isLoading, error } = useTrafficData();
+  const { uploadedData, analysisStatus } = useTrafficData(); // Corrected destructuring
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const isLoading = analysisStatus === 'processing' || analysisStatus === 'idle';
+  const error = analysisStatus === 'error' ? new Error("Failed to load raw data.") : null;
+
 
   const filteredData = useMemo(() => {
     if (!uploadedData) return [];
@@ -120,7 +128,7 @@ const TrafficDataTablePage: React.FC = () => {
                     <TableRow className="border-b border-gray-200 dark:border-gray-600">
                       {columns.map(key => (
                         <TableHead key={key} className="py-4 px-6 text-gray-700 dark:text-gray-300 font-semibold text-sm whitespace-nowrap">
-                          {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} {/* Format column names */}
+                          {(key as string).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} {/* Format column names */}
                         </TableHead>
                       ))}
                     </TableRow>
