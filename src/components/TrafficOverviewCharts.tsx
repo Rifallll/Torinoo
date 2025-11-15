@@ -141,9 +141,18 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
 
   const totalCongestionPercentage = useMemo(() => {
     if (congestionData.length === 0) return 0;
-    const totalHighModerate = congestionData.filter(d => d.name !== 'Low Congestion').reduce((sum, d) => sum + d.value, 0);
-    const totalAll = congestionData.reduce((sum, d) => sum + d.value, 0);
-    return totalAll > 0 ? ((totalHighModerate / totalAll) * 100).toFixed(0) : 0;
+
+    let highModerateSum = 0;
+    let totalSum = 0;
+
+    for (const d of congestionData) {
+      totalSum += d.value;
+      if (d.name !== 'Low Congestion') {
+        highModerateSum += d.value;
+      }
+    }
+    
+    return totalSum > 0 ? ((highModerateSum / totalSum) * 100).toFixed(0) : 0;
   }, [congestionData]);
 
   // --- Data preparation for new charts ---
