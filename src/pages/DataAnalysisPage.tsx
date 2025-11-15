@@ -13,7 +13,7 @@ import { useTrafficData } from '@/contexts/TrafficDataContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, ScatterChart, Scatter } from 'recharts';
 
 const DataAnalysisPage = () => {
-  const { uploadedData, analysisStatus, analysisProgress, analysisResults, startAnalysis, resetAnalysis } = useTrafficData();
+  const { uploadedData, analysisStatus, analysisProgress, analysisResults, startAnalysis, resetAnalysis, hasMoreData, loadMoreData } = useTrafficData();
 
   const getStatusMessage = () => {
     switch (analysisStatus) {
@@ -176,7 +176,7 @@ const DataAnalysisPage = () => {
               {uploadedData && (
                 <p className="text-sm text-gray-600 flex items-center">
                   <FileText className="h-4 w-4 mr-2" />
-                  Data uploaded: {uploadedData.length} rows.
+                  Data loaded: {uploadedData.length} records. {hasMoreData && <span className="ml-1">(More available)</span>}
                 </p>
               )}
               <p className="text-sm text-gray-600">
@@ -184,6 +184,12 @@ const DataAnalysisPage = () => {
               </p>
             </div>
             <div className="mt-6 flex justify-end space-x-2">
+              {hasMoreData && (
+                <Button variant="outline" onClick={loadMoreData} className="flex items-center">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Load More Data
+                </Button>
+              )}
               {analysisStatus === 'completed' && (
                 <Button variant="outline" onClick={resetAnalysis} className="flex items-center">
                   <RefreshCcw className="h-4 w-4 mr-2" />
@@ -232,7 +238,7 @@ const DataAnalysisPage = () => {
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
                 <div className="space-y-2">
-                  <p><strong>Total Records:</strong> {analysisResults.totalRecords}</p>
+                  <p><strong>Total Records Analyzed:</strong> {analysisResults.totalRecords}</p>
                   <p><strong>Average Speed:</strong> {analysisResults.averageSpeed}</p>
                   <p><strong>Average Flow:</strong> {analysisResults.averageFlow}</p>
                   <p><strong>Average Occupancy:</strong> {analysisResults.averageOccupancy}</p>

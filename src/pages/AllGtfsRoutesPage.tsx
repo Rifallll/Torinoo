@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Route, Bus, TramFront, Info, Search, XCircle, TrainFront, CableCar, Ship, Cable } from 'lucide-react'; // Replaced Ferry with Ship
+import { ArrowLeft, Route, Bus, TramFront, Info, Search, XCircle, TrainFront, CableCar, Ship, Cable, Plus } from 'lucide-react'; // Replaced Ferry with Ship
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,13 +11,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+const ITEMS_PER_LOAD = 20; // Number of items to load at a time
+
 const AllGtfsRoutesPage: React.FC = () => {
   const { data: gtfsData, isLoading, error } = useGtfsData();
-  const routes = gtfsData?.routes || [];
+  const allRoutes = gtfsData?.routes || [];
   const agencies = gtfsData?.agencies || [];
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedRouteType, setSelectedRouteType] = useState<string>('all');
+  const [loadCount, setLoadCount] = useState(1);
 
   const getRouteTypeLabel = (routeType: number) => {
     switch (routeType) {
@@ -48,7 +51,7 @@ const AllGtfsRoutesPage: React.FC = () => {
   };
 
   const filteredRoutes = useMemo(() => {
-    let currentRoutes = routes;
+    let currentRoutes = allRoutes;
 
     // Filter by search term
     if (searchTerm) {
@@ -69,18 +72,27 @@ const AllGtfsRoutesPage: React.FC = () => {
     }
 
     return currentRoutes;
-  }, [routes, searchTerm, selectedRouteType, agencies]);
+  }, [allRoutes, searchTerm, selectedRouteType, agencies]);
+
+  const displayedRoutes = useMemo(() => {
+    return filteredRoutes.slice(0, loadCount * ITEMS_PER_LOAD);
+  }, [filteredRoutes, loadCount]);
+
+  const handleLoadMore = useCallback(() => {
+    setLoadCount(prevCount => prevCount + 1);
+  }, []);
 
   const handleResetFilters = () => {
     setSearchTerm('');
     setSelectedRouteType('all');
+    setLoadCount(1); // Reset load count when filters change
   };
 
   const availableRouteTypes = useMemo(() => {
     const types = new Set<number>();
-    routes.forEach(route => types.add(route.route_type));
+    allRoutes.forEach(route => types.add(route.route_type));
     return Array.from(types).sort((a, b) => a - b);
-  }, [routes]);
+  }, [allRoutes]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
@@ -154,7 +166,7 @@ const AllGtfsRoutesPage: React.FC = () => {
               Failed to load routes: {error.message}
             </CardContent>
           </Card>
-        ) : filteredRoutes.length > 0 ? (
+        ) : displayedRoutes.length > 0 ? (
           <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-xl rounded-xl">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -170,7 +182,7 @@ const AllGtfsRoutesPage: React.FC = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredRoutes.map((route) => {
+                    {displayedRoutes.map((route) => {
                       const agency = agencies.find(a => a.agency_id === route.agency_id);
                       return (
                         <TableRow key={route.route_id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -191,6 +203,13 @@ const AllGtfsRoutesPage: React.FC = () => {
                 </Table>
               </div>
             </CardContent>
+            {displayedRoutes.length < filteredRoutes.length && (
+              <div className="text-center mt-4 p-4 border-t dark:border-gray-700">
+                <Button onClick={handleLoadMore} variant="outline" className="flex items-center mx-auto">
+                  <Plus className="h-4 w-4 mr-2" /> Load More ({filteredRoutes.length - displayedRoutes.length} remaining)
+                </Button>
+              </div>
+            )}
           </Card>
         ) : (
           <Card className="dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-xl">

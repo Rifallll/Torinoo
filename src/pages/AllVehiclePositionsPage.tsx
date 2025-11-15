@@ -1,26 +1,40 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Gauge, ArrowRight, TrafficCone } from 'lucide-react';
+import { ArrowLeft, Bus, TramFront, Clock, MapPin, Info, Car, Gauge, ArrowRight, TrafficCone, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { parseGtfsRealtimeData, ParsedVehiclePosition, formatRelativeTime } from '@/utils/gtfsRealtimeParser';
 
+const ITEMS_PER_LOAD = 20; // Number of items to load at a time
+
 const AllVehiclePositionsPage: React.FC = () => {
-  const [vehiclePositions, setVehiclePositionData] = useState<ParsedVehiclePosition[]>([]);
+  const [allVehiclePositions, setAllVehiclePositions] = useState<ParsedVehiclePosition[]>([]);
+  const [displayedVehiclePositions, setDisplayedVehiclePositions] = useState<ParsedVehiclePosition[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadCount, setLoadCount] = useState(1);
 
   const fetchAndParseData = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Only fetch vehicle positions for this page
       const data = await parseGtfsRealtimeData('/trip_update.bin', '/alerts.bin', '/vehicle_position.bin');
-      setVehiclePositionData(data.vehiclePositions);
-      console.log("[AllVehiclePositionsPage] Fetched Vehicle Positions:", data.vehiclePositions);
+      // Sort vehicle positions to prioritize 'EMPTY' occupancy status
+      const sortedData = [...data.vehiclePositions].sort((a, b) => {
+        if (a.occupancy_status === 'EMPTY' && b.occupancy_status !== 'EMPTY') {
+          return -1;
+        }
+        if (a.occupancy_status !== 'EMPTY' && b.occupancy_status === 'EMPTY') {
+          return 1;
+        }
+        return 0;
+      });
+      setAllVehiclePositions(sortedData);
+      setDisplayedVehiclePositions(sortedData.slice(0, ITEMS_PER_LOAD));
+      console.log("[AllVehiclePositionsPage] Fetched Vehicle Positions:", sortedData);
     } catch (err) {
       console.error("Failed to fetch or parse GTFS-realtime data:", err);
       setError("Failed to load or parse vehicle position data.");
@@ -51,7 +65,7 @@ const AllVehiclePositionsPage: React.FC = () => {
 
     // Simulate real-time updates for vehicle positions
     const interval = setInterval(() => {
-      setVehiclePositionData(prevPositions =>
+      setAllVehiclePositions(prevPositions =>
         prevPositions.map(vp => {
           const newTimestamp = Math.floor(Date.now() / 1000); // Always use current time for update
 
@@ -101,6 +115,15 @@ const AllVehiclePositionsPage: React.FC = () => {
     }, 15000); // Update every 15 seconds
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Update displayed vehicles when allVehiclePositions or loadCount changes
+  useEffect(() => {
+    setDisplayedVehiclePositions(allVehiclePositions.slice(0, loadCount * ITEMS_PER_LOAD));
+  }, [allVehiclePositions, loadCount]);
+
+  const handleLoadMore = useCallback(() => {
+    setLoadCount(prevCount => prevCount + 1);
   }, []);
 
   const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
@@ -162,17 +185,6 @@ const AllVehiclePositionsPage: React.FC = () => {
     }
   };
 
-  // Sort vehicle positions to prioritize 'EMPTY' occupancy status
-  const sortedVehiclePositions = [...vehiclePositions].sort((a, b) => {
-    if (a.occupancy_status === 'EMPTY' && b.occupancy_status !== 'EMPTY') {
-      return -1;
-    }
-    if (a.occupancy_status !== 'EMPTY' && b.occupancy_status === 'EMPTY') {
-      return 1;
-    }
-    return 0;
-  });
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
       <header className="flex items-center justify-between mb-6">
@@ -193,42 +205,51 @@ const AllVehiclePositionsPage: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">Loading all vehicle positions...</p>
         ) : error ? (
           <p className="text-red-500 text-center py-4 col-span-full">{error}</p>
-        ) : sortedVehiclePositions.length > 0 ? (
-          sortedVehiclePositions.map(vp => (
-            <Card key={vp.id} className="overflow-hidden flex flex-col">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold flex items-center">
-                  {getRouteTypeIcon(vp.trip?.route_id)}
-                  Route {vp.trip?.route_id || vp.vehicle?.label || vp.id}
-                </CardTitle>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Trip ID: {vp.trip?.trip_id || 'N/A'}</p>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-between space-y-2">
-                <div className="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
-                  <span className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
-                  </span>
-                  <Badge variant="secondary" className="text-xs">
-                    {getVehicleStatus(vp.current_status, vp.occupancy_status)}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
-                  <span className="flex items-center">
-                    <Gauge className="h-4 w-4 mr-2" /> Speed: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
-                  </span>
-                  <span className="flex items-center">
-                    <ArrowRight className="h-4 w-4 mr-2" /> Bearing: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
-                  </span>
-                  <span className="flex items-center col-span-2">
-                    <TrafficCone className="h-4 w-4 mr-2" /> Congestion: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
-                  </span>
-                  <span className="flex items-center col-span-2">
-                    <Clock className="h-4 w-4 mr-2" /> Update: {formatRelativeTime(vp.timestamp)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+        ) : displayedVehiclePositions.length > 0 ? (
+          <>
+            {displayedVehiclePositions.map(vp => (
+              <Card key={vp.id} className="overflow-hidden flex flex-col">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold flex items-center">
+                    {getRouteTypeIcon(vp.trip?.route_id)}
+                    Route {vp.trip?.route_id || vp.vehicle?.label || vp.id}
+                  </CardTitle>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Trip ID: {vp.trip?.trip_id || 'N/A'}</p>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col justify-between space-y-2">
+                  <div className="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
+                    <span className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-2" /> Lat: {vp.position?.latitude?.toFixed(4) || 'N/A'}, Lon: {vp.position?.longitude?.toFixed(4) || 'N/A'}
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {getVehicleStatus(vp.current_status, vp.occupancy_status)}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center">
+                      <Gauge className="h-4 w-4 mr-2" /> Speed: {vp.position?.speed ? `${vp.position.speed.toFixed(1)} km/h` : 'N/A'}
+                    </span>
+                    <span className="flex items-center">
+                      <ArrowRight className="h-4 w-4 mr-2" /> Bearing: {vp.position?.bearing ? `${vp.position.bearing.toFixed(0)}°` : 'N/A'}
+                    </span>
+                    <span className="flex items-center col-span-2">
+                      <TrafficCone className="h-4 w-4 mr-2" /> Congestion: <Badge className={getCongestionBadgeClass(vp.congestion_level)}>{formatCongestionLevel(vp.congestion_level)}</Badge>
+                    </span>
+                    <span className="flex items-center col-span-2">
+                      <Clock className="h-4 w-4 mr-2" /> Update: {formatRelativeTime(vp.timestamp)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {displayedVehiclePositions.length < allVehiclePositions.length && (
+              <div className="col-span-full text-center mt-4">
+                <Button onClick={handleLoadMore} variant="outline" className="flex items-center">
+                  <Plus className="h-4 w-4 mr-2" /> Load More ({allVehiclePositions.length - displayedVehiclePositions.length} remaining)
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">No vehicle positions available.</p>
         )}
