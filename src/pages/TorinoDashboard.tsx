@@ -24,6 +24,7 @@ import GtfsRoutesCard from '@/components/GtfsRoutesCard'; // New component
 // import TrafficSpeedDistributionChart from '@/components/TrafficSpeedDistributionChart'; // Removed
 import QuickActionsCard from '@/components/QuickActionsCard';
 import { mockTrafficChanges } from '@/components/TrafficChangesInsights'; // New: Import mockTrafficChanges
+import TrafficOverviewCharts from '@/components/TrafficOverviewCharts'; // New: Import TrafficOverviewCharts
 
 // import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Removed chart imports
 
@@ -202,6 +203,11 @@ const TorinoDashboard = () => {
                 onExportClick={handleExportClick}
               />
             </div>
+          </div>
+
+          {/* New: Traffic Overview Charts */}
+          <div className="mt-6">
+            <TrafficOverviewCharts />
           </div>
 
           {/* Removed: RecentNewsSection as it uses dummy data */}
