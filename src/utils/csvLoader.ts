@@ -25,7 +25,7 @@ export interface TorinoTrafficDataRow {
 }
 
 /**
- * Loads and parses the torino_cleaned_ordered.csv file.
+ * Loads and parses the torino_cleaned_ordered.csv file, filtering by a specific date range.
  * @returns A promise that resolves to an array of TorinoTrafficDataRow objects.
  */
 export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> => {
@@ -48,7 +48,7 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
             toast.error(`Failed to parse traffic data CSV: ${results.errors[0].message}`);
             reject(new Error(`Parsing error in ${filePath}`));
           }
-          // Ensure the data matches the interface
+          
           const parsedData = results.data.map((row: any) => ({
             day: String(row.day),
             day_of_week: String(row.day_of_week),
@@ -68,10 +68,21 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
             week_number: Number(row.week_number),
             is_weekend: Boolean(row.is_weekend),
           })) as TorinoTrafficDataRow[];
+
+          // Define the date range for filtering
+          const startDate = new Date('2016-09-26T00:00:00Z'); // Start of September 26, 2016
+          const endDate = new Date('2016-09-28T23:59:59Z');   // End of September 28, 2016
+
+          const filteredData = parsedData.filter(row => {
+            // Convert the 'day' string from the row to a Date object for comparison
+            const rowDate = new Date(row.day + 'T00:00:00Z'); // Append T00:00:00Z to ensure UTC comparison
+
+            return rowDate >= startDate && rowDate <= endDate;
+          });
           
-          toast.success("Torino traffic data loaded successfully!");
-          console.log("Torino Traffic Data Loaded:", parsedData);
-          resolve(parsedData);
+          toast.success(`Torino traffic data loaded and filtered for 2016-09-26 to 2016-09-28! Total records: ${filteredData.length}`);
+          console.log("Torino Traffic Data Loaded and Filtered:", filteredData);
+          resolve(filteredData);
         },
         error: (error: Error) => {
           console.error(`Error reading ${filePath}:`, error);
