@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
-import { loadTorinoTrafficData, TorinoTrafficDataRow } from '@/utils/csvLoader'; // Import the new loader
+import { loadTorinoTrafficData, TorinoTrafficDataRow } from '@/utils/csvLoader';
 
 export interface TrafficDataRow {
   day: string;
@@ -27,7 +27,6 @@ export interface TrafficDataRow {
 
 interface AnalysisResults {
   totalRecords: number;
-  // uniqueDetectors: number; // Removed as 'detid' column is no longer present
   averageSpeed: string;
   averageFlow: string;
   averageOccupancy: string;
@@ -43,27 +42,38 @@ interface TrafficDataContextType {
   analysisStatus: 'idle' | 'processing' | 'completed' | 'error';
   analysisProgress: number;
   analysisResults: AnalysisResults | null; // Simulated analysis results
+  hasMoreData: boolean; // New: Indicates if there's more data than currently loaded
   uploadData: (data: TrafficDataRow[]) => void;
   startAnalysis: () => void;
   resetAnalysis: () => void;
+  loadMoreData: () => void; // New: Function to load more data
 }
 
 const TrafficDataContext = createContext<TrafficDataContextType | undefined>(undefined);
 
+// Define a constant for the maximum number of rows to load initially
+const MAX_INITIAL_LOAD_ROWS = 10000; // Load 10,000 rows initially
+
 export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [uploadedData, setUploadedData] = useState<TrafficDataRow[] | null>(null);
+  const [allRawData, setAllRawData] = useState<TorinoTrafficDataRow[] | null>(null); // Store all raw data
   const [analysisStatus, setAnalysisStatus] = useState<'idle' | 'processing' | 'completed' | 'error'>('idle');
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+  const [hasMoreData, setHasMoreData] = useState(false); // New state
 
   // Load default data from torino_cleaned_ordered.csv on initial mount
   useEffect(() => {
     const fetchDefaultData = async () => {
       try {
         const data = await loadTorinoTrafficData();
-        setUploadedData(data as TrafficDataRow[]); // Cast to TrafficDataRow[]
-        // Automatically start analysis for the default data
-        simulateAnalysis(data as TrafficDataRow[]); // Cast to TrafficDataRow[]
+        setAllRawData(data); // Store all raw data
+        const initialData = data.slice(0, MAX_INITIAL_LOAD_ROWS);
+        setUploadedData(initialData as TrafficDataRow[]);
+        setHasMoreData(data.length > MAX_INITIAL_LOAD_ROWS); // Set hasMoreData
+        
+        // Automatically start analysis for the initial subset of data
+        simulateAnalysis(initialData as TrafficDataRow[]);
       } catch (err) {
         console.error("Failed to load default traffic data:", err);
         setAnalysisStatus('error');
@@ -89,7 +99,6 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
 
         // Perform actual analysis based on the new CSV structure
         const totalRecords = data.length;
-        // const uniqueDetectors = new Set(data.map(row => row.detid)).size; // Removed as 'detid' column is no longer present
 
         const totalSpeed = data.reduce((sum, row) => sum + (Number(row.speed) || 0), 0);
         const totalFlow = data.reduce((sum, row) => sum + (Number(row.flow) || 0), 0);
@@ -144,7 +153,6 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
 
         setAnalysisResults({
           totalRecords,
-          // uniqueDetectors, // Removed
           averageSpeed,
           averageFlow,
           averageOccupancy,
@@ -158,8 +166,11 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
   }, []);
 
   const uploadData = useCallback((data: TrafficDataRow[]) => {
-    setUploadedData(data);
-    simulateAnalysis(data);
+    setAllRawData(data); // Store all uploaded data
+    const initialData = data.slice(0, MAX_INITIAL_LOAD_ROWS);
+    setUploadedData(initialData);
+    setHasMoreData(data.length > MAX_INITIAL_LOAD_ROWS);
+    simulateAnalysis(initialData);
   }, [simulateAnalysis]);
 
   const startAnalysis = useCallback(() => {
@@ -172,11 +183,24 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   const resetAnalysis = useCallback(() => {
     setUploadedData(null);
+    setAllRawData(null);
     setAnalysisStatus('idle');
     setAnalysisProgress(0);
     setAnalysisResults(null);
+    setHasMoreData(false);
     toast.info("Analysis status has been reset.");
   }, []);
+
+  const loadMoreData = useCallback(() => {
+    if (allRawData && uploadedData) {
+      const currentLength = uploadedData.length;
+      const nextChunk = allRawData.slice(currentLength, currentLength + MAX_INITIAL_LOAD_ROWS);
+      const newLoadedData = [...uploadedData, ...nextChunk];
+      setUploadedData(newLoadedData);
+      setHasMoreData(allRawData.length > newLoadedData.length);
+      toast.info(`Loaded ${nextChunk.length} more records. Total: ${newLoadedData.length}`);
+    }
+  }, [allRawData, uploadedData]);
 
   return (
     <TrafficDataContext.Provider
@@ -185,9 +209,11 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
         analysisStatus,
         analysisProgress,
         analysisResults,
+        hasMoreData,
         uploadData,
         startAnalysis,
         resetAnalysis,
+        loadMoreData,
       }}
     >
       {children}
