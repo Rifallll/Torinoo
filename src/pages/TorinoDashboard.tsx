@@ -25,7 +25,6 @@ import GtfsRoutesCard from '@/components/GtfsRoutesCard'; // New component
 import QuickActionsCard from '@/components/QuickActionsCard';
 import { mockTrafficChanges } from '@/components/TrafficChangesInsights'; // New: Import mockTrafficChanges
 import TrafficOverviewCharts from '@/components/TrafficOverviewCharts'; // New: Import TrafficOverviewCharts
-import { useTrafficData } from '@/contexts/TrafficDataContext'; // Import useTrafficData
 
 // import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'; // Removed chart imports
 
@@ -39,8 +38,6 @@ const TorinoDashboard = () => {
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
-
-  const { uploadedData } = useTrafficData(); // Get uploadedData from context
 
   // Memoize callback functions for QuickActionsCard
   const handleUploadCSVClick = useCallback(() => {
@@ -210,7 +207,7 @@ const TorinoDashboard = () => {
 
           {/* New: Traffic Overview Charts */}
           <div className="mt-6">
-            {uploadedData && <TrafficOverviewCharts data={uploadedData} />}
+            <TrafficOverviewCharts />
           </div>
 
           {/* Removed: RecentNewsSection as it uses dummy data */}

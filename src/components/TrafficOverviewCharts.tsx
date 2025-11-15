@@ -2,98 +2,57 @@
 
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrafficDataRow } from '@/contexts/TrafficDataContext';
-
-// Import modular chart components
-import TrafficSummaryLineChart from '@/components/charts/TrafficSummaryLineChart';
-import TrafficCongestionDonutChart from '@/components/charts/TrafficCongestionDonutChart';
-import AverageSpeedByDayOfWeekChart from '@/components/charts/AverageSpeedByDayOfWeekChart';
-import AverageFlowByTimeOfDayChart from '@/components/charts/AverageFlowByTimeOfDayChart';
-import FlowSpeedScatterPlot from '@/components/charts/FlowSpeedScatterPlot';
-import SpeedDistributionHistogram from '@/components/charts/SpeedDistributionHistogram';
-import FlowDistributionHistogram from '@/components/charts/FlowDistributionHistogram';
-import OccupancyDistributionHistogram from '@/components/charts/OccupancyDistributionHistogram';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, BarChart2, Gauge, TrafficCone, Cloud } from 'lucide-react';
+import { useTrafficData, TrafficDataRow } from '@/contexts/TrafficDataContext';
+import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 
 type ChartType = 'dailyFlow' | 'dailySpeed' | 'hourlyFlow' | 'hourlySpeed';
 
-interface TrafficOverviewChartsProps {
-  data: TrafficDataRow[];
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  label?: string;
+  chartType: ChartType;
 }
 
-const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo(({ data }) => {
+const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, chartType }) => {
+  if (active && payload && payload.length) {
+    const dataPoint = payload[0].payload;
+    let formattedLabel = label;
+    let valueLabel = '';
+    let unit = '';
+
+    if (chartType.includes('daily')) {
+      formattedLabel = format(new Date(label || ''), 'MMM dd, yyyy', { locale: enUS });
+    } else if (chartType.includes('hourly')) {
+      formattedLabel = `${label}`;
+    }
+
+    if (chartType.includes('Flow')) {
+      valueLabel = 'Flow';
+      unit = '';
+    } else if (chartType.includes('Speed')) {
+      valueLabel = 'Speed';
+      unit = ' km/h';
+    }
+
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg text-sm text-gray-800 dark:text-gray-100">
+        <p className="font-semibold mb-1">{formattedLabel}</p>
+        <p>{`${valueLabel}: ${payload[0].value}${unit}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const TrafficOverviewCharts: React.FC = React.memo(() => {
+  const { uploadedData, analysisResults, analysisStatus } = useTrafficData();
   const [selectedChartType, setSelectedChartType] = useState<ChartType>('dailyFlow');
-
-  const analysisResults = useMemo(() => {
-    if (!data || data.length === 0) {
-      return null;
-    }
-
-    const totalRecords = data.length;
-    let totalSpeed = 0;
-    let totalFlow = 0;
-    let totalOccupancy = 0;
-
-    const dailyData: { [day: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
-    const hourlyData: { [hour: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
-
-    for (const row of data) {
-      totalSpeed += (Number(row.speed) || 0);
-      totalFlow += (Number(row.flow) || 0);
-      totalOccupancy += (Number(row.occ) || 0);
-
-      // Daily data aggregation
-      if (!dailyData[row.day]) {
-        dailyData[row.day] = { totalSpeed: 0, totalFlow: 0, count: 0 };
-      }
-      dailyData[row.day].totalSpeed += (Number(row.speed) || 0);
-      dailyData[row.day].totalFlow += (Number(row.flow) || 0);
-      dailyData[row.day].count++;
-
-      // Hourly data aggregation
-      const hour = row.time.split(':')[0] + ':00';
-      if (!hourlyData[hour]) {
-        hourlyData[hour] = { totalSpeed: 0, totalFlow: 0, count: 0 };
-      }
-      hourlyData[hour].totalSpeed += (Number(row.speed) || 0);
-      hourlyData[hour].totalFlow += (Number(row.flow) || 0);
-      hourlyData[hour].count++;
-    }
-
-    const averageSpeed = totalRecords > 0 ? (totalSpeed / totalRecords).toFixed(2) + ' km/h' : 'N/A';
-    const averageFlow = totalRecords > 0 ? (totalFlow / totalRecords).toFixed(2) : 'N/A';
-    const averageOccupancy = totalRecords > 0 ? (totalOccupancy / totalRecords).toFixed(2) + ' %' : 'N/A';
-
-    const dailySpeedAverages = Object.keys(dailyData).map(day => ({
-      day,
-      averageSpeed: dailyData[day].count > 0 ? parseFloat((dailyData[day].totalSpeed / dailyData[day].count).toFixed(2)) : 0,
-    })).sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
-
-    const dailyFlowAverages = Object.keys(dailyData).map(day => ({
-      day,
-      averageFlow: dailyData[day].count > 0 ? parseFloat((dailyData[day].totalFlow / dailyData[day].count).toFixed(2)) : 0,
-    })).sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
-
-    const hourlySpeedAverages = Object.keys(hourlyData).map(hour => ({
-      hour,
-      averageSpeed: hourlyData[hour].count > 0 ? parseFloat((hourlyData[hour].totalSpeed / hourlyData[hour].count).toFixed(2)) : 0,
-    })).sort((a, b) => a.hour.localeCompare(b.hour));
-
-    const hourlyFlowAverages = Object.keys(hourlyData).map(hour => ({
-      hour,
-      averageFlow: hourlyData[hour].count > 0 ? parseFloat((hourlyData[hour].totalFlow / hourlyData[hour].count).toFixed(2)) : 0,
-    })).sort((a, b) => a.hour.localeCompare(b.hour));
-
-    return {
-      totalRecords,
-      averageSpeed,
-      averageFlow,
-      averageOccupancy,
-      dailySpeedAverages,
-      dailyFlowAverages,
-      hourlySpeedAverages,
-      hourlyFlowAverages,
-    };
-  }, [data]);
 
   const chartData = useMemo(() => {
     if (!analysisResults) return [];
@@ -119,13 +78,13 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
   }, [selectedChartType]);
 
   const congestionData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!uploadedData || uploadedData.length === 0) return [];
 
     let low = 0;
     let moderate = 0;
     let high = 0;
 
-    for (const row of data) {
+    uploadedData.forEach((row: TrafficDataRow) => {
       const speed = row.speed;
       if (speed < 20) {
         high++;
@@ -134,160 +93,33 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
       } else {
         low++;
       }
-    }
+    });
 
     const total = low + moderate + high;
     if (total === 0) return [];
 
     return [
-      { name: 'Low Congestion', value: low, percentage: (low / total) * 100, color: '#82ca9d' },
-      { name: 'Moderate Congestion', value: moderate, percentage: (moderate / total) * 100, color: '#ffc658' },
-      { name: 'High Congestion', value: high, percentage: (high / total) * 100, color: '#ff7300' },
+      { name: 'Low Congestion', value: low, percentage: (low / total) * 100, color: '#82ca9d' }, // Green
+      { name: 'Moderate Congestion', value: moderate, percentage: (moderate / total) * 100, color: '#ffc658' }, // Yellow
+      { name: 'High Congestion', value: high, percentage: (high / total) * 100, color: '#ff7300' }, // Orange
     ];
-  }, [data]);
+  }, [uploadedData]);
 
   const totalCongestionPercentage = useMemo(() => {
     if (congestionData.length === 0) return 0;
-
-    let highModerateSum = 0;
-    let totalSum = 0;
-
-    for (const d of congestionData) {
-      totalSum += d.value;
-      if (d.name !== 'Low Congestion') {
-        highModerateSum += d.value;
-      }
-    }
-    
-    return totalSum > 0 ? ((highModerateSum / totalSum) * 100).toFixed(0) : 0;
+    const totalHighModerate = congestionData.filter(d => d.name !== 'Low Congestion').reduce((sum, d) => sum + d.value, 0);
+    const totalAll = congestionData.reduce((sum, d) => sum + d.value, 0);
+    return totalAll > 0 ? ((totalHighModerate / totalAll) * 100).toFixed(0) : 0;
   }, [congestionData]);
 
-  // --- Data preparation for new charts ---
-  const speedDistributionData = useMemo(() => {
-    if (!data) return [];
-    const speeds = data.map(row => row.speed).filter(s => s !== undefined && s !== null) as number[];
-    const bins = Array.from({ length: 9 }, (_, i) => i * 10);
-    const counts = new Array(bins.length).fill(0);
+  const PIE_COLORS = ['#82ca9d', '#ffc658', '#ff7300']; // Green, Yellow, Orange
 
-    for (const speed of speeds) {
-      for (let i = 0; i < bins.length; i++) {
-        if (speed >= bins[i] && (i === bins.length - 1 || speed < bins[i + 1])) {
-          counts[i]++;
-          break;
-        }
-      }
-    }
-
-    return bins.map((bin, i) => ({
-      range: `${bin}-${bin + 9} km/h`,
-      count: counts[i],
-    })).filter(d => d.count > 0);
-  }, [data]);
-
-  const flowDistributionData = useMemo(() => {
-    if (!data) return [];
-    const flows = data.map(row => row.flow).filter(f => f !== undefined && f !== null) as number[];
-    
-    // Calculate maxFlow iteratively to avoid stack overflow
-    let maxFlow = 0;
-    if (flows.length > 0) {
-      maxFlow = flows[0];
-      for (let i = 1; i < flows.length; i++) {
-        if (flows[i] > maxFlow) {
-          maxFlow = flows[i];
-        }
-      }
-    }
-
-    const binSize = Math.ceil(maxFlow / 10);
-    const bins = Array.from({ length: 10 }, (_, i) => i * binSize);
-    const counts = new Array(bins.length).fill(0);
-
-    for (const flow of flows) {
-      for (let i = 0; i < bins.length; i++) {
-        if (flow >= bins[i] && (i === bins.length - 1 || flow < bins[i + 1])) {
-          counts[i]++;
-          break;
-        }
-      }
-    }
-
-    return bins.map((bin, i) => ({
-      range: `${bin}-${bin + binSize - 1}`,
-      count: counts[i],
-    })).filter(d => d.count > 0);
-  }, [data]);
-
-  const occupancyDistributionData = useMemo(() => {
-    if (!data) return [];
-    const occs = data.map(row => row.occ).filter(o => o !== undefined && o !== null) as number[];
-    const bins = Array.from({ length: 11 }, (_, i) => i * 10);
-    const counts = new Array(bins.length).fill(0);
-
-    for (const occ of occs) {
-      for (let i = 0; i < bins.length; i++) {
-        if (occ >= bins[i] && (i === bins.length - 1 || occ < bins[i + 1])) {
-          counts[i]++;
-          break;
-        }
-      }
-    }
-
-    return bins.map((bin, i) => ({
-      range: `${bin}-${bin + 9}%`,
-      count: counts[i],
-    })).filter(d => d.count > 0);
-  }, [data]);
-
-  const averageSpeedByDayOfWeek = useMemo(() => {
-    if (!data) return [];
-    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const dataMap: { [key: string]: { totalSpeed: number; count: number } } = {};
-
-    for (const row of data) {
-      if (!dataMap[row.day_of_week]) {
-        dataMap[row.day_of_week] = { totalSpeed: 0, count: 0 };
-      }
-      dataMap[row.day_of_week].totalSpeed += row.speed;
-      dataMap[row.day_of_week].count++;
-    }
-
-    return dayOrder.map(day => ({
-      day_of_week: day,
-      averageSpeed: dataMap[day] ? parseFloat((dataMap[day].totalSpeed / dataMap[day].count).toFixed(2)) : 0,
-    }));
-  }, [data]);
-
-  const averageFlowByTimeOfDay = useMemo(() => {
-    if (!data) return [];
-    const timeOfDayOrder = ["dini hari", "pagi", "siang", "sore", "malam"];
-    const dataMap: { [key: string]: { totalFlow: number; count: number } } = {};
-
-    for (const row of data) {
-      if (!dataMap[row.time_of_day]) {
-        dataMap[row.time_of_day] = { totalFlow: 0, count: 0 };
-      }
-      dataMap[row.time_of_day].totalFlow += row.flow;
-      dataMap[row.time_of_day].count++;
-    }
-
-    return timeOfDayOrder.map(time => ({
-      time_of_day: time,
-      averageFlow: dataMap[time] ? parseFloat((dataMap[time].totalFlow / dataMap[time].count).toFixed(2)) : 0,
-    }));
-  }, [data]);
-
-  const flowSpeedScatterData = useMemo(() => {
-    if (!data) return [];
-    return data.map(row => ({ flow: row.flow, speed: row.speed }));
-  }, [data]);
-  // --- End Data preparation for new charts ---
-
-  if (!analysisResults || !data || data.length === 0) {
+  if (analysisStatus === 'processing' || analysisStatus === 'idle') {
     return (
       <Card className="bg-white dark:bg-gray-800 shadow-lg col-span-full">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+            <BarChart2 className="h-5 w-5 mr-2 text-indigo-600 animate-pulse" />
             Loading Traffic Overview...
           </CardTitle>
         </CardHeader>
@@ -301,79 +133,116 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     );
   }
 
+  if (analysisStatus === 'error' || !analysisResults || !uploadedData) {
+    return (
+      <Card className="bg-white dark:bg-gray-800 shadow-lg col-span-full border-red-500">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-red-500 flex items-center">
+            <TrafficCone className="h-5 w-5 mr-2" />
+            Traffic Overview Error
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
+          <p>Failed to load traffic overview data. Please check the data source or try again.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Traffic Summary Line Chart */}
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader>
-          <TrafficSummaryLineChart
-            chartData={chartData}
-            selectedChartType={selectedChartType}
-            setSelectedChartType={setSelectedChartType}
-            lineDataKey={lineDataKey}
-            lineChartLabel={lineChartLabel}
-          />
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+            <BarChart2 className="h-5 w-5 mr-2 text-indigo-600" /> Traffic Summary
+          </CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center">
+                {selectedChartType === 'dailyFlow' && 'Daily Flow'}
+                {selectedChartType === 'dailySpeed' && 'Daily Speed'}
+                {selectedChartType === 'hourlyFlow' && 'Hourly Flow'}
+                {selectedChartType === 'hourlySpeed' && 'Hourly Speed'}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="z-50">
+              <DropdownMenuItem onClick={() => setSelectedChartType('dailyFlow')}>Daily Flow</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedChartType('dailySpeed')}>Daily Speed</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedChartType('hourlyFlow')}>Hourly Flow</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedChartType('hourlySpeed')}>Hourly Speed</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
-        <CardContent></CardContent>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 0,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis dataKey="name" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip content={<CustomLineChartTooltip chartType={selectedChartType} />} />
+              <Line type="monotone" dataKey={lineDataKey} stroke="#8884d8" activeDot={{ r: 8 }} name={lineChartLabel} />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
       </Card>
 
       {/* Traffic Congestion Breakdown Donut Chart */}
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
-          <TrafficCongestionDonutChart
-            congestionData={congestionData}
-            totalCongestionPercentage={totalCongestionPercentage}
-          />
+          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+            <TrafficCone className="h-5 w-5 mr-2 text-orange-600" /> Traffic Congestion Breakdown
+          </CardTitle>
         </CardHeader>
-        <CardContent></CardContent>
-      </Card>
-
-      {/* Average Speed by Day of Week */}
-      <Card className="flex flex-col">
-        <CardHeader>
-          <AverageSpeedByDayOfWeekChart data={averageSpeedByDayOfWeek} />
-        </CardHeader>
-        <CardContent></CardContent>
-      </Card>
-
-      {/* Average Flow by Time of Day */}
-      <Card className="flex flex-col">
-        <CardHeader>
-          <AverageFlowByTimeOfDayChart data={averageFlowByTimeOfDay} />
-        </CardHeader>
-        <CardContent></CardContent>
-      </Card>
-
-      {/* Flow vs Speed Scatter Plot */}
-      <Card className="lg:col-span-2 flex flex-col">
-        <CardHeader>
-          <FlowSpeedScatterPlot data={flowSpeedScatterData} />
-        </CardHeader>
-        <CardContent></CardContent>
-      </Card>
-
-      {/* Speed Distribution Histogram */}
-      <Card className="lg:col-span-1 flex flex-col">
-        <CardHeader>
-          <SpeedDistributionHistogram data={speedDistributionData} />
-        </CardHeader>
-        <CardContent></CardContent>
-      </Card>
-
-      {/* Flow Distribution Histogram */}
-      <Card className="lg:col-span-1 flex flex-col">
-        <CardHeader>
-          <FlowDistributionHistogram data={flowDistributionData} />
-        </CardHeader>
-        <CardContent></CardContent>
-      </Card>
-
-      {/* Occupancy Distribution Histogram */}
-      <Card className="lg:col-span-1 flex flex-col">
-        <CardHeader>
-          <OccupancyDistributionHistogram data={occupancyDistributionData} />
-        </CardHeader>
-        <CardContent></CardContent>
+        <CardContent className="h-[300px] flex items-center justify-center">
+          {congestionData.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={congestionData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {congestionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
+                  formatter={(value: number, name: string, props: any) => [`${value} (${props.payload.percentage.toFixed(1)}%)`, name]}
+                />
+                <Legend
+                  layout="vertical"
+                  verticalAlign="middle"
+                  align="right"
+                  wrapperStyle={{ right: -20, top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                  <tspan x="50%" dy="-0.5em">Total</tspan>
+                  <tspan x="50%" dy="1.5em">{totalCongestionPercentage}%</tspan>
+                </text>
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400">No congestion data available.</p>
+          )}
+        </CardContent>
       </Card>
     </div>
   );

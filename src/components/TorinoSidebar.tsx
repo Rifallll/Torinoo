@@ -4,7 +4,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route, Leaf, FileText
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route, Leaf
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -45,16 +45,15 @@ const navItems: NavItemConfig[] = [
       { label: "Traffic Changes & Roadworks", path: "/traffic-changes", icon: TrafficCone }, // New: Traffic Changes page
     ],
   },
-  {
-    label: "Analytics & Data", // New category for Data Analysis
-    icon: BarChart2,
-    isCategory: true,
-    subItems: [
-      { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
-      { label: "Raw Traffic Data", path: "/traffic-data-table", icon: FileText }, // New: Raw Traffic Data Table
-      { label: "Traffic Data Dashboard", path: "/traffic-data-dashboard", icon: LayoutDashboard }, // New: Traffic Data Dashboard
-    ],
-  },
+  // Kategori 'Analytics & Data' dihapus sesuai permintaan
+  // {
+  //   label: "Analytics & Data", // New category for Data Analysis
+  //   icon: BarChart2,
+  //   isCategory: true,
+  //   subItems: [
+  //     { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
+  //   ],
+  // },
   {
     label: "Environment",
     icon: CloudSun,

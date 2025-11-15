@@ -30,7 +30,8 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = React.memo(({ onUpload
             <Upload className="h-6 w-6 text-blue-600 mb-2" />
             <span className="text-sm font-medium text-gray-800 dark:text-gray-100">Upload CSV Data</span>
           </Button>
-          <Button
+          {/* Tombol 'View & Sync Data' dihapus sesuai permintaan */}
+          {/* <Button
             asChild
             variant="ghost"
             className="flex flex-col items-center justify-center p-3 h-auto w-full
@@ -42,7 +43,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = React.memo(({ onUpload
               <BarChart2 className="h-6 w-6 text-green-600 mb-2" />
               <span className="text-sm font-medium text-gray-800 dark:text-gray-100">View & Sync Data</span>
             </Link>
-          </Button>
+          </Button> */}
           <Button
             asChild
             variant="ghost"

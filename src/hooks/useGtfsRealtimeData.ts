@@ -112,7 +112,7 @@ export const useGtfsRealtimeData = () => {
           alerts: newAlerts,
         };
       });
-    }, 30000); // Changed from 15000ms (15 seconds) to 30000ms (30 seconds)
+    }, 15000);
 
     return () => clearInterval(interval);
   }, [fetchData]);
