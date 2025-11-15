@@ -52,6 +52,7 @@ const navItems: NavItemConfig[] = [
     subItems: [
       { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
       { label: "Raw Traffic Data", path: "/traffic-data-table", icon: FileText }, // New: Raw Traffic Data Table
+      { label: "Traffic Data Dashboard", path: "/traffic-data-dashboard", icon: LayoutDashboard }, // New: Traffic Data Dashboard
     ],
   },
   {

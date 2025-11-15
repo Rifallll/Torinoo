@@ -6,7 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, BarChart2, Gauge, TrafficCone, Cloud } from 'lucide-react';
-import { useTrafficData, TrafficDataRow } from '@/contexts/TrafficDataContext';
+import { TrafficDataRow } from '@/contexts/TrafficDataContext'; // Import TrafficDataRow
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 
@@ -50,9 +50,78 @@ const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload,
   return null;
 };
 
-const TrafficOverviewCharts: React.FC = React.memo(() => {
-  const { uploadedData, analysisResults, analysisStatus } = useTrafficData();
+interface TrafficOverviewChartsProps {
+  data: TrafficDataRow[]; // Now accepts data as a prop
+}
+
+const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo(({ data }) => {
   const [selectedChartType, setSelectedChartType] = useState<ChartType>('dailyFlow');
+
+  const analysisResults = useMemo(() => {
+    if (!data || data.length === 0) return null;
+
+    const totalRecords = data.length;
+    const totalSpeed = data.reduce((sum, row) => sum + (Number(row.speed) || 0), 0);
+    const totalFlow = data.reduce((sum, row) => sum + (Number(row.flow) || 0), 0);
+    const totalOccupancy = data.reduce((sum, row) => sum + (Number(row.occ) || 0), 0);
+
+    const averageSpeed = totalRecords > 0 ? (totalSpeed / totalRecords).toFixed(2) + ' km/h' : 'N/A';
+    const averageFlow = totalRecords > 0 ? (totalFlow / totalRecords).toFixed(2) : 'N/A';
+    const averageOccupancy = totalRecords > 0 ? (totalOccupancy / totalRecords).toFixed(2) + ' %' : 'N/A';
+
+    const dailyData: { [day: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
+    data.forEach(row => {
+      if (!dailyData[row.day]) {
+        dailyData[row.day] = { totalSpeed: 0, totalFlow: 0, count: 0 };
+      }
+      dailyData[row.day].totalSpeed += Number(row.speed) || 0;
+      dailyData[row.day].totalFlow += Number(row.flow) || 0;
+      dailyData[row.day].count++;
+    });
+
+    const dailySpeedAverages = Object.keys(dailyData).map(day => ({
+      day,
+      averageSpeed: dailyData[day].count > 0 ? parseFloat((dailyData[day].totalSpeed / dailyData[day].count).toFixed(2)) : 0,
+    })).sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
+
+    const dailyFlowAverages = Object.keys(dailyData).map(day => ({
+      day,
+      averageFlow: dailyData[day].count > 0 ? parseFloat((dailyData[day].totalFlow / dailyData[day].count).toFixed(2)) : 0,
+    })).sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
+
+    const hourlyData: { [hour: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
+    data.forEach(row => {
+      const hour = row.time.split(':')[0] + ':00';
+      if (!hourlyData[hour]) {
+        hourlyData[hour] = { totalSpeed: 0, totalFlow: 0, count: 0 };
+      }
+      hourlyData[hour].totalSpeed += Number(row.speed) || 0;
+      hourlyData[hour].totalFlow += Number(row.flow) || 0;
+      hourlyData[hour].count++;
+    });
+
+    const hourlySpeedAverages = Object.keys(hourlyData).map(hour => ({
+      hour,
+      averageSpeed: hourlyData[hour].count > 0 ? parseFloat((hourlyData[hour].totalSpeed / hourlyData[hour].count).toFixed(2)) : 0,
+    })).sort((a, b) => a.hour.localeCompare(b.hour));
+
+    const hourlyFlowAverages = Object.keys(hourlyData).map(hour => ({
+      hour,
+      averageFlow: hourlyData[hour].count > 0 ? parseFloat((hourlyData[hour].totalFlow / hourlyData[hour].count).toFixed(2)) : 0,
+    })).sort((a, b) => a.hour.localeCompare(b.hour));
+
+    return {
+      totalRecords,
+      averageSpeed,
+      averageFlow,
+      averageOccupancy,
+      dailySpeedAverages,
+      dailyFlowAverages,
+      hourlySpeedAverages,
+      hourlyFlowAverages,
+    };
+  }, [data]);
+
 
   const chartData = useMemo(() => {
     if (!analysisResults) return [];
@@ -78,13 +147,13 @@ const TrafficOverviewCharts: React.FC = React.memo(() => {
   }, [selectedChartType]);
 
   const congestionData = useMemo(() => {
-    if (!uploadedData || uploadedData.length === 0) return [];
+    if (!data || data.length === 0) return [];
 
     let low = 0;
     let moderate = 0;
     let high = 0;
 
-    uploadedData.forEach((row: TrafficDataRow) => {
+    data.forEach((row: TrafficDataRow) => {
       const speed = row.speed;
       if (speed < 20) {
         high++;
@@ -103,7 +172,7 @@ const TrafficOverviewCharts: React.FC = React.memo(() => {
       { name: 'Moderate Congestion', value: moderate, percentage: (moderate / total) * 100, color: '#ffc658' }, // Yellow
       { name: 'High Congestion', value: high, percentage: (high / total) * 100, color: '#ff7300' }, // Orange
     ];
-  }, [uploadedData]);
+  }, [data]);
 
   const totalCongestionPercentage = useMemo(() => {
     if (congestionData.length === 0) return 0;
@@ -114,7 +183,7 @@ const TrafficOverviewCharts: React.FC = React.memo(() => {
 
   const PIE_COLORS = ['#82ca9d', '#ffc658', '#ff7300']; // Green, Yellow, Orange
 
-  if (analysisStatus === 'processing' || analysisStatus === 'idle') {
+  if (!analysisResults || !data || data.length === 0) {
     return (
       <Card className="bg-white dark:bg-gray-800 shadow-lg col-span-full">
         <CardHeader>
@@ -128,22 +197,6 @@ const TrafficOverviewCharts: React.FC = React.memo(() => {
           <div className="h-[300px] flex items-center justify-center">
             <span className="text-gray-500">Please wait...</span>
           </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (analysisStatus === 'error' || !analysisResults || !uploadedData) {
-    return (
-      <Card className="bg-white dark:bg-gray-800 shadow-lg col-span-full border-red-500">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-red-500 flex items-center">
-            <TrafficCone className="h-5 w-5 mr-2" />
-            Traffic Overview Error
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-          <p>Failed to load traffic overview data. Please check the data source or try again.</p>
         </CardContent>
       </Card>
     );
