@@ -24,7 +24,9 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
   const [selectedChartType, setSelectedChartType] = useState<ChartType>('dailyFlow');
 
   const analysisResults = useMemo(() => {
-    if (!data || data.length === 0) return null;
+    if (!data || data.length === 0) {
+      return null;
+    }
 
     const totalRecords = data.length;
     let totalSpeed = 0;
@@ -34,7 +36,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const dailyData: { [day: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
     const hourlyData: { [hour: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
 
-    for (const row of data) { // Using for...of loop for stack safety
+    for (const row of data) {
       totalSpeed += (Number(row.speed) || 0);
       totalFlow += (Number(row.flow) || 0);
       totalOccupancy += (Number(row.occ) || 0);
@@ -123,7 +125,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     let moderate = 0;
     let high = 0;
 
-    for (const row of data) { // Changed from data.forEach to for...of for stack safety
+    for (const row of data) {
       const speed = row.speed;
       if (speed < 20) {
         high++;
@@ -138,9 +140,9 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     if (total === 0) return [];
 
     return [
-      { name: 'Low Congestion', value: low, percentage: (low / total) * 100, color: '#82ca9d' }, // Green
-      { name: 'Moderate Congestion', value: moderate, percentage: (moderate / total) * 100, color: '#ffc658' }, // Yellow
-      { name: 'High Congestion', value: high, percentage: (high / total) * 100, color: '#ff7300' }, // Orange
+      { name: 'Low Congestion', value: low, percentage: (low / total) * 100, color: '#82ca9d' },
+      { name: 'Moderate Congestion', value: moderate, percentage: (moderate / total) * 100, color: '#ffc658' },
+      { name: 'High Congestion', value: high, percentage: (high / total) * 100, color: '#ff7300' },
     ];
   }, [data]);
 
@@ -164,10 +166,10 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
   const speedDistributionData = useMemo(() => {
     if (!data) return [];
     const speeds = data.map(row => row.speed).filter(s => s !== undefined && s !== null) as number[];
-    const bins = Array.from({ length: 9 }, (_, i) => i * 10); // 0-10, 10-20, ..., 80-90
+    const bins = Array.from({ length: 9 }, (_, i) => i * 10);
     const counts = new Array(bins.length).fill(0);
 
-    for (const speed of speeds) { // Using for...of loop for stack safety
+    for (const speed of speeds) {
       for (let i = 0; i < bins.length; i++) {
         if (speed >= bins[i] && (i === bins.length - 1 || speed < bins[i + 1])) {
           counts[i]++;
@@ -186,11 +188,11 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     if (!data) return [];
     const flows = data.map(row => row.flow).filter(f => f !== undefined && f !== null) as number[];
     const maxFlow = Math.max(...flows);
-    const binSize = Math.ceil(maxFlow / 10); // 10 bins
+    const binSize = Math.ceil(maxFlow / 10);
     const bins = Array.from({ length: 10 }, (_, i) => i * binSize);
     const counts = new Array(bins.length).fill(0);
 
-    for (const flow of flows) { // Using for...of loop for stack safety
+    for (const flow of flows) {
       for (let i = 0; i < bins.length; i++) {
         if (flow >= bins[i] && (i === bins.length - 1 || flow < bins[i + 1])) {
           counts[i]++;
@@ -208,17 +210,17 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
   const occupancyDistributionData = useMemo(() => {
     if (!data) return [];
     const occs = data.map(row => row.occ).filter(o => o !== undefined && o !== null) as number[];
-    const bins = Array.from({ length: 11 }, (_, i) => i * 10); // 0-10, 10-20, ..., 100
+    const bins = Array.from({ length: 11 }, (_, i) => i * 10);
     const counts = new Array(bins.length).fill(0);
 
-    for (const occ of occs) { // Using for...of loop for stack safety
+    for (const occ of occs) {
       for (let i = 0; i < bins.length; i++) {
         if (occ >= bins[i] && (i === bins.length - 1 || occ < bins[i + 1])) {
           counts[i]++;
           break;
         }
       }
-    });
+    }
 
     return bins.map((bin, i) => ({
       range: `${bin}-${bin + 9}%`,
@@ -231,7 +233,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const dataMap: { [key: string]: { totalSpeed: number; count: number } } = {};
 
-    for (const row of data) { // Using for...of loop for stack safety
+    for (const row of data) {
       if (!dataMap[row.day_of_week]) {
         dataMap[row.day_of_week] = { totalSpeed: 0, count: 0 };
       }
@@ -250,7 +252,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const timeOfDayOrder = ["dini hari", "pagi", "siang", "sore", "malam"];
     const dataMap: { [key: string]: { totalFlow: number; count: number } } = {};
 
-    for (const row of data) { // Using for...of loop for stack safety
+    for (const row of data) {
       if (!dataMap[row.time_of_day]) {
         dataMap[row.time_of_day] = { totalFlow: 0, count: 0 };
       }
@@ -301,7 +303,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
             lineChartLabel={lineChartLabel}
           />
         </CardHeader>
-        <CardContent></CardContent> {/* Content is rendered inside the chart component */}
+        <CardContent></CardContent>
       </Card>
 
       {/* Traffic Congestion Breakdown Donut Chart */}
