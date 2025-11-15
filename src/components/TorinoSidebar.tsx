@@ -4,7 +4,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, MapPin, BarChart2, Bell, Newspaper, Info, Mail, CloudSun, Activity,
-  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route, Leaf
+  LayoutDashboard, Bike, TrafficCone, Settings, LogOut, User, Palette, Car, Clock, AlertTriangle, Route, Leaf, FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -51,6 +51,7 @@ const navItems: NavItemConfig[] = [
     isCategory: true,
     subItems: [
       { label: "Data Analysis", path: "/data-analysis", icon: BarChart2 },
+      { label: "Raw Traffic Data", path: "/traffic-data-table", icon: FileText }, // New: Raw Traffic Data Table
     ],
   },
   {
