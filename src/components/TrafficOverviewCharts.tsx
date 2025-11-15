@@ -27,23 +27,39 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     if (!data || data.length === 0) return null;
 
     const totalRecords = data.length;
-    const totalSpeed = data.reduce((sum, row) => sum + (Number(row.speed) || 0), 0);
-    const totalFlow = data.reduce((sum, row) => sum + (Number(row.flow) || 0), 0);
-    const totalOccupancy = data.reduce((sum, row) => sum + (Number(row.occ) || 0), 0);
+    let totalSpeed = 0;
+    let totalFlow = 0;
+    let totalOccupancy = 0;
+
+    const dailyData: { [day: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
+    const hourlyData: { [hour: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
+
+    for (const row of data) { // Using for...of loop for stack safety
+      totalSpeed += (Number(row.speed) || 0);
+      totalFlow += (Number(row.flow) || 0);
+      totalOccupancy += (Number(row.occ) || 0);
+
+      // Daily data aggregation
+      if (!dailyData[row.day]) {
+        dailyData[row.day] = { totalSpeed: 0, totalFlow: 0, count: 0 };
+      }
+      dailyData[row.day].totalSpeed += (Number(row.speed) || 0);
+      dailyData[row.day].totalFlow += (Number(row.flow) || 0);
+      dailyData[row.day].count++;
+
+      // Hourly data aggregation
+      const hour = row.time.split(':')[0] + ':00';
+      if (!hourlyData[hour]) {
+        hourlyData[hour] = { totalSpeed: 0, totalFlow: 0, count: 0 };
+      }
+      hourlyData[hour].totalSpeed += (Number(row.speed) || 0);
+      hourlyData[hour].totalFlow += (Number(row.flow) || 0);
+      hourlyData[hour].count++;
+    }
 
     const averageSpeed = totalRecords > 0 ? (totalSpeed / totalRecords).toFixed(2) + ' km/h' : 'N/A';
     const averageFlow = totalRecords > 0 ? (totalFlow / totalRecords).toFixed(2) : 'N/A';
     const averageOccupancy = totalRecords > 0 ? (totalOccupancy / totalRecords).toFixed(2) + ' %' : 'N/A';
-
-    const dailyData: { [day: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
-    data.forEach(row => {
-      if (!dailyData[row.day]) {
-        dailyData[row.day] = { totalSpeed: 0, totalFlow: 0, count: 0 };
-      }
-      dailyData[row.day].totalSpeed += Number(row.speed) || 0;
-      dailyData[row.day].totalFlow += Number(row.flow) || 0;
-      dailyData[row.day].count++;
-    });
 
     const dailySpeedAverages = Object.keys(dailyData).map(day => ({
       day,
@@ -54,17 +70,6 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
       day,
       averageFlow: dailyData[day].count > 0 ? parseFloat((dailyData[day].totalFlow / dailyData[day].count).toFixed(2)) : 0,
     })).sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
-
-    const hourlyData: { [hour: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
-    data.forEach(row => {
-      const hour = row.time.split(':')[0] + ':00';
-      if (!hourlyData[hour]) {
-        hourlyData[hour] = { totalSpeed: 0, totalFlow: 0, count: 0 };
-      }
-      hourlyData[hour].totalSpeed += Number(row.speed) || 0;
-      hourlyData[hour].totalFlow += Number(row.flow) || 0;
-      hourlyData[hour].count++;
-    });
 
     const hourlySpeedAverages = Object.keys(hourlyData).map(hour => ({
       hour,
@@ -118,7 +123,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     let moderate = 0;
     let high = 0;
 
-    data.forEach((row: TrafficDataRow) => {
+    for (const row of data) { // Changed from data.forEach to for...of for stack safety
       const speed = row.speed;
       if (speed < 20) {
         high++;
@@ -127,7 +132,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
       } else {
         low++;
       }
-    });
+    }
 
     const total = low + moderate + high;
     if (total === 0) return [];
@@ -162,14 +167,14 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const bins = Array.from({ length: 9 }, (_, i) => i * 10); // 0-10, 10-20, ..., 80-90
     const counts = new Array(bins.length).fill(0);
 
-    speeds.forEach(speed => {
+    for (const speed of speeds) { // Using for...of loop for stack safety
       for (let i = 0; i < bins.length; i++) {
         if (speed >= bins[i] && (i === bins.length - 1 || speed < bins[i + 1])) {
           counts[i]++;
           break;
         }
       }
-    });
+    }
 
     return bins.map((bin, i) => ({
       range: `${bin}-${bin + 9} km/h`,
@@ -185,14 +190,14 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const bins = Array.from({ length: 10 }, (_, i) => i * binSize);
     const counts = new Array(bins.length).fill(0);
 
-    flows.forEach(flow => {
+    for (const flow of flows) { // Using for...of loop for stack safety
       for (let i = 0; i < bins.length; i++) {
         if (flow >= bins[i] && (i === bins.length - 1 || flow < bins[i + 1])) {
           counts[i]++;
           break;
         }
       }
-    });
+    }
 
     return bins.map((bin, i) => ({
       range: `${bin}-${bin + binSize - 1}`,
@@ -206,7 +211,7 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const bins = Array.from({ length: 11 }, (_, i) => i * 10); // 0-10, 10-20, ..., 100
     const counts = new Array(bins.length).fill(0);
 
-    occs.forEach(occ => {
+    for (const occ of occs) { // Using for...of loop for stack safety
       for (let i = 0; i < bins.length; i++) {
         if (occ >= bins[i] && (i === bins.length - 1 || occ < bins[i + 1])) {
           counts[i]++;
@@ -226,13 +231,13 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const dataMap: { [key: string]: { totalSpeed: number; count: number } } = {};
 
-    data.forEach(row => {
+    for (const row of data) { // Using for...of loop for stack safety
       if (!dataMap[row.day_of_week]) {
         dataMap[row.day_of_week] = { totalSpeed: 0, count: 0 };
       }
       dataMap[row.day_of_week].totalSpeed += row.speed;
       dataMap[row.day_of_week].count++;
-    });
+    }
 
     return dayOrder.map(day => ({
       day_of_week: day,
@@ -245,13 +250,13 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     const timeOfDayOrder = ["dini hari", "pagi", "siang", "sore", "malam"];
     const dataMap: { [key: string]: { totalFlow: number; count: number } } = {};
 
-    data.forEach(row => {
+    for (const row of data) { // Using for...of loop for stack safety
       if (!dataMap[row.time_of_day]) {
         dataMap[row.time_of_day] = { totalFlow: 0, count: 0 };
       }
       dataMap[row.time_of_day].totalFlow += row.flow;
       dataMap[row.time_of_day].count++;
-    });
+    }
 
     return timeOfDayOrder.map(time => ({
       time_of_day: time,
