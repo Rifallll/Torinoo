@@ -22,6 +22,7 @@ export interface TorinoTrafficDataRow {
   quarter: number;
   week_number: number;
   is_weekend: boolean;
+  [key: string]: string | number | boolean; // Added index signature for compatibility
 }
 
 /**
