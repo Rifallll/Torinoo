@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
+import { loadTorinoTrafficData, TorinoTrafficDataRow } from '@/utils/csvLoader'; // Import the new loader
 
 export interface TrafficDataRow {
   day: string;
@@ -45,6 +46,23 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [analysisStatus, setAnalysisStatus] = useState<'idle' | 'processing' | 'completed' | 'error'>('idle');
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+
+  // Load default data from torino_cleaned_ordered.csv on initial mount
+  useEffect(() => {
+    const fetchDefaultData = async () => {
+      try {
+        const data = await loadTorinoTrafficData();
+        setUploadedData(data);
+        // Automatically start analysis for the default data
+        simulateAnalysis(data);
+      } catch (err) {
+        console.error("Failed to load default traffic data:", err);
+        setAnalysisStatus('error');
+        toast.error("Failed to load default traffic data.");
+      }
+    };
+    fetchDefaultData();
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const simulateAnalysis = useCallback((data: TrafficDataRow[]) => {
     setAnalysisStatus('processing');
