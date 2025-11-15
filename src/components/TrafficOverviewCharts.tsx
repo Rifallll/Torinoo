@@ -187,7 +187,18 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
   const flowDistributionData = useMemo(() => {
     if (!data) return [];
     const flows = data.map(row => row.flow).filter(f => f !== undefined && f !== null) as number[];
-    const maxFlow = Math.max(...flows);
+    
+    // Calculate maxFlow iteratively to avoid stack overflow
+    let maxFlow = 0;
+    if (flows.length > 0) {
+      maxFlow = flows[0];
+      for (let i = 1; i < flows.length; i++) {
+        if (flows[i] > maxFlow) {
+          maxFlow = flows[i];
+        }
+      }
+    }
+
     const binSize = Math.ceil(maxFlow / 10);
     const bins = Array.from({ length: 10 }, (_, i) => i * binSize);
     const counts = new Array(bins.length).fill(0);
