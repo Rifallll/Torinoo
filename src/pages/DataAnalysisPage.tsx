@@ -122,7 +122,7 @@ const DataAnalysisPage = () => {
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
                 <div className="space-y-2">
                   <p><strong>Total Records:</strong> {analysisResults.totalRecords}</p>
-                  <p><strong>Unique Detectors:</strong> {analysisResults.uniqueDetectors}</p>
+                  {/* <p><strong>Unique Detectors:</strong> {analysisResults.uniqueDetectors}</p> */} {/* Removed */}
                   <p><strong>Average Speed:</strong> {analysisResults.averageSpeed}</p>
                   <p><strong>Average Flow:</strong> {analysisResults.averageFlow}</p>
                   <p><strong>Average Occupancy:</strong> {analysisResults.averageOccupancy}</p>

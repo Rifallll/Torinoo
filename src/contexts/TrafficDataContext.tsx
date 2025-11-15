@@ -6,19 +6,28 @@ import { loadTorinoTrafficData, TorinoTrafficDataRow } from '@/utils/csvLoader';
 
 export interface TrafficDataRow {
   day: string;
-  interval: string;
-  detid: string;
+  day_of_week: string;
+  interval: number;
+  hour: number;
+  minute: number;
+  time: string;
+  time_of_day: string;
   flow: number;
-  occ: number;
-  error: number;
-  city: string;
   speed: number;
-  [key: string]: string | number; // Allow for other potential columns
+  occ: number;
+  city: string;
+  day_of_month: number;
+  month: number;
+  month_name: string;
+  quarter: number;
+  week_number: number;
+  is_weekend: boolean;
+  [key: string]: string | number | boolean; // Allow for other potential columns
 }
 
 interface AnalysisResults {
   totalRecords: number;
-  uniqueDetectors: number;
+  // uniqueDetectors: number; // Removed as 'detid' column is no longer present
   averageSpeed: string;
   averageFlow: string;
   averageOccupancy: string;
@@ -80,7 +89,7 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
 
         // Perform actual analysis based on the new CSV structure
         const totalRecords = data.length;
-        const uniqueDetectors = new Set(data.map(row => row.detid)).size;
+        // const uniqueDetectors = new Set(data.map(row => row.detid)).size; // Removed as 'detid' column is no longer present
 
         const totalSpeed = data.reduce((sum, row) => sum + (Number(row.speed) || 0), 0);
         const totalFlow = data.reduce((sum, row) => sum + (Number(row.flow) || 0), 0);
@@ -114,7 +123,7 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
         // Calculate hourly averages
         const hourlyData: { [hour: string]: { totalSpeed: number; totalFlow: number; count: number } } = {};
         data.forEach(row => {
-          const hour = row.interval.split(':')[0] + ':00'; // Group by hour
+          const hour = row.time.split(':')[0] + ':00'; // Group by hour using the new 'time' column
           if (!hourlyData[hour]) {
             hourlyData[hour] = { totalSpeed: 0, totalFlow: 0, count: 0 };
           }
@@ -135,7 +144,7 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
 
         setAnalysisResults({
           totalRecords,
-          uniqueDetectors,
+          // uniqueDetectors, // Removed
           averageSpeed,
           averageFlow,
           averageOccupancy,

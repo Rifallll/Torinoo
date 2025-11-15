@@ -6,13 +6,22 @@ import { toast } from 'sonner';
 // Define the interface for a single row of your traffic data
 export interface TorinoTrafficDataRow {
   day: string;
-  interval: string;
-  detid: string;
+  day_of_week: string;
+  interval: number; // interval is in seconds, so number
+  hour: number;
+  minute: number;
+  time: string; // e.g., "08:30"
+  time_of_day: string; // e.g., "pagi", "siang"
   flow: number;
-  occ: number;
-  error: number;
-  city: string;
   speed: number;
+  occ: number;
+  city: string;
+  day_of_month: number;
+  month: number;
+  month_name: string;
+  quarter: number;
+  week_number: number;
+  is_weekend: boolean;
 }
 
 /**
@@ -42,13 +51,22 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
           // Ensure the data matches the interface
           const parsedData = results.data.map((row: any) => ({
             day: String(row.day),
-            interval: String(row.interval),
-            detid: String(row.detid),
+            day_of_week: String(row.day_of_week),
+            interval: Number(row.interval),
+            hour: Number(row.hour),
+            minute: Number(row.minute),
+            time: String(row.time),
+            time_of_day: String(row.time_of_day),
             flow: Number(row.flow),
-            occ: Number(row.occ),
-            error: Number(row.error),
-            city: String(row.city),
             speed: Number(row.speed),
+            occ: Number(row.occ),
+            city: String(row.city),
+            day_of_month: Number(row.day_of_month),
+            month: Number(row.month),
+            month_name: String(row.month_name),
+            quarter: Number(row.quarter),
+            week_number: Number(row.week_number),
+            is_weekend: Boolean(row.is_weekend),
           })) as TorinoTrafficDataRow[];
           
           toast.success("Torino traffic data loaded successfully!");
