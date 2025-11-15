@@ -25,11 +25,11 @@ export interface TorinoTrafficDataRow {
 }
 
 /**
- * Loads and parses the torino_cleaned_ordered.csv file, filtering by a specific date range.
+ * Loads and parses the sa.txt file, including all data without filtering.
  * @returns A promise that resolves to an array of TorinoTrafficDataRow objects.
  */
 export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> => {
-  const filePath = '/torino_cleaned_ordered.csv';
+  const filePath = '/sa.txt'; // Mengubah path file ke sa.txt
   try {
     const response = await fetch(filePath);
     if (!response.ok) {
@@ -69,20 +69,11 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
             is_weekend: Boolean(row.is_weekend),
           })) as TorinoTrafficDataRow[];
 
-          // Define the date range for filtering
-          const startDate = new Date('2016-09-26T00:00:00Z'); // Start of September 26, 2016
-          const endDate = new Date('2016-09-28T23:59:59Z');   // End of September 28, 2016
-
-          const filteredData = parsedData.filter(row => {
-            // Convert the 'day' string from the row to a Date object for comparison
-            const rowDate = new Date(row.day + 'T00:00:00Z'); // Append T00:00:00Z to ensure UTC comparison
-
-            return rowDate >= startDate && rowDate <= endDate;
-          });
+          // Menghapus logika pemfilteran tanggal agar semua data dimuat
           
-          toast.success(`Torino traffic data loaded and filtered for 2016-09-26 to 2016-09-28! Total records: ${filteredData.length}`);
-          console.log("Torino Traffic Data Loaded and Filtered:", filteredData);
-          resolve(filteredData);
+          toast.success(`Traffic data from 'sa.txt' loaded successfully! Total records: ${parsedData.length}`);
+          console.log("Traffic Data Loaded from 'sa.txt':", parsedData);
+          resolve(parsedData);
         },
         error: (error: Error) => {
           console.error(`Error reading ${filePath}:`, error);
@@ -93,7 +84,7 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
     });
   } catch (error) {
     console.error(`Failed to load ${filePath}:`, error);
-    toast.error(`Failed to load Torino traffic data CSV.`);
+    toast.error(`Failed to load traffic data from 'sa.txt'.`);
     return [];
   }
 };
