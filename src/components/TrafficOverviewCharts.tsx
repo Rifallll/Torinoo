@@ -2,11 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, BarChart, Bar, ScatterChart, Scatter } from 'recharts';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, BarChart2, Gauge, TrafficCone, Cloud } from 'lucide-react';
-import { TrafficDataRow } from '@/contexts/TrafficDataContext'; // Import TrafficDataRow
+import { ChevronDown, BarChart2, Gauge, TrafficCone, Cloud, Droplet, CalendarDays, Clock, Car } from 'lucide-react';
+import { TrafficDataRow } from '@/contexts/TrafficDataContext';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 
@@ -16,12 +16,11 @@ interface CustomTooltipProps {
   active?: boolean;
   payload?: any[];
   label?: string;
-  chartType: ChartType;
+  chartType: string; // e.g., 'dailyFlow', 'hourlySpeed', 'dayOfWeekSpeed'
 }
 
 const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, chartType }) => {
   if (active && payload && payload.length) {
-    const dataPoint = payload[0].payload;
     let formattedLabel = label;
     let valueLabel = '';
     let unit = '';
@@ -30,6 +29,10 @@ const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload,
       formattedLabel = format(new Date(label || ''), 'MMM dd, yyyy', { locale: enUS });
     } else if (chartType.includes('hourly')) {
       formattedLabel = `${label}`;
+    } else if (chartType.includes('dayOfWeek')) {
+      formattedLabel = label;
+    } else if (chartType.includes('timeOfDay')) {
+      formattedLabel = label;
     }
 
     if (chartType.includes('Flow')) {
@@ -38,6 +41,9 @@ const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload,
     } else if (chartType.includes('Speed')) {
       valueLabel = 'Speed';
       unit = ' km/h';
+    } else if (chartType.includes('Occupancy')) {
+      valueLabel = 'Occupancy';
+      unit = ' %';
     }
 
     return (
@@ -51,7 +57,7 @@ const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload,
 };
 
 interface TrafficOverviewChartsProps {
-  data: TrafficDataRow[]; // Now accepts data as a prop
+  data: TrafficDataRow[];
 }
 
 const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo(({ data }) => {
@@ -122,7 +128,6 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     };
   }, [data]);
 
-
   const chartData = useMemo(() => {
     if (!analysisResults) return [];
     switch (selectedChartType) {
@@ -182,6 +187,116 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
   }, [congestionData]);
 
   const PIE_COLORS = ['#82ca9d', '#ffc658', '#ff7300']; // Green, Yellow, Orange
+
+  // --- Data preparation for new charts ---
+  const speedDistributionData = useMemo(() => {
+    if (!data) return [];
+    const speeds = data.map(row => row.speed).filter(s => s !== undefined && s !== null) as number[];
+    const bins = Array.from({ length: 9 }, (_, i) => i * 10); // 0-10, 10-20, ..., 80-90
+    const counts = new Array(bins.length).fill(0);
+
+    speeds.forEach(speed => {
+      for (let i = 0; i < bins.length; i++) {
+        if (speed >= bins[i] && (i === bins.length - 1 || speed < bins[i + 1])) {
+          counts[i]++;
+          break;
+        }
+      }
+    });
+
+    return bins.map((bin, i) => ({
+      range: `${bin}-${bin + 9} km/h`,
+      count: counts[i],
+    })).filter(d => d.count > 0);
+  }, [data]);
+
+  const flowDistributionData = useMemo(() => {
+    if (!data) return [];
+    const flows = data.map(row => row.flow).filter(f => f !== undefined && f !== null) as number[];
+    const maxFlow = Math.max(...flows);
+    const binSize = Math.ceil(maxFlow / 10); // 10 bins
+    const bins = Array.from({ length: 10 }, (_, i) => i * binSize);
+    const counts = new Array(bins.length).fill(0);
+
+    flows.forEach(flow => {
+      for (let i = 0; i < bins.length; i++) {
+        if (flow >= bins[i] && (i === bins.length - 1 || flow < bins[i + 1])) {
+          counts[i]++;
+          break;
+        }
+      }
+    });
+
+    return bins.map((bin, i) => ({
+      range: `${bin}-${bin + binSize - 1}`,
+      count: counts[i],
+    })).filter(d => d.count > 0);
+  }, [data]);
+
+  const occupancyDistributionData = useMemo(() => {
+    if (!data) return [];
+    const occs = data.map(row => row.occ).filter(o => o !== undefined && o !== null) as number[];
+    const bins = Array.from({ length: 11 }, (_, i) => i * 10); // 0-10, 10-20, ..., 100
+    const counts = new Array(bins.length).fill(0);
+
+    occs.forEach(occ => {
+      for (let i = 0; i < bins.length; i++) {
+        if (occ >= bins[i] && (i === bins.length - 1 || occ < bins[i + 1])) {
+          counts[i]++;
+          break;
+        }
+      }
+    });
+
+    return bins.map((bin, i) => ({
+      range: `${bin}-${bin + 9}%`,
+      count: counts[i],
+    })).filter(d => d.count > 0);
+  }, [data]);
+
+  const averageSpeedByDayOfWeek = useMemo(() => {
+    if (!data) return [];
+    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const dataMap: { [key: string]: { totalSpeed: number; count: number } } = {};
+
+    data.forEach(row => {
+      if (!dataMap[row.day_of_week]) {
+        dataMap[row.day_of_week] = { totalSpeed: 0, count: 0 };
+      }
+      dataMap[row.day_of_week].totalSpeed += row.speed;
+      dataMap[row.day_of_week].count++;
+    });
+
+    return dayOrder.map(day => ({
+      day_of_week: day,
+      averageSpeed: dataMap[day] ? parseFloat((dataMap[day].totalSpeed / dataMap[day].count).toFixed(2)) : 0,
+    }));
+  }, [data]);
+
+  const averageFlowByTimeOfDay = useMemo(() => {
+    if (!data) return [];
+    const timeOfDayOrder = ["dini hari", "pagi", "siang", "sore", "malam"];
+    const dataMap: { [key: string]: { totalFlow: number; count: number } } = {};
+
+    data.forEach(row => {
+      if (!dataMap[row.time_of_day]) {
+        dataMap[row.time_of_day] = { totalFlow: 0, count: 0 };
+      }
+      dataMap[row.time_of_day].totalFlow += row.flow;
+      dataMap[row.time_of_day].count++;
+    });
+
+    return timeOfDayOrder.map(time => ({
+      time_of_day: time,
+      averageFlow: dataMap[time] ? parseFloat((dataMap[time].totalFlow / dataMap[time].count).toFixed(2)) : 0,
+    }));
+  }, [data]);
+
+  const flowSpeedScatterData = useMemo(() => {
+    if (!data) return [];
+    return data.map(row => ({ flow: row.flow, speed: row.speed }));
+  }, [data]);
+  // --- End Data preparation for new charts ---
 
   if (!analysisResults || !data || data.length === 0) {
     return (
@@ -295,6 +410,164 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
           ) : (
             <p className="text-gray-600 dark:text-gray-400">No congestion data available.</p>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Average Speed by Day of Week */}
+      <Card className="flex flex-col">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <CalendarDays className="h-5 w-5 mr-2 text-orange-600" /> Average Speed by Day of Week
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={averageSpeedByDayOfWeek} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis dataKey="day_of_week" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis label={{ value: 'Avg Speed (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip
+                content={<CustomLineChartTooltip chartType="dayOfWeekSpeed" />}
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: number) => [`${value} km/h`, 'Average Speed']}
+              />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Bar dataKey="averageSpeed" fill="#E91E63" name="Average Speed" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Average Flow by Time of Day */}
+      <Card className="flex flex-col">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <Clock className="h-5 w-5 mr-2 text-purple-600" /> Average Flow by Time of Day
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={averageFlowByTimeOfDay} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis dataKey="time_of_day" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis label={{ value: 'Avg Flow', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip
+                content={<CustomLineChartTooltip chartType="timeOfDayFlow" />}
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: number) => [`${value}`, 'Average Flow']}
+              />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Bar dataKey="averageFlow" fill="#00BCD4" name="Average Flow" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Flow vs Speed Scatter Plot */}
+      <Card className="lg:col-span-2 flex flex-col">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <Car className="h-5 w-5 mr-2 text-red-600" /> Flow vs Speed Scatter Plot
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis type="number" dataKey="flow" name="Flow" unit="" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis type="number" dataKey="speed" name="Speed" unit="km/h" className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip
+                cursor={{ strokeDasharray: '3 3' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+              />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Scatter name="Traffic Data" data={flowSpeedScatterData} fill="#8884d8" />
+            </ScatterChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Speed Distribution Histogram */}
+      <Card className="lg:col-span-1 flex flex-col">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <Gauge className="h-5 w-5 mr-2 text-blue-600" /> Speed Distribution
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={speedDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: number) => [`${value} vehicles`, 'Count']}
+              />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Bar dataKey="count" fill="#4CAF50" name="Speed Range" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Flow Distribution Histogram */}
+      <Card className="lg:col-span-1 flex flex-col">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <Cloud className="h-5 w-5 mr-2 text-green-600" /> Flow Distribution
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={flowDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: number) => [`${value} vehicles`, 'Count']}
+              />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Bar dataKey="count" fill="#FFC107" name="Flow Range" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Occupancy Distribution Histogram */}
+      <Card className="lg:col-span-1 flex flex-col">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <Droplet className="h-5 w-5 mr-2 text-blue-600" /> Occupancy Distribution
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={occupancyDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+              <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
+              <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+              <Tooltip
+                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: number) => [`${value} instances`, 'Count']}
+              />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Bar dataKey="count" fill="#9C27B0" name="Occupancy Range" />
+            </BarChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
     </div>

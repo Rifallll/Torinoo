@@ -7,7 +7,7 @@ import { loadTorinoTrafficData, TorinoTrafficDataRow } from '@/utils/csvLoader';
 export interface TrafficDataRow {
   day: string;
   day_of_week: string;
-  interval: number;
+  interval: number; // interval is in seconds, so number
   hour: number;
   minute: number;
   time: string; // e.g., "08:30"
@@ -61,9 +61,9 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
     const fetchDefaultData = async () => {
       try {
         const data = await loadTorinoTrafficData();
-        setUploadedData(data);
+        setUploadedData(data as TrafficDataRow[]); // Cast to TrafficDataRow[]
         // Automatically start analysis for the default data
-        simulateAnalysis(data);
+        simulateAnalysis(data as TrafficDataRow[]); // Cast to TrafficDataRow[]
       } catch (err) {
         console.error("Failed to load default traffic data:", err);
         setAnalysisStatus('error');
