@@ -40,22 +40,25 @@ const TrafficDataFilterControls: React.FC<TrafficDataFilterControlsProps> = ({ d
     })];
   }, [data]);
 
+  const isFilterActive = dayOfWeekFilter !== 'all' || timeOfDayFilter !== 'all' || monthFilter !== 'all';
+
   const filteredData = useMemo(() => {
+    if (!isFilterActive) {
+      return data; // Return original data reference if no filters are active
+    }
     return data.filter(row => {
       const matchesDay = dayOfWeekFilter === 'all' || row.day_of_week === dayOfWeekFilter;
       const matchesTime = timeOfDayFilter === 'all' || row.time_of_day === timeOfDayFilter;
       const matchesMonth = monthFilter === 'all' || row.month_name === monthFilter;
       return matchesDay && matchesTime && matchesMonth;
     });
-  }, [data, dayOfWeekFilter, timeOfDayFilter, monthFilter]);
+  }, [data, dayOfWeekFilter, timeOfDayFilter, monthFilter, isFilterActive]);
 
   const handleResetFilters = () => {
     setDayOfWeekFilter('all');
     setTimeOfDayFilter('all');
     setMonthFilter('all');
   };
-
-  const isFilterActive = dayOfWeekFilter !== 'all' || timeOfDayFilter !== 'all' || monthFilter !== 'all';
 
   return (
     <div className="space-y-6">
