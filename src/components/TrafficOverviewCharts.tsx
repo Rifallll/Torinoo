@@ -2,59 +2,19 @@
 
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, BarChart, Bar, ScatterChart, Scatter } from 'recharts';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, BarChart2, Gauge, TrafficCone, Cloud, Droplet, CalendarDays, Clock, Car } from 'lucide-react';
 import { TrafficDataRow } from '@/contexts/TrafficDataContext';
-import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+
+// Import modular chart components
+import TrafficSummaryLineChart from '@/components/charts/TrafficSummaryLineChart';
+import TrafficCongestionDonutChart from '@/components/charts/TrafficCongestionDonutChart';
+import AverageSpeedByDayOfWeekChart from '@/components/charts/AverageSpeedByDayOfWeekChart';
+import AverageFlowByTimeOfDayChart from '@/components/charts/AverageFlowByTimeOfDayChart';
+import FlowSpeedScatterPlot from '@/components/charts/FlowSpeedScatterPlot';
+import SpeedDistributionHistogram from '@/components/charts/SpeedDistributionHistogram';
+import FlowDistributionHistogram from '@/components/charts/FlowDistributionHistogram';
+import OccupancyDistributionHistogram from '@/components/charts/OccupancyDistributionHistogram';
 
 type ChartType = 'dailyFlow' | 'dailySpeed' | 'hourlyFlow' | 'hourlySpeed';
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-  chartType: string; // e.g., 'dailyFlow', 'hourlySpeed', 'dayOfWeekSpeed'
-}
-
-const CustomLineChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, chartType }) => {
-  if (active && payload && payload.length) {
-    let formattedLabel = label;
-    let valueLabel = '';
-    let unit = '';
-
-    if (chartType.includes('daily')) {
-      formattedLabel = format(new Date(label || ''), 'MMM dd, yyyy', { locale: enUS });
-    } else if (chartType.includes('hourly')) {
-      formattedLabel = `${label}`;
-    } else if (chartType.includes('dayOfWeek')) {
-      formattedLabel = label;
-    } else if (chartType.includes('timeOfDay')) {
-      formattedLabel = label;
-    }
-
-    if (chartType.includes('Flow')) {
-      valueLabel = 'Flow';
-      unit = '';
-    } else if (chartType.includes('Speed')) {
-      valueLabel = 'Speed';
-      unit = ' km/h';
-    } else if (chartType.includes('Occupancy')) {
-      valueLabel = 'Occupancy';
-      unit = ' %';
-    }
-
-    return (
-      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg text-sm text-gray-800 dark:text-gray-100">
-        <p className="font-semibold mb-1">{formattedLabel}</p>
-        <p>{`${valueLabel}: ${payload[0].value}${unit}`}</p>
-      </div>
-    );
-  }
-  return null;
-};
 
 interface TrafficOverviewChartsProps {
   data: TrafficDataRow[];
@@ -186,8 +146,6 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     return totalAll > 0 ? ((totalHighModerate / totalAll) * 100).toFixed(0) : 0;
   }, [congestionData]);
 
-  const PIE_COLORS = ['#82ca9d', '#ffc658', '#ff7300']; // Green, Yellow, Orange
-
   // --- Data preparation for new charts ---
   const speedDistributionData = useMemo(() => {
     if (!data) return [];
@@ -303,7 +261,6 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
       <Card className="bg-white dark:bg-gray-800 shadow-lg col-span-full">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <BarChart2 className="h-5 w-5 mr-2 text-indigo-600 animate-pulse" />
             Loading Traffic Overview...
           </CardTitle>
         </CardHeader>
@@ -321,254 +278,75 @@ const TrafficOverviewCharts: React.FC<TrafficOverviewChartsProps> = React.memo((
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Traffic Summary Line Chart */}
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <BarChart2 className="h-5 w-5 mr-2 text-indigo-600" /> Traffic Summary
-          </CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center">
-                {selectedChartType === 'dailyFlow' && 'Daily Flow'}
-                {selectedChartType === 'dailySpeed' && 'Daily Speed'}
-                {selectedChartType === 'hourlyFlow' && 'Hourly Flow'}
-                {selectedChartType === 'hourlySpeed' && 'Hourly Speed'}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="z-50">
-              <DropdownMenuItem onClick={() => setSelectedChartType('dailyFlow')}>Daily Flow</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedChartType('dailySpeed')}>Daily Speed</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedChartType('hourlyFlow')}>Hourly Flow</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedChartType('hourlySpeed')}>Hourly Speed</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <CardHeader>
+          <TrafficSummaryLineChart
+            chartData={chartData}
+            selectedChartType={selectedChartType}
+            setSelectedChartType={setSelectedChartType}
+            lineDataKey={lineDataKey}
+            lineChartLabel={lineChartLabel}
+          />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 0,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis dataKey="name" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip content={<CustomLineChartTooltip chartType={selectedChartType} />} />
-              <Line type="monotone" dataKey={lineDataKey} stroke="#8884d8" activeDot={{ r: 8 }} name={lineChartLabel} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent> {/* Content is rendered inside the chart component */}
       </Card>
 
       {/* Traffic Congestion Breakdown Donut Chart */}
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center">
-            <TrafficCone className="h-5 w-5 mr-2 text-orange-600" /> Traffic Congestion Breakdown
-          </CardTitle>
+          <TrafficCongestionDonutChart
+            congestionData={congestionData}
+            totalCongestionPercentage={totalCongestionPercentage}
+          />
         </CardHeader>
-        <CardContent className="h-[300px] flex items-center justify-center">
-          {congestionData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={congestionData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {congestionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                  labelStyle={{ color: 'hsl(var(--foreground))' }}
-                  itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  formatter={(value: number, name: string, props: any) => [`${value} (${props.payload.percentage.toFixed(1)}%)`, name]}
-                />
-                <Legend
-                  layout="vertical"
-                  verticalAlign="middle"
-                  align="right"
-                  wrapperStyle={{ right: -20, top: '50%', transform: 'translateY(-50%)' }}
-                />
-                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                  <tspan x="50%" dy="-0.5em">Total</tspan>
-                  <tspan x="50%" dy="1.5em">{totalCongestionPercentage}%</tspan>
-                </text>
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">No congestion data available.</p>
-          )}
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
 
       {/* Average Speed by Day of Week */}
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <CalendarDays className="h-5 w-5 mr-2 text-orange-600" /> Average Speed by Day of Week
-          </CardTitle>
+          <AverageSpeedByDayOfWeekChart data={averageSpeedByDayOfWeek} />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={averageSpeedByDayOfWeek} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis dataKey="day_of_week" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis label={{ value: 'Avg Speed (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip
-                content={<CustomLineChartTooltip chartType="dayOfWeekSpeed" />}
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-                formatter={(value: number) => [`${value} km/h`, 'Average Speed']}
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar dataKey="averageSpeed" fill="#E91E63" name="Average Speed" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
 
       {/* Average Flow by Time of Day */}
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <Clock className="h-5 w-5 mr-2 text-purple-600" /> Average Flow by Time of Day
-          </CardTitle>
+          <AverageFlowByTimeOfDayChart data={averageFlowByTimeOfDay} />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={averageFlowByTimeOfDay} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis dataKey="time_of_day" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis label={{ value: 'Avg Flow', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip
-                content={<CustomLineChartTooltip chartType="timeOfDayFlow" />}
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-                formatter={(value: number) => [`${value}`, 'Average Flow']}
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar dataKey="averageFlow" fill="#00BCD4" name="Average Flow" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
 
       {/* Flow vs Speed Scatter Plot */}
       <Card className="lg:col-span-2 flex flex-col">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <Car className="h-5 w-5 mr-2 text-red-600" /> Flow vs Speed Scatter Plot
-          </CardTitle>
+          <FlowSpeedScatterPlot data={flowSpeedScatterData} />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis type="number" dataKey="flow" name="Flow" unit="" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis type="number" dataKey="speed" name="Speed" unit="km/h" className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip
-                cursor={{ strokeDasharray: '3 3' }}
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Scatter name="Traffic Data" data={flowSpeedScatterData} fill="#8884d8" />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
 
       {/* Speed Distribution Histogram */}
       <Card className="lg:col-span-1 flex flex-col">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <Gauge className="h-5 w-5 mr-2 text-blue-600" /> Speed Distribution
-          </CardTitle>
+          <SpeedDistributionHistogram data={speedDistributionData} />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={speedDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-                formatter={(value: number) => [`${value} vehicles`, 'Count']}
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar dataKey="count" fill="#4CAF50" name="Speed Range" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
 
       {/* Flow Distribution Histogram */}
       <Card className="lg:col-span-1 flex flex-col">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <Cloud className="h-5 w-5 mr-2 text-green-600" /> Flow Distribution
-          </CardTitle>
+          <FlowDistributionHistogram data={flowDistributionData} />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={flowDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-                formatter={(value: number) => [`${value} vehicles`, 'Count']}
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar dataKey="count" fill="#FFC107" name="Flow Range" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
 
       {/* Occupancy Distribution Histogram */}
       <Card className="lg:col-span-1 flex flex-col">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <Droplet className="h-5 w-5 mr-2 text-blue-600" /> Occupancy Distribution
-          </CardTitle>
+          <OccupancyDistributionHistogram data={occupancyDistributionData} />
         </CardHeader>
-        <CardContent className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={occupancyDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-              <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
-              <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
-              <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-                formatter={(value: number) => [`${value} instances`, 'Count']}
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar dataKey="count" fill="#9C27B0" name="Occupancy Range" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+        <CardContent></CardContent>
       </Card>
     </div>
   );
