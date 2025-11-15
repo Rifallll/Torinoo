@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Cloud, AlertTriangle } from 'lucide-react'; // AlertTriangle ditambahkan
+import { ArrowLeft, BarChart2, Database, RefreshCcw, TrafficCone, Gauge, AlertCircle, Clock, Map, Car, ParkingSquare, Target, FileText, CheckCircle2, Cloud, AlertTriangle, CalendarDays, Sun, Droplet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import ProjectPlanningSection from '@/components/ProjectPlanningSection';
 import TrafficChangesInsights from '@/components/TrafficChangesInsights';
 import { useTrafficData } from '@/contexts/TrafficDataContext';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, ScatterChart, Scatter } from 'recharts';
 
 const DataAnalysisPage = () => {
   const { uploadedData, analysisStatus, analysisProgress, analysisResults, startAnalysis, resetAnalysis } = useTrafficData();
@@ -29,6 +29,117 @@ const DataAnalysisPage = () => {
         return "Unknown status.";
     }
   };
+
+  // --- Data preparation for new charts ---
+  const speedDistributionData = useMemo(() => {
+    if (!uploadedData) return [];
+    const speeds = uploadedData.map(row => row.speed).filter(s => s !== undefined && s !== null) as number[];
+    const bins = Array.from({ length: 9 }, (_, i) => i * 10); // 0-10, 10-20, ..., 80-90
+    const counts = new Array(bins.length).fill(0);
+
+    speeds.forEach(speed => {
+      for (let i = 0; i < bins.length; i++) {
+        if (speed >= bins[i] && (i === bins.length - 1 || speed < bins[i + 1])) {
+          counts[i]++;
+          break;
+        }
+      }
+    });
+
+    return bins.map((bin, i) => ({
+      range: `${bin}-${bin + 9} km/h`,
+      count: counts[i],
+    })).filter(d => d.count > 0);
+  }, [uploadedData]);
+
+  const flowDistributionData = useMemo(() => {
+    if (!uploadedData) return [];
+    const flows = uploadedData.map(row => row.flow).filter(f => f !== undefined && f !== null) as number[];
+    const maxFlow = Math.max(...flows);
+    const binSize = Math.ceil(maxFlow / 10); // 10 bins
+    const bins = Array.from({ length: 10 }, (_, i) => i * binSize);
+    const counts = new Array(bins.length).fill(0);
+
+    flows.forEach(flow => {
+      for (let i = 0; i < bins.length; i++) {
+        if (flow >= bins[i] && (i === bins.length - 1 || flow < bins[i + 1])) {
+          counts[i]++;
+          break;
+        }
+      }
+    });
+
+    return bins.map((bin, i) => ({
+      range: `${bin}-${bin + binSize - 1}`,
+      count: counts[i],
+    })).filter(d => d.count > 0);
+  }, [uploadedData]);
+
+  const occupancyDistributionData = useMemo(() => {
+    if (!uploadedData) return [];
+    const occs = uploadedData.map(row => row.occ).filter(o => o !== undefined && o !== null) as number[];
+    const bins = Array.from({ length: 11 }, (_, i) => i * 10); // 0-10, 10-20, ..., 100
+    const counts = new Array(bins.length).fill(0);
+
+    occs.forEach(occ => {
+      for (let i = 0; i < bins.length; i++) {
+        if (occ >= bins[i] && (i === bins.length - 1 || occ < bins[i + 1])) {
+          counts[i]++;
+          break;
+        }
+      }
+    });
+
+    return bins.map((bin, i) => ({
+      range: `${bin}-${bin + 9}%`,
+      count: counts[i],
+    })).filter(d => d.count > 0);
+  }, [uploadedData]);
+
+  const averageSpeedByDayOfWeek = useMemo(() => {
+    if (!uploadedData) return [];
+    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const dataMap: { [key: string]: { totalSpeed: number; count: number } } = {};
+
+    uploadedData.forEach(row => {
+      if (!dataMap[row.day_of_week]) {
+        dataMap[row.day_of_week] = { totalSpeed: 0, count: 0 };
+      }
+      dataMap[row.day_of_week].totalSpeed += row.speed;
+      dataMap[row.day_of_week].count++;
+    });
+
+    return dayOrder.map(day => ({
+      day_of_week: day,
+      averageSpeed: dataMap[day] ? parseFloat((dataMap[day].totalSpeed / dataMap[day].count).toFixed(2)) : 0,
+    }));
+  }, [uploadedData]);
+
+  const averageFlowByTimeOfDay = useMemo(() => {
+    if (!uploadedData) return [];
+    const timeOfDayOrder = ["dini hari", "pagi", "siang", "sore", "malam"];
+    const dataMap: { [key: string]: { totalFlow: number; count: number } } = {};
+
+    uploadedData.forEach(row => {
+      if (!dataMap[row.time_of_day]) {
+        dataMap[row.time_of_day] = { totalFlow: 0, count: 0 };
+      }
+      dataMap[row.time_of_day].totalFlow += row.flow;
+      dataMap[row.time_of_day].count++;
+    });
+
+    return timeOfDayOrder.map(time => ({
+      time_of_day: time,
+      averageFlow: dataMap[time] ? parseFloat((dataMap[time].totalFlow / dataMap[time].count).toFixed(2)) : 0,
+    }));
+  }, [uploadedData]);
+
+  const flowSpeedScatterData = useMemo(() => {
+    if (!uploadedData) return [];
+    return uploadedData.map(row => ({ flow: row.flow, speed: row.speed }));
+  }, [uploadedData]);
+
+  // --- End Data preparation for new charts ---
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 p-4 md:p-6">
@@ -122,7 +233,6 @@ const DataAnalysisPage = () => {
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
                 <div className="space-y-2">
                   <p><strong>Total Records:</strong> {analysisResults.totalRecords}</p>
-                  {/* <p><strong>Unique Detectors:</strong> {analysisResults.uniqueDetectors}</p> */} {/* Removed */}
                   <p><strong>Average Speed:</strong> {analysisResults.averageSpeed}</p>
                   <p><strong>Average Flow:</strong> {analysisResults.averageFlow}</p>
                   <p><strong>Average Occupancy:</strong> {analysisResults.averageOccupancy}</p>
@@ -244,6 +354,174 @@ const DataAnalysisPage = () => {
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
                       <Line type="monotone" dataKey="averageFlow" stroke="#f97316" activeDot={{ r: 8 }} name="Average Flow" />
                     </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Speed Distribution Histogram */}
+            {speedDistributionData.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Gauge className="h-5 w-5 mr-2 text-blue-600" /> Speed Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={speedDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value: number) => [`${value} vehicles`, 'Count']}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Bar dataKey="count" fill="#4CAF50" name="Speed Range" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Flow Distribution Histogram */}
+            {flowDistributionData.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Cloud className="h-5 w-5 mr-2 text-green-600" /> Flow Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={flowDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value: number) => [`${value} vehicles`, 'Count']}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Bar dataKey="count" fill="#FFC107" name="Flow Range" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Occupancy Distribution Histogram */}
+            {occupancyDistributionData.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Droplet className="h-5 w-5 mr-2 text-blue-600" /> Occupancy Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={occupancyDistributionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="range" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value: number) => [`${value} instances`, 'Count']}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Bar dataKey="count" fill="#9C27B0" name="Occupancy Range" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Average Speed by Day of Week */}
+            {averageSpeedByDayOfWeek.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <CalendarDays className="h-5 w-5 mr-2 text-orange-600" /> Average Speed by Day of Week
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={averageSpeedByDayOfWeek} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="day_of_week" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Avg Speed (km/h)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value: number) => [`${value} km/h`, 'Average Speed']}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Bar dataKey="averageSpeed" fill="#E91E63" name="Average Speed" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Average Flow by Time of Day */}
+            {averageFlowByTimeOfDay.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Clock className="h-5 w-5 mr-2 text-purple-600" /> Average Flow by Time of Day
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={averageFlowByTimeOfDay} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis dataKey="time_of_day" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis label={{ value: 'Avg Flow', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value: number) => [`${value}`, 'Average Flow']}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Bar dataKey="averageFlow" fill="#00BCD4" name="Average Flow" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Flow vs Speed Scatter Plot */}
+            {flowSpeedScatterData.length > 0 && (
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center">
+                    <Car className="h-5 w-5 mr-2 text-red-600" /> Flow vs Speed Scatter Plot
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ScatterChart margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis type="number" dataKey="flow" name="Flow" unit="" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <YAxis type="number" dataKey="speed" name="Speed" unit="km/h" className="text-sm text-gray-600 dark:text-gray-400" />
+                      <Tooltip
+                        cursor={{ strokeDasharray: '3 3' }}
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '0.5rem' }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Scatter name="Traffic Data" data={flowSpeedScatterData} fill="#8884d8" />
+                    </ScatterChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
