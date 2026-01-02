@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic ML Analysis</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Traffic ML Analysis</h1>
+            <p>Random Forest Prediction System • Torino Dataset</p>
+        </header>
+
+        <div class="grid">
+            <section class="card">
+                <h2>Data Statistics</h2>
+                <div id="statistics">
+                    <p class="placeholder">Loading data...</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Model Training</h2>
+                <button id="trainBtn" class="btn btn-success" disabled>
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+                    </svg>
+                    Train Model
+                </button>
+                <div id="trainingStatus" class="status"></div>
+                <div id="metrics"></div>
+            </section>
+
+            <section class="card">
+                <h2>Prediction</h2>
+                <form id="predictForm">
+                    <div class="form-group">
+                        <label>Hour (0-23)</label>
+                        <input type="number" id="predHour" min="0" max="23" value="12">
+                    </div>
+                    <div class="form-group">
+                        <label>Weekday (0=Mon)</label>
+                        <input type="number" id="predWeekday" min="0" max="6" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Detector ID</label>
+                        <input type="number" id="predDetid" value="230">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="predictBtn" disabled>Predict Flow</button>
+                </form>
+                <div id="predictionResult"></div>
+            </section>
+        </div>
+
+        <div class="charts-grid">
+            <section class="card chart-card">
+                <h2>Feature Importance</h2>
+                <canvas id="featureChart"></canvas>
+            </section>
+
+            <section class="card chart-card">
+                <h2>Hourly Traffic Flow</h2>
+                <canvas id="hourlyChart"></canvas>
+            </section>
+
+            <section class="card chart-card">
+                <h2>Traffic Distribution</h2>
+                <canvas id="trafficDistChart"></canvas>
+            </section>
+        </div>
+
+        <!-- New Analysis Charts -->
+        <div class="charts-grid">
+            <section class="card chart-card">
+                <h2>Weekday vs Weekend Comparison</h2>
+                <canvas id="weekdayWeekendChart"></canvas>
+            </section>
+
+            <section class="card chart-card">
+                <h2>Congestion by Hour</h2>
+                <canvas id="hourlyCongestionChart"></canvas>
+            </section>
+
+            <section class="card chart-card">
+                <h2>Congestion by Day</h2>
+                <canvas id="dailyCongestionChart"></canvas>
+            </section>
+        </div>
+
+        <!-- Peak Hours Info -->
+        <div class="grid">
+            <section class="card">
+                <h2>Peak Congestion Hours</h2>
+                <div id="peakHours">
+                    <p class="placeholder">Loading analysis...</p>
+                </div>
+            </section>
+
+            <section class="card" style="grid-column: span 2;">
+                <h2>Weekday vs Weekend Flow Pattern</h2>
+                <canvas id="flowComparisonChart"></canvas>
+            </section>
+        </div>
+
+        <div class="grid">
+            <section class="card">
+                <h2>Data Filters</h2>
+                <div class="filters">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="filterStartDate" value="2016-09-26">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="filterEndDate" value="2016-10-31">
+                    </div>
+                    <div class="form-group">
+                        <label>Detector ID</label>
+                        <input type="number" id="filterDetid" placeholder="All detectors">
+                    </div>
+                    <div class="form-group">
+                        <label>Hour Start</label>
+                        <input type="number" id="filterHourStart" min="0" max="23" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Hour End</label>
+                        <input type="number" id="filterHourEnd" min="0" max="23" placeholder="23">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button id="applyFilters" class="btn btn-secondary">Apply Filters</button>
+                    </div>
+                </div>
+                <div id="filterResults" class="status"></div>
+            </section>
+
+            <section class="card" style="grid-column: span 2;">
+                <h2>Feature Correlations</h2>
+                <div id="correlations">
+                    <p class="placeholder">Train model to see correlations</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

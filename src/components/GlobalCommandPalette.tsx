@@ -56,7 +56,7 @@ const searchableItems = [
       { label: "Traffic Incidents", value: "traffic incidents", path: "/incidents", icon: AlertTriangle },
       { label: "Reports", value: "reports", path: "/reports", icon: BarChart2 },
       // Item 'Data Analysis' dihapus sesuai permintaan
-      // { label: "Data Analysis", value: "data analysis", path: "/data-analysis", icon: BarChart2 },
+      { label: "Data Analysis", value: "data analysis", path: "/data-analysis", icon: BarChart2 },
       { label: "About Torino City", value: "about torino city", path: "/about-torino", icon: Info },
       { label: "Culture, Cuisine & Tourism", value: "culture cuisine tourism", path: "/culture-tourism", icon: Palette },
       { label: "Contact & Collaboration", value: "contact collaboration", path: "/contact-collaboration", icon: Mail },

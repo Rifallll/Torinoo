@@ -33,7 +33,7 @@ const AboutTorinoPage = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Mole_Antonelliana_Torino.jpg/1280px-Mole_Antonelliana_Torino.jpg"
+              src="/GAMBAR/12.jpg"
               alt="Mole Antonelliana, Torino"
               className="w-full h-64 object-cover rounded-md shadow-md"
             />

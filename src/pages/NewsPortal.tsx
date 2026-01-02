@@ -7,30 +7,63 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 // Select, SelectContent, SelectItem, SelectTrigger, SelectValue removed
-import { useCombinedNews } from '@/hooks/useCombinedNews';
+// Fetch real-time traffic news from Supabase (scraped from Official sources)
+import { useSupabaseTraffic, SupabaseTrafficChange } from '@/hooks/useSupabaseTraffic';
 
 const NewsPortal = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('Torino AND (traffic OR incident)');
-  // currentQuery state removed, use searchTerm directly for the hook
-  const fixedLanguage = 'en'; // Fixed language to English
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const { trafficChanges, isLoading, error } = useSupabaseTraffic();
 
-  // Fetch news based on searchTerm and fixedLanguage
-  const { data: newsArticles, isLoading, error } = useCombinedNews(searchTerm, fixedLanguage);
+  // Filter news based on search term (Local search)
+  const filteredNews = useMemo(() => {
+    if (!trafficChanges) return [];
+    if (!searchTerm) return trafficChanges;
 
-  // handleSearch function removed as search is now live
+    const lowerTerm = searchTerm.toLowerCase();
 
-  const handleResetFilters = () => {
-    setSearchTerm('Torino AND (traffic OR incident)');
-    // Language is now fixed, no need to reset it here
+    // 1. Filter by Search Term & Strict Link Requirement
+    const matches = trafficChanges.filter(item =>
+      (item.description?.includes('LINK:') ?? false) &&
+      // Aggressive Exclusion
+      !item.type?.toLowerCase().includes('public_transport') && // Exclude Type
+      !item.type?.toLowerCase().includes('debug') && // Exclude Type
+      !item.responsible_entity?.toLowerCase().includes('gtt') && // Exclude Entity
+      !item.responsible_entity?.toLowerCase().includes('debug') && // Exclude Entity
+      !item.title.toUpperCase().includes('GTT') && // Exclude Title
+      !(item.description || '').includes('Public Transport Alert') && // Exclude specific GTT phrase
+      !(item.description || '').includes('GTT') && // Exclude GTT in desc (Aggressive)
+      // Standard Search
+      (item.title.toLowerCase().includes(lowerTerm) ||
+        item.description?.toLowerCase().includes(lowerTerm) ||
+        item.responsible_entity?.toLowerCase().includes(lowerTerm))
+    );
+
+    // 2. Deduplicate (Keep only the first occurrence of a unique title+desc signature)
+    const uniqueItems = new Map();
+    matches.forEach(item => {
+      const signature = `${item.title}-${item.description?.substring(0, 50)}`; // Create unique signature
+      if (!uniqueItems.has(signature)) {
+        uniqueItems.set(signature, item);
+      }
+    });
+
+    return Array.from(uniqueItems.values());
+  }, [trafficChanges, searchTerm]);
+
+  // Determine an image based on keyword
+  const getNewsImage = (item: SupabaseTrafficChange) => {
+    const text = (item.title + item.description).toLowerCase();
+    if (text.includes('sciopero') || text.includes('strike')) return 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&q=80&w=400';
+    if (text.includes('lavori') || text.includes('work') || text.includes('cantiere')) return 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=400';
+    if (text.includes('linea') || text.includes('metro') || text.includes('bus')) return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=400';
+    return 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=400'; // Default Traffic
   };
-
-  // availableLanguages memo removed as language filter is removed
 
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 items-center justify-center">
         <Newspaper className="h-12 w-12 mr-3 text-indigo-600 animate-pulse" />
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Loading Latest News...</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-4">Loading Latest Traffic News...</h1>
       </div>
     );
   }
@@ -41,7 +74,7 @@ const NewsPortal = () => {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
             <Newspaper className="h-8 w-8 mr-3 text-indigo-600" />
-            Traffic News Portal
+            Torino Traffic News
           </h1>
           <Button asChild variant="outline">
             <Link to="/torino-dashboard" className="flex items-center">
@@ -51,18 +84,9 @@ const NewsPortal = () => {
           </Button>
         </header>
         <main className="flex-1 flex items-center justify-center">
-          <Card className="bg-white dark:bg-gray-800 shadow-lg border-red-500 max-w-md w-full">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-red-500 flex items-center">
-                <AlertCircle className="h-5 w-5 mr-2" />
-                Error Loading News
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p>Failed to load news articles: {error.message}</p>
-              <p className="text-sm text-gray-500">Please ensure your NewsAPI and GNews.io API keys are correct and internet connection is stable.</p>
-            </CardContent>
-          </Card>
+          <div className="text-center p-8 bg-red-50 text-red-600 rounded-lg">
+            Error loading news: {error}
+          </div>
         </main>
       </div>
     );
@@ -73,7 +97,7 @@ const NewsPortal = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center">
           <Newspaper className="h-8 w-8 mr-3 text-indigo-600" />
-          Traffic News Portal
+          Torino Traffic News (Official)
         </h1>
         <Button asChild variant="outline">
           <Link to="/torino-dashboard" className="flex items-center">
@@ -89,11 +113,10 @@ const NewsPortal = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             <Input
               type="text"
-              placeholder="Search news (e.g., 'Torino traffic', 'congestion')..."
+              placeholder="Search news..."
               className="pl-9 pr-8 w-full h-10 text-base border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              // onKeyPress removed as search is now live
             />
             {searchTerm && (
               <Button
@@ -106,43 +129,60 @@ const NewsPortal = () => {
               </Button>
             )}
           </div>
-
-          {/* Language Select dropdown removed */}
-
-          {/* Search button removed as search is now live */}
-
-          {searchTerm !== 'Torino AND (traffic OR incident)' && ( // Condition adjusted
-            <Button variant="outline" onClick={handleResetFilters} className="flex items-center h-10 px-4 py-2 text-base">
-              <XCircle className="h-4 w-4 mr-2" />
-              Reset Filters
-            </Button>
-          )}
         </div>
       </div>
 
       <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
-        {newsArticles && newsArticles.length > 0 ? (
-          newsArticles.map(article => (
-            <Card key={article.url} className="overflow-hidden flex flex-col">
+        {filteredNews && filteredNews.length > 0 ? (
+          filteredNews.map((article, idx) => (
+            <Card key={article.id || idx} className="overflow-hidden flex flex-col hover:shadow-lg transition-shadow bg-white dark:bg-gray-800">
               <img
-                src={article.urlToImage || 'https://via.placeholder.com/400x200?text=No+Image'}
-                alt={article.title}
-                className="w-full h-48 object-cover"
+                src={getNewsImage(article)}
+                alt="Traffic News"
+                className="w-full h-48 object-cover opacity-90 hover:opacity-100 transition-opacity"
               />
               <CardHeader>
-                <CardTitle className="text-xl font-semibold">{article.title}</CardTitle>
-                <p className="text-sm text-gray-500">{new Date(article.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded">
+                    {article.responsible_entity || 'Traffic Update'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(article.start_date || Date.now()).toLocaleDateString('en-GB')}
+                  </span>
+                </div>
+                <CardTitle className="text-lg font-bold leading-tight text-gray-900 dark:text-gray-100">
+                  {article.title}
+                </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between">
-                <p className="text-gray-700 mb-4">{article.description || article.content || 'No description available.'}</p>
-                <Button variant="link" className="p-0 h-auto justify-start" asChild>
-                  <a href={article.url} target="_blank" rel="noopener noreferrer">Read More</a>
-                </Button>
+                <div
+                  className="text-gray-600 dark:text-gray-300 mb-4 text-sm line-clamp-4 prose prose-indigo max-w-none"
+                  dangerouslySetInnerHTML={{
+                    __html: (article.description || 'No description provided.').split('LINK:')[0].trim().replace(/\n/g, '<br/>')
+                  }}
+                />
+
+                {/* Strict External Link Only */}
+                {(article.description || '').includes('LINK:') && (
+                  <Button variant="outline" className="w-full mt-auto" asChild>
+                    <a
+                      href={(article.description || '').split('LINK:')[1].trim()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2"
+                    >
+                      Read on {article.responsible_entity || 'Official Site'} &rarr;
+                    </a>
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))
         ) : (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-4 col-span-full">No news articles could be loaded at this time.</p>
+          <div className="col-span-full text-center py-12 text-gray-500">
+            <Newspaper className="h-12 w-12 mx-auto text-gray-300 mb-2" />
+            <p>No traffic news found matching your search.</p>
+          </div>
         )}
       </main>
     </div>

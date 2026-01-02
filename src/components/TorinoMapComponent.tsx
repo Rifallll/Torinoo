@@ -288,9 +288,11 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
 
       // Add subway stations to their layer group
       subwayStationsData.forEach(station => {
-        const { latitude, longitude } = convertCoordinates(station.x, station.y);
-        if (latitude !== 0 || longitude !== 0) { // Check for valid conversion
-          L.marker([latitude, longitude], {
+        const coords = convertCoordinates(station.x, station.y);
+
+        // Defensive check: ensure coords object and properties exist
+        if (coords && typeof coords.latitude === 'number' && typeof coords.longitude === 'number' && (coords.latitude !== 0 || coords.longitude !== 0)) {
+          L.marker([coords.latitude, coords.longitude], {
             icon: L.divIcon({
               className: 'subway-station-marker',
               html: `<div style="background-color:#007bff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">M</div>`,
@@ -298,22 +300,23 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
               iconAnchor: [10, 10]
             })
           })
-          .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
-          .addTo(subwayStationsLayerGroupRef.current!);
+            .bindPopup(`<b>${station.name}</b><br/>Subway Station`)
+            .addTo(subwayStationsLayerGroupRef.current!);
         }
       });
 
       // Get TomTom API Key from environment variables
       const tomtomApiKey = import.meta.env.VITE_TOMTOM_API_KEY;
       console.log("TomTom API Key (masked):", tomtomApiKey ? tomtomApiKey.substring(0, 5) + '...' + tomtomApiKey.substring(tomtomApiKey.length - 5) : 'NOT_SET');
-      
+
       if (tomtomApiKey && tomtomApiKey !== 'YOUR_TOMTOM_API_KEY_HERE') {
         tomtomTrafficFlowLayerRef.current = L.tileLayer(
           `https://api.tomtom.com/traffic/map/4/tile/flow/absolute/{z}/{x}/{y}.png?key=${tomtomApiKey}`,
           {
             attribution: '&copy; <a href="https://tomtom.com">TomTom</a>',
             maxZoom: 19,
-            opacity: 1.0, // Mengubah opasitas menjadi 1.0
+            opacity: 1.0,
+            bounds: torinoBounds, // Restrict tiles to Torino area
           }
         );
       } else {
@@ -326,21 +329,27 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
       L.Control.geocoder({
         defaultMarkGeocode: false,
       })
-      .on('markgeocode', function(e: any) {
-        const bbox = e.geocode.bbox;
-        const poly = L.polygon([
-          [bbox.getSouthEast().lat, bbox.getSouthEast().lng],
-          [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
-          [bbox.getNorthWest().lat, bbox.getNorthWest().lng],
-          [bbox.getSouthWest().lat, bbox.getSouthWest().lng]
-        ]).addTo(mapRef.current!);
-        mapRef.current!.fitBounds(poly.getBounds());
-      })
-      .addTo(mapRef.current!);
+        .on('markgeocode', function (e: any) {
+          const bbox = e.geocode.bbox;
+          if (!bbox || !bbox.getSouthEast || !bbox.getNorthEast || !bbox.getNorthWest || !bbox.getSouthWest) return;
+
+          try {
+            const poly = L.polygon([
+              [bbox.getSouthEast().lat, bbox.getSouthEast().lng],
+              [bbox.getNorthEast().lat, bbox.getNorthEast().lng],
+              [bbox.getNorthWest().lat, bbox.getNorthWest().lng],
+              [bbox.getSouthWest().lat, bbox.getSouthWest().lng]
+            ]).addTo(mapRef.current!);
+            mapRef.current!.fitBounds(poly.getBounds());
+          } catch (err) {
+            console.error("Error processing geocode result:", err);
+          }
+        })
+        .addTo(mapRef.current!);
 
       // Add Fullscreen control (simple custom button)
       const FullscreenControl = L.Control.extend({
-        onAdd: function(map: L.Map) {
+        onAdd: function (map: L.Map) {
           const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
           container.innerHTML = '<button title="Toggle Fullscreen" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x26F6;</button>';
           container.onclick = () => {
@@ -352,7 +361,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
           };
           return container;
         },
-        onRemove: function(map: L.Map) {},
+        onRemove: function (map: L.Map) { },
       });
       new FullscreenControl({ position: 'topleft' }).addTo(mapRef.current);
 
@@ -377,7 +386,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
 
       // Reset view control
       const ResetViewControl = L.Control.extend({
-        onAdd: function(map: L.Map) {
+        onAdd: function (map: L.Map) {
           const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
           container.innerHTML = '<button title="Reset View" style="width:30px;height:30px;line-height:30px;text-align:center;cursor:pointer;">&#x21BA;</button>';
           container.onclick = () => {
@@ -385,7 +394,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
           };
           return container;
         },
-        onRemove: function(map: L.Map) {},
+        onRemove: function (map: L.Map) { },
       });
       new ResetViewControl({ position: 'topleft' }).addTo(mapRef.current);
 
@@ -416,17 +425,17 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
           geoJsonLayerGroupRef.current.clearLayers();
 
           // Filter features based on selectedVehicleType and roadConditionFilter
-          const filteredFeatures = data.features.filter((feature: L.GeoJSON.Feature) => {
+          const filteredFeatures = data.features.filter((feature: any) => {
             const properties = feature.properties;
-            const matchesVehicleType = selectedVehicleType === 'all' || 
-                                       (properties?.vehicle_type && properties.vehicle_type.toLowerCase() === selectedVehicleType.toLowerCase());
-            const matchesRoadCondition = roadConditionFilter === 'all' || 
-                                         (properties?.traffic_level && properties.traffic_level.toLowerCase() === roadConditionFilter.toLowerCase());
+            const matchesVehicleType = selectedVehicleType === 'all' ||
+              (properties?.vehicle_type && properties.vehicle_type.toLowerCase() === selectedVehicleType.toLowerCase());
+            const matchesRoadCondition = roadConditionFilter === 'all' ||
+              (properties?.traffic_level && properties.traffic_level.toLowerCase() === roadConditionFilter.toLowerCase());
             return matchesVehicleType && matchesRoadCondition;
           });
 
           geoJsonLayerRef.current = L.geoJSON({ ...data, features: filteredFeatures }, {
-            onEachFeature: (feature, layer) => {
+            onEachFeature: (feature: any, layer: any) => {
               // Bind popup with all properties
               if (feature.properties) {
                 let popupContent = "<table>";
@@ -437,11 +446,14 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
                 layer.bindPopup(popupContent);
               }
             },
-            pointToLayer: (feature, latlng) => {
+            pointToLayer: (feature: any, latlng: any) => {
+              // Defensive check for valid latlng
+              if (!latlng || typeof latlng.lat !== 'number' || typeof latlng.lng !== 'number') return L.marker([0, 0], { opacity: 0 }); // Return invisible marker to prevent crash
+
               // Custom marker for points based on 'vehicle_type' or 'amenity' property
               return L.marker(latlng, { icon: getCustomIcon(feature) });
             },
-            style: (feature) => {
+            style: (feature: any) => {
               // Custom style for lines/polygons based on properties
               const trafficLevel = feature?.properties?.traffic_level;
               let color = '#6b7280'; // Changed default to a darker gray
@@ -518,6 +530,9 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
     trafficChangesLayerGroupRef.current.clearLayers(); // Clear existing markers
 
     trafficChanges.forEach(change => {
+      // Validate coordinates
+      if (!change.latitude || !change.longitude || typeof change.latitude !== 'number' || typeof change.longitude !== 'number') return;
+
       // Menggunakan satu ikon TrafficCone untuk semua jenis perubahan lalu lintas
       const iconHtml = `
         <div style="background-color:#facc15; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#333; font-size:16px; font-weight:bold; opacity:0.9; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">

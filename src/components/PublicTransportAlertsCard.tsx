@@ -1,19 +1,29 @@
-"use client";
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrafficCone, AlertTriangle, Info, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { mockTrafficChanges } from '@/components/TrafficChangesInsights';
 import { Link } from 'react-router-dom';
+import { TrafficChange } from '@/components/TrafficChangesInsights';
 
-const PublicTransportAlertsCard: React.FC = React.memo(() => {
-  const trafficChanges = mockTrafficChanges;
+interface PublicTransportAlertsCardProps {
+  trafficChanges?: TrafficChange[];
+}
 
+const PublicTransportAlertsCard: React.FC<PublicTransportAlertsCardProps> = React.memo(({ trafficChanges = [] }) => {
   const isLoading = false;
   const error = null;
 
-  const displayedTrafficChanges = trafficChanges.slice(0, 4); // Display up to 4 items
+  // Deduplicate before slicing
+  const uniqueTrafficChanges = Array.from(
+    new Map(
+      trafficChanges.map(item => [
+        `${item.title}-${item.description?.substring(0, 50)}`,
+        item
+      ])
+    ).values()
+  );
+
+  const displayedTrafficChanges = uniqueTrafficChanges.slice(0, 4); // Display up to 4 unique items
 
   if (isLoading) {
     return (
@@ -41,7 +51,7 @@ const PublicTransportAlertsCard: React.FC = React.memo(() => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-red-500 text-center py-4">Failed to load changes: {error.message}</p>
+          <p className="text-red-500 text-center py-4">Failed to load changes</p>
         </CardContent>
       </Card>
     );
