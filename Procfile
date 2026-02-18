@@ -1,1 +1,1 @@
-web: cd "algo 2/algo/src" && gunicorn app:app
+web: cd "backend/algo/src" && gunicorn app:app

@@ -23,7 +23,7 @@ export default defineConfig(() => ({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, "algo 2/algo/static/dist"),
+    outDir: process.env.VERCEL ? "dist" : path.resolve(__dirname, "backend/algo/static/dist"),
     emptyOutDir: true,
   },
 }));
