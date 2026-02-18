@@ -67,7 +67,6 @@ export const TrafficDataProvider: React.FC<{ children: ReactNode }> = ({ childre
       } catch (err) {
         console.error("Failed to load default traffic data:", err);
         setAnalysisStatus('error');
-        toast.error("Failed to load default traffic data.");
       }
     };
     fetchDefaultData();

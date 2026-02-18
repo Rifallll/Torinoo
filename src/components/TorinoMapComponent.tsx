@@ -482,7 +482,6 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
         setGeoJsonData(data); // Store in state/cache
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
-        toast.error(`Failed to load GeoJSON data: ${error instanceof Error ? error.message : String(error)}`);
       }
     };
 
