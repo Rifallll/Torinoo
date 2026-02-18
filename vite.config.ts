@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig(({ mode }) => ({
-  base: mode === "development" || process.env.VERCEL ? "/" : "/static/dist/",
+  base: mode === "development" || process.env.VERCEL ? "/" : (process.env.GITHUB_PAGES ? "/traffic-app/" : "/static/dist/"),
   server: {
     host: "::",
     port: 8080,

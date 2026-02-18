@@ -474,7 +474,7 @@ const TorinoMapComponent: React.FC<TorinoMapComponentProps> = React.memo(({ sele
   useEffect(() => {
     const fetchGeoJSON = async () => {
       try {
-        const response = await fetch('/export.geojson');
+        const response = await fetch(`${import.meta.env.BASE_URL}export.geojson`);
         if (!response.ok) {
           throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
         }
