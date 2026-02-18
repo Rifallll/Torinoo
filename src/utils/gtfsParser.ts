@@ -151,14 +151,14 @@ const parseCsv = async <T>(filePath: string): Promise<T[]> => {
 
 export const loadGtfsData = async (): Promise<ParsedGtfsData> => {
   const [agencies, routes, stops, trips, stopTimes, calendar, calendarDates, shapes] = await Promise.all([
-    parseCsv<GtfsAgency>('/gtt_gtfs/agency.txt'),
-    parseCsv<GtfsRoute>('/gtt_gtfs/routes.txt'),
-    parseCsv<GtfsStop>('/gtt_gtfs/stops.txt'),
-    parseCsv<GtfsTrip>('/gtt_gtfs/trips.txt'),
-    parseCsv<GtfsStopTime>('/gtt_gtfs/stop_times.txt'),
-    parseCsv<GtfsCalendar>('/gtt_gtfs/calendar.txt'),
-    parseCsv<GtfsCalendarDate>('/gtt_gtfs/calendar_dates.txt'),
-    parseCsv<GtfsShape>('/gtt_gtfs/shapes.txt'),
+    parseCsv<GtfsAgency>(`${import.meta.env.BASE_URL}gtt_gtfs/agency.txt`),
+    parseCsv<GtfsRoute>(`${import.meta.env.BASE_URL}gtt_gtfs/routes.txt`),
+    parseCsv<GtfsStop>(`${import.meta.env.BASE_URL}gtt_gtfs/stops.txt`),
+    parseCsv<GtfsTrip>(`${import.meta.env.BASE_URL}gtt_gtfs/trips.txt`),
+    parseCsv<GtfsStopTime>(`${import.meta.env.BASE_URL}gtt_gtfs/stop_times.txt`),
+    parseCsv<GtfsCalendar>(`${import.meta.env.BASE_URL}gtt_gtfs/calendar.txt`),
+    parseCsv<GtfsCalendarDate>(`${import.meta.env.BASE_URL}gtt_gtfs/calendar_dates.txt`),
+    parseCsv<GtfsShape>(`${import.meta.env.BASE_URL}gtt_gtfs/shapes.txt`),
     // Add other GTFS files here as needed
   ]);
 

@@ -83,7 +83,7 @@ const loadProto = async () => {
     return; // Already loaded
   }
   try {
-    root = await protobuf.load('/src/proto/gtfs-realtime.proto');
+    root = await protobuf.load(`${import.meta.env.BASE_URL}proto/gtfs-realtime.proto`);
     FeedMessage = root.lookupType('transit_realtime.FeedMessage');
     console.log("GTFS-realtime .proto loaded successfully.");
   } catch (error) {
@@ -107,7 +107,7 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
       return [];
     }
     const buffer = await response.arrayBuffer();
-    
+
     // Add check for empty buffer
     if (buffer.byteLength === 0) {
       console.warn(`Fetched ${type}.bin from ${path} but it was empty.`);
@@ -138,24 +138,24 @@ const parseSingleBinFile = async (path: string, type: string, FeedMessage: proto
 
           // Remap the non-standard fields from the provided JSON snippet
           const remappedTrip: ParsedTripDescriptor = {
-              trip_id: rawTrip?.tripId,
-              route_id: rawTrip?.startDate, // Assuming raw `startDate` is the actual route ID (e.g., "10U")
-              start_time: rawTrip?.routeId, // Assuming raw `routeId` is the actual start time (e.g., "08:31:00")
-              start_date: rawTrip?.directionId, // Reverted to use raw `directionId` for start_date
-              // direction_id is not clearly available as a number, leave undefined for now
+            trip_id: rawTrip?.tripId,
+            route_id: rawTrip?.startDate, // Assuming raw `startDate` is the actual route ID (e.g., "10U")
+            start_time: rawTrip?.routeId, // Assuming raw `routeId` is the actual start time (e.g., "08:31:00")
+            start_date: rawTrip?.directionId, // Reverted to use raw `directionId` for start_date
+            // direction_id is not clearly available as a number, leave undefined for now
           };
 
           entities.push({
-              id: entity.id,
-              trip: remappedTrip,
-              vehicle: rawVehiclePosition.vehicle,
-              position: rawVehiclePosition.position,
-              timestamp: rawVehiclePosition.timestamp,
-              occupancy_status: rawVehiclePosition.occupancyStatus,
-              current_stop_sequence: rawVehiclePosition.currentStopSequence,
-              stop_id: rawVehiclePosition.stopId,
-              current_status: rawVehiclePosition.currentStatus || 'UNKNOWN_STOP_STATUS', // Default if missing
-              congestion_level: rawVehiclePosition.congestionLevel,
+            id: entity.id,
+            trip: remappedTrip,
+            vehicle: rawVehiclePosition.vehicle,
+            position: rawVehiclePosition.position,
+            timestamp: rawVehiclePosition.timestamp,
+            occupancy_status: rawVehiclePosition.occupancyStatus,
+            current_stop_sequence: rawVehiclePosition.currentStopSequence,
+            stop_id: rawVehiclePosition.stopId,
+            current_status: rawVehiclePosition.currentStatus || 'UNKNOWN_STOP_STATUS', // Default if missing
+            congestion_level: rawVehiclePosition.congestionLevel,
           } as ParsedVehiclePosition);
         } else if (type === 'alert' && entity.alert) {
           entities.push({ id: entity.id, ...entity.alert } as ParsedAlert);
@@ -191,7 +191,7 @@ export const formatRelativeTime = (timestamp?: number | string) => {
   if (secondsAgo < 0) return 'In the future'; // Should not happen for "last updated"
   if (secondsAgo < 10) return 'Just now';
   if (secondsAgo < 60) return `${secondsAgo} seconds ago`;
-  
+
   const minutesAgo = Math.floor(secondsAgo / 60);
   if (minutesAgo < 60) return `${minutesAgo} minutes ago`;
 
@@ -310,7 +310,7 @@ export const parseGtfsRealtimeData = async (
     // TODO: Remove for production
     toast.info("No GTFS-realtime data found in uploaded or parsed files.");
   }
-  
+
   return { tripUpdates, vehiclePositions, alerts };
 };
 
@@ -351,7 +351,7 @@ export const getRouteTypeIcon = (routeId?: string, routeType?: number) => {
     if (routeId.includes('T') || routeId === '4' || routeId === '15') return <TramFront className="h-4 w-4 mr-1" />;
     if (routeId.endsWith('U')) return <Bus className="h-4 w-4 mr-1" />;
   }
-  
+
   return <Info className="h-4 w-4 mr-1" />; // Default if no match
 };
 

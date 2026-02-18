@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 const backgroundImages = [
-  '/GAMBAR/1.jpg',
-  '/GAMBAR/2.jpg',
-  '/GAMBAR/3.jpg',
+  `${import.meta.env.BASE_URL}GAMBAR/1.jpg`,
+  `${import.meta.env.BASE_URL}GAMBAR/2.jpg`,
+  `${import.meta.env.BASE_URL}GAMBAR/3.jpg`,
 ];
 
 const HomePage: React.FC = () => {
@@ -40,16 +40,14 @@ const HomePage: React.FC = () => {
       {/* Lapisan Gambar Latar Belakang */}
       {/* Gambar yang sedang aktif dan akan memudar */}
       <div
-        className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
-          isFading ? 'opacity-0' : 'opacity-100'
-        }`}
+        className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${isFading ? 'opacity-0' : 'opacity-100'
+          }`}
         style={{ backgroundImage: `url('${currentBg}')` }}
       ></div>
       {/* Gambar berikutnya yang akan memudar masuk */}
       <div
-        className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
-          isFading ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${isFading ? 'opacity-100' : 'opacity-0'
+          }`}
         style={{ backgroundImage: `url('${nextBg}')` }}
       ></div>
 

@@ -19,7 +19,11 @@ export const useGtfsRealtimeData = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await parseGtfsRealtimeData('/trip_update.bin', '/alerts.bin', '/vehicle_position.bin');
+      const result = await parseGtfsRealtimeData(
+        `${import.meta.env.BASE_URL}trip_update.bin`,
+        `${import.meta.env.BASE_URL}alerts.bin`,
+        `${import.meta.env.BASE_URL}vehicle_position.bin`
+      );
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
@@ -52,8 +56,8 @@ export const useGtfsRealtimeData = () => {
         const newTripUpdates = prevData.tripUpdates.map(update => {
           const currentDelay = update.delay || (update.stop_time_update?.[0]?.arrival?.delay || 0);
           const newDelay = currentDelay + Math.floor(Math.random() * 60) - 30; // +/- 30 seconds
-          
-          const updatedStopTimeUpdates = update.stop_time_update ? update.stop_time_update.map((stu, idx) => 
+
+          const updatedStopTimeUpdates = update.stop_time_update ? update.stop_time_update.map((stu, idx) =>
             idx === 0 ? { ...stu, arrival: { ...stu.arrival, delay: newDelay }, departure: { ...stu.departure, delay: newDelay } } : stu
           ) : [];
 
@@ -80,7 +84,7 @@ export const useGtfsRealtimeData = () => {
 
           const currentCongestionLevel = vp.congestion_level && congestionLevels.includes(vp.congestion_level) ? vp.congestion_level : 'RUNNING_SMOOTHLY';
           const currentCongestionIndex = congestionLevels.indexOf(currentCongestionLevel);
-          
+
           let newCongestionIndex = currentCongestionIndex + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0);
           newCongestionIndex = Math.max(0, Math.min(congestionLevels.length - 1, newCongestionIndex));
           const newCongestionLevel = congestionLevels[newCongestionIndex];
