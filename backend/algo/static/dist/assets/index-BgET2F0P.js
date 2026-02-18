@@ -1,0 +1,1 @@
+import{r,Q as n,J as s}from"./index-DF6BEUun.js";var u=n[" useId ".trim().toString()]||(()=>{}),i=0;function x(t){const[e,o]=r.useState(u());return s(()=>{o(a=>a??String(i++))},[t]),t||(e?`radix-${e}`:"")}var c=r.createContext(void 0);function f(t){const e=r.useContext(c);return t||e||"ltr"}export{f as a,x as u};

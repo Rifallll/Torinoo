@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: process.env.VERCEL ? "dist" : path.resolve(__dirname, "backend/algo/static/dist"),
+    outDir: (process.env.VERCEL || process.env.GITHUB_PAGES) ? "dist" : path.resolve(__dirname, "backend/algo/static/dist"),
     emptyOutDir: true,
   },
 }));
