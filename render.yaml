@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: torino-traffic-app
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      npm install
+      npm run build
+    startCommand: cd "algo 2/algo" && gunicorn src.app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0

@@ -107,9 +107,23 @@ Gunakan mode ini untuk menjalankan aplikasi seperti di server produksi (satu por
 
 ---
 
+## ☁️ Deployment (Paling Mudah & Gratis)
+
+Hanya direkomendasikan menggunakan **Render** karena paling mudah ("enak") dan support monolith.
+
+1. Daftar di [dashboard.render.com](https://dashboard.render.com/).
+2. Klik **New +** -> **Web Service**.
+3. Koneksikan ke GitHub repo ini.
+4. Render akan otomatis mendeteksi `render.yaml` atau setting berikut:
+    - **Build Command**: `pip install -r requirements.txt && npm install && npm run build`
+    - **Start Command**: `gunicorn src.app:app` (masuk ke directory `algo 2/algo` dulu di setting Root Directory jika perlu, atau sesuaikan path).
+    - *Saran*: Gunakan file `render.yaml` yang sudah saya sediakan untuk auto-config.
+
+---
+
 ## 📂 Struktur Project
 
-```
+```bash
 traffic-app/
 ├── src/                  # Source code Frontend (React)
 │   ├── components/       # Komponen UI (Map, Charts, dll)
