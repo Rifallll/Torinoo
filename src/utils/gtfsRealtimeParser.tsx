@@ -273,8 +273,6 @@ export const parseGtfsRealtimeData = async (
         delay: -30,
       },
     ];
-    // TODO: Remove for production
-    toast.info("Using dummy data for Trip Updates.");
   }
 
   if (alerts.length === 0) {
@@ -299,17 +297,9 @@ export const parseGtfsRealtimeData = async (
         description_text: { translation: [{ text: 'Urgent maintenance on TRAM-4 line. The stop at Piazza Castello has been moved 50m north.', language: 'en' }] },
       },
     ];
-    // TODO: Remove for production
-    toast.info("Using dummy data for Alerts.");
   }
 
-  if (tripUpdates.length > 0 || vehiclePositions.length > 0 || alerts.length > 0) {
-    // TODO: Remove for production
-    toast.success("GTFS-realtime data successfully parsed or dummy data loaded!");
-  } else {
-    // TODO: Remove for production
-    toast.info("No GTFS-realtime data found in uploaded or parsed files.");
-  }
+
 
   return { tripUpdates, vehiclePositions, alerts };
 };
