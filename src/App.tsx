@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary'; // Import ErrorBoundary
 import { TrafficDataProvider } from './contexts/TrafficDataContext';
@@ -43,7 +43,7 @@ const App = () => (
             <Sonner />
             <TooltipProvider>
               <div>
-                <BrowserRouter basename={import.meta.env.BASE_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                   <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
@@ -69,7 +69,7 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Suspense>
-                </BrowserRouter>
+                </HashRouter>
               </div>
             </TooltipProvider>
           </>
