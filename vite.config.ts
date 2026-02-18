@@ -3,8 +3,8 @@ import dyadComponentTagger from "@dyad-sh/react-vite-component-tagger";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-export default defineConfig(() => ({
-  base: "/static/dist/",
+export default defineConfig(({ mode }) => ({
+  base: mode === "development" || process.env.VERCEL ? "/" : "/static/dist/",
   server: {
     host: "::",
     port: 8080,
@@ -14,6 +14,7 @@ export default defineConfig(() => ({
         changeOrigin: true,
         secure: false,
       },
+      // Proxy static files during dev if needed, or rely on "/" base
     },
   },
   plugins: [dyadComponentTagger(), react()],
