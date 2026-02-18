@@ -9,7 +9,7 @@ from model import TrafficModel
 import os
 
 app = Flask(__name__, 
-            template_folder='../templates',
+            template_folder='../static/dist',
             static_folder='../static')
 CORS(app)
 
@@ -47,9 +47,13 @@ def load_data():
 # Load data on startup
 load_data()
 
-@app.route('/')
-def index():
-    """Render main page."""
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    """Render main page or serve static files if needed manually (though unnecessary with static_folder)."""
+    # API requests are handled by specific routes below.
+    # Everything else returns index.html for SPA routing.
+    # Note: If path matches an API route, Flask matches that first due to specificity.
     return render_template('index.html')
 
 @app.route('/api/statistics')

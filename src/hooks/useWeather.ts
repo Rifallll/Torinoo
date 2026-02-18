@@ -130,8 +130,9 @@ export const useWeather = (city: string = "Torino", enabled: boolean = true) => 
   return useQuery<OpenMeteoParsedData, Error>({
     queryKey: ["weather", city],
     queryFn: () => fetchOpenMeteoWeather(city),
-    staleTime: 5 * 60 * 1000, // Data dianggap segar selama 5 menit
-    refetchOnWindowFocus: false, // Mencegah pengambilan ulang saat jendela fokus
-    enabled: enabled, // Hanya menjalankan kueri jika diaktifkan
+    staleTime: 30 * 1000, // Data considered stale after 30 seconds
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
+    refetchInterval: 60 * 1000, // Auto-refetch every 1 minute
+    enabled: enabled, // Only run query if enabled
   });
 };

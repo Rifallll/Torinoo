@@ -101,8 +101,11 @@ export const useTomTomIncidents = () => {
 
     useEffect(() => {
         fetchIncidents();
-        // Refresh every 5 minutes
-        const interval = setInterval(fetchIncidents, 5 * 60 * 1000);
+        // Refresh every 1 minute
+        const interval = setInterval(() => {
+            console.log("Auto-refreshing TomTom incidents...");
+            fetchIncidents();
+        }, 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 

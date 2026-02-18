@@ -5,8 +5,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, TrendingUp, Clock, MapPin } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 
+export interface TrafficChange {
+  id: string;
+  title: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+  startDate?: string;
+  endDate?: string;
+  type?: 'roadwork' | 'closure' | 'accident' | 'other';
+  responsibleEntity?: string;
+}
+
+interface TrafficAnalysisData {
+  summary?: {
+    total_traffic_changes: number;
+    total_incidents: number;
+  };
+  timeline?: {
+    last_24h: number;
+    last_7d: number;
+  };
+  by_type?: Record<string, number>;
+  by_entity?: Record<string, number>;
+  recent_items?: Array<{
+    title: string;
+    type: string;
+    entity: string;
+  }>;
+}
+
 const TrafficChangesInsights = ({ id }: { id?: string }) => {
-  const [analysisData, setAnalysisData] = React.useState<any>(null);
+  const [analysisData, setAnalysisData] = React.useState<TrafficAnalysisData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(false);
 
@@ -163,7 +193,7 @@ const TrafficChangesInsights = ({ id }: { id?: string }) => {
                 <Clock className="h-5 w-5 mr-2" /> Recent Traffic Updates
               </h3>
               <div className="space-y-2">
-                {analysisData.recent_items.slice(0, 5).map((item: any, idx: number) => (
+                {analysisData.recent_items.slice(0, 5).map((item, idx) => (
                   <div key={idx} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg flex items-start">
                     <MapPin className="h-4 w-4 mr-2 mt-1 text-blue-500 flex-shrink-0" />
                     <div className="flex-1">

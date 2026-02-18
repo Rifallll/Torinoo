@@ -37,7 +37,7 @@ const TorinoDashboard = () => {
   const [roadConditionFilter, setRoadConditionFilter] = useState<string>('all');
 
   // Combined and Mapped Traffic Data
-  const trafficChanges: TrafficChange[] = [
+  const trafficChanges: TrafficChange[] = React.useMemo(() => [
     ...(supabaseRoadworks || []).map(rw => ({
       id: rw.id,
       title: rw.title,
@@ -59,10 +59,10 @@ const TorinoDashboard = () => {
         inc.type.toLowerCase().includes('work') ? 'roadwork' : 'reduction') as any,
       responsibleEntity: 'TomTom Live'
     }))
-  ];
+  ], [supabaseRoadworks, tomtomIncidents]);
 
   // Combined Incidents for Alerts Card
-  const allAlerts = [
+  const allAlerts = React.useMemo(() => [
     ...(supabaseIncidents || []).map(inc => ({
       id: inc.id,
       type: inc.type,
@@ -79,7 +79,7 @@ const TorinoDashboard = () => {
       reportedAt: inc.reportedAt,
       location: inc.location
     }))
-  ];
+  ], [supabaseIncidents, tomtomIncidents]);
 
   const handleUploadCSVClick = useCallback(() => {
     setIsUploadCSVModalOpen(true);

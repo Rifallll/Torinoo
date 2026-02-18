@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+!algo 2/algo/static/dist
 dist-ssr
 *.local
 

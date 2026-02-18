@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig(() => ({
+  base: "/static/dist/",
   server: {
     host: "::",
     port: 8080,
@@ -20,5 +21,9 @@ export default defineConfig(() => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    outDir: path.resolve(__dirname, "algo 2/algo/static/dist"),
+    emptyOutDir: true,
   },
 }));
