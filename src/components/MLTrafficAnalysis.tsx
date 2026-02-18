@@ -106,9 +106,9 @@ const MLTrafficDashboard = () => {
         try {
             setLoading(true);
             const [statsRes, analysisRes, dataRes] = await Promise.all([
-                fetch('/api/statistics'),
-                fetch('/api/analysis'),
-                fetch('/api/data'),
+                fetch(`${import.meta.env.BASE_URL}api/statistics`),
+                fetch(`${import.meta.env.BASE_URL}api/analysis`),
+                fetch(`${import.meta.env.BASE_URL}api/data`),
             ]);
 
             if (!statsRes.ok || !analysisRes.ok || !dataRes.ok) {
@@ -148,9 +148,9 @@ const MLTrafficDashboard = () => {
 
             // Fetch ALL data with filters
             const [statsRes, analysisRes, dataRes] = await Promise.all([
-                fetch(`/api/statistics?${queryString}`),
-                fetch(`/api/analysis?${queryString}`),
-                fetch(`/api/data?${queryString}`),
+                fetch(`${import.meta.env.BASE_URL}api/statistics?${queryString}`),
+                fetch(`${import.meta.env.BASE_URL}api/analysis?${queryString}`),
+                fetch(`${import.meta.env.BASE_URL}api/data?${queryString}`),
             ]);
 
             if (statsRes.ok && analysisRes.ok && dataRes.ok) {
@@ -181,14 +181,14 @@ const MLTrafficDashboard = () => {
     const handleTrainModel = async () => {
         try {
             setTraining(true);
-            const res = await fetch('/api/train', { method: 'POST' });
+            const res = await fetch(`${import.meta.env.BASE_URL}api/train`, { method: 'POST' });
             if (!res.ok) throw new Error('Training failed');
             const data = await res.json();
             setModelMetrics(data.metrics);
             setFeatures(data.feature_importance);
 
             // Fetch correlations after training
-            const corrRes = await fetch('/api/correlation');
+            const corrRes = await fetch(`${import.meta.env.BASE_URL}api/correlation`);
             if (corrRes.ok) {
                 const corrData = await corrRes.json();
                 setCorrelations(corrData.correlations);
@@ -203,7 +203,7 @@ const MLTrafficDashboard = () => {
     const handlePredict = async () => {
         try {
             setPredicting(true);
-            const res = await fetch('/api/predict', {
+            const res = await fetch(`${import.meta.env.BASE_URL}api/predict`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -294,7 +294,7 @@ const MLTrafficDashboard = () => {
             {/* Back Button */}
             <div className="mb-4">
                 <Button
-                    onClick={() => window.location.href = '/torino-dashboard'}
+                    onClick={() => window.location.href = `${import.meta.env.BASE_URL}torino-dashboard`}
                     variant="outline"
                     className="border-gray-700 hover:bg-gray-800 text-gray-300 hover:text-white"
                 >

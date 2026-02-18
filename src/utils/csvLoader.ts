@@ -29,7 +29,7 @@ export interface TorinoTrafficDataRow {
  * @returns A promise that resolves to an array of TorinoTrafficDataRow objects.
  */
 export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> => {
-  const filePath = '/sa.txt'; // Mengubah path file ke sa.txt
+  const filePath = `${import.meta.env.BASE_URL}sa.txt`; // Mengubah path file ke sa.txt
   try {
     const response = await fetch(filePath);
     if (!response.ok) {
@@ -48,7 +48,7 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
             toast.error(`Failed to parse traffic data CSV: ${results.errors[0].message}`);
             reject(new Error(`Parsing error in ${filePath}`));
           }
-          
+
           const parsedData = results.data.map((row: any) => ({
             day: String(row.day),
             day_of_week: String(row.day_of_week),
@@ -70,7 +70,7 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
           })) as TorinoTrafficDataRow[];
 
           // Menghapus logika pemfilteran tanggal agar semua data dimuat
-          
+
           toast.success(`Traffic data from 'sa.txt' loaded successfully! Total records: ${parsedData.length}`);
           console.log("Traffic Data Loaded from 'sa.txt':", parsedData);
           resolve(parsedData);

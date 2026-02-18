@@ -43,7 +43,7 @@ const TrafficChangesInsights = ({ id }: { id?: string }) => {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/supabase-analysis');
+        const res = await fetch(`${import.meta.env.BASE_URL}api/supabase-analysis`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setAnalysisData(data);
