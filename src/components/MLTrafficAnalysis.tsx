@@ -14,6 +14,7 @@ import {
     Target,
     ArrowLeft,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
     ResponsiveContainer,
     BarChart,
@@ -112,6 +113,13 @@ const MLTrafficDashboard = () => {
             ]);
 
             if (!statsRes.ok || !analysisRes.ok || !dataRes.ok) {
+                // If on GitHub Pages, use mock data instead of throwing error
+                if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
+                    console.log('Using mock data for GitHub Pages environment');
+                    setupMockData();
+                    setLoading(false);
+                    return;
+                }
                 throw new Error('Backend not available');
             }
 
@@ -126,13 +134,85 @@ const MLTrafficDashboard = () => {
             setTrafficData(trafficDataRes);
             setError(null);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load data');
+            // Check if we should fallback to mock data on ANY error in GH Pages
+            if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
+                setupMockData();
+            } else {
+                setError(err instanceof Error ? err.message : 'Failed to load data');
+            }
         } finally {
             setLoading(false);
         }
     };
 
+    const setupMockData = () => {
+        const mockStats: StatisticsData = {
+            row_count: 125430,
+            date_range: { start: '2016-09-26', end: '2016-10-16' },
+            detector_count: 450,
+            flow_stats: { mean: 45.2, min: 2, max: 245 },
+            speed_stats: { mean: 32.5, min: 5, max: 85 }
+        };
+
+        const mockAnalysis: AnalysisData = {
+            weekday_vs_weekend: {
+                weekday: { avg_flow: 48.5, avg_speed: 31.2, avg_occ: 12.5, avg_traffic_index: 0.65 },
+                weekend: { avg_flow: 35.2, avg_speed: 35.8, avg_occ: 8.2, avg_traffic_index: 0.42 }
+            },
+            hourly_congestion: {
+                0: 0.2, 1: 0.15, 2: 0.1, 3: 0.1, 4: 0.12, 5: 0.25, 6: 0.6, 7: 0.85, 8: 0.95, 9: 0.8, 10: 0.7,
+                11: 0.65, 12: 0.7, 13: 0.68, 14: 0.72, 15: 0.75, 16: 0.88, 17: 0.92, 18: 0.85, 19: 0.7,
+                20: 0.55, 21: 0.45, 22: 0.35, 23: 0.28
+            },
+            daily_congestion: {
+                'Monday': 0.72, 'Tuesday': 0.75, 'Wednesday': 0.78, 'Thursday': 0.74, 'Friday': 0.82, 'Saturday': 0.45, 'Sunday': 0.38
+            },
+            peak_hours: [
+                { hour: 8, index: 0.95 },
+                { hour: 17, index: 0.92 }
+            ],
+            weekday_hourly_flow: {
+                8: 120, 17: 115, 12: 85
+            },
+            weekend_hourly_flow: {
+                12: 95, 15: 88, 10: 75
+            }
+        };
+
+        const mockTraffic: TrafficData = {
+            hourly_flow: { 8: 120, 17: 115, 12: 85, 10: 75 },
+            traffic_distribution: { 'Busy': 35, 'Normal': 45, 'Light': 20 }
+        };
+
+        const mockMetrics: ModelMetrics = {
+            r2_score: 0.842,
+            mae: 12.5,
+            rmse: 15.8,
+            train_size: 85000,
+            test_size: 21250
+        };
+
+        const mockFeatures: FeatureImportance = {
+            'hour': 0.45,
+            'weekday': 0.25,
+            'detector_id': 0.15,
+            'previous_flow': 0.10,
+            'temperature': 0.05
+        };
+
+        setStatistics(mockStats);
+        setAnalysis(mockAnalysis);
+        setTrafficData(mockTraffic);
+        setModelMetrics(mockMetrics);
+        setFeatures(mockFeatures);
+        setError(null);
+    };
+
     const applyFilters = async () => {
+        if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
+            setFilterMessage("Filter results applied (Mock Mode)");
+            return;
+        }
         try {
             setFilterLoading(true);
             setFilterMessage(null);
@@ -179,6 +259,14 @@ const MLTrafficDashboard = () => {
     };
 
     const handleTrainModel = async () => {
+        if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
+            setTraining(true);
+            setTimeout(() => {
+                setTraining(false);
+                toast.success("Model trained successfully (Mock Mode)!");
+            }, 1500);
+            return;
+        }
         try {
             setTraining(true);
             const res = await fetch(`${import.meta.env.BASE_URL}api/train`, { method: 'POST' });
@@ -201,6 +289,14 @@ const MLTrafficDashboard = () => {
     };
 
     const handlePredict = async () => {
+        if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {
+            setPredicting(true);
+            setTimeout(() => {
+                setPredicting(false);
+                setPrediction({ predicted_flow: 42.5 });
+            }, 800);
+            return;
+        }
         try {
             setPredicting(true);
             const res = await fetch(`${import.meta.env.BASE_URL}api/predict`, {
@@ -244,6 +340,9 @@ const MLTrafficDashboard = () => {
                 </CardHeader>
                 <CardContent>
                     <p className="text-gray-300 mb-4">Run: <code className="bg-black px-2 py-1 rounded text-green-400">npm run dev:all</code></p>
+                    <Button onClick={() => useMockData()} className="w-full bg-indigo-600 hover:bg-indigo-700">
+                        Try Demo Mode (Mock Data)
+                    </Button>
                 </CardContent>
             </Card>
         );

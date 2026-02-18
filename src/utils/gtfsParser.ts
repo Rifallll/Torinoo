@@ -123,6 +123,7 @@ const parseCsv = async <T>(filePath: string): Promise<T[]> => {
       Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
+        delimiter: ",", // Explicitly set delimiter to comma for GTFS files
         dynamicTyping: true, // Automatically convert numbers, booleans, etc.
         complete: (results) => {
           if (results.errors.length > 0) {
