@@ -127,9 +127,8 @@ const parseCsv = async <T>(filePath: string): Promise<T[]> => {
         dynamicTyping: true, // Automatically convert numbers, booleans, etc.
         complete: (results) => {
           if (results.errors.length > 0) {
-            console.error(`Errors parsing ${filePath}:`, results.errors);
-            toast.error(`Failed to parse GTFS file ${filePath.split('/').pop()}: ${results.errors[0].message}`);
-            reject(new Error(`Parsing error in ${filePath}`));
+            console.warn(`PapaParse found ${results.errors.length} errors in ${filePath}:`, results.errors);
+            // Don't reject for minor parsing errors in GTFS data
           }
           resolve(results.data as T[]);
         },

@@ -331,18 +331,29 @@ const MLTrafficDashboard = () => {
 
     if (error || !statistics || !analysis) {
         return (
-            <Card className="border-orange-500/50 bg-gray-900">
+            <Card className="border-orange-500/50 bg-gray-900 shadow-xl">
                 <CardHeader>
                     <CardTitle className="flex items-center text-orange-400">
                         <AlertCircle className="h-5 w-5 mr-2" />
                         Backend Not Running
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-gray-300 mb-4">Run: <code className="bg-black px-2 py-1 rounded text-green-400">npm run dev:all</code></p>
-                    <Button onClick={() => useMockData()} className="w-full bg-indigo-600 hover:bg-indigo-700">
-                        Try Demo Mode (Mock Data)
-                    </Button>
+                <CardContent className="space-y-4">
+                    <p className="text-gray-300">
+                        The Python backend is required for real-time analysis. If you're on GitHub Pages,
+                        please use the Demo Mode to explore the dashboard features.
+                    </p>
+                    <div className="flex flex-col gap-3">
+                        <Button
+                            onClick={() => setupMockData()}
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 font-semibold"
+                        >
+                            🚀 Activate Demo Mode (Mock Data)
+                        </Button>
+                        <p className="text-xs text-gray-500 text-center italic">
+                            Local development: Run <code className="bg-black px-1 rounded text-green-400">npm run dev:all</code>
+                        </p>
+                    </div>
                 </CardContent>
             </Card>
         );
