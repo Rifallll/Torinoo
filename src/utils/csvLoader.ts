@@ -45,7 +45,6 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
         complete: (results) => {
           if (results.errors.length > 0) {
             console.error(`Errors parsing ${filePath}:`, results.errors);
-            toast.error(`Failed to parse traffic data CSV: ${results.errors[0].message}`);
             reject(new Error(`Parsing error in ${filePath}`));
           }
 
@@ -71,20 +70,18 @@ export const loadTorinoTrafficData = async (): Promise<TorinoTrafficDataRow[]> =
 
           // Menghapus logika pemfilteran tanggal agar semua data dimuat
 
-          toast.success(`Traffic data from 'sa.txt' loaded successfully! Total records: ${parsedData.length}`);
+
           console.log("Traffic Data Loaded from 'sa.txt':", parsedData);
           resolve(parsedData);
         },
         error: (error: Error) => {
           console.error(`Error reading ${filePath}:`, error);
-          toast.error(`An error occurred while reading traffic data CSV: ${error.message}`);
           reject(error);
         },
       });
     });
   } catch (error) {
     console.error(`Failed to load ${filePath}:`, error);
-    toast.error(`Failed to load traffic data from 'sa.txt'.`);
     return [];
   }
 };
